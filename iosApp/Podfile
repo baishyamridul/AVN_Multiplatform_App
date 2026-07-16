@@ -1,0 +1,6 @@
+target 'iosApp' do
+  use_frameworks! :linkage => :static
+  platform :ios, '15.0'
+  pod 'MapLibre', '~> 6.6'
+#   pod 'shared', :path => '../shared'
+end

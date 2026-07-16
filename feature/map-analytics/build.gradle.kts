@@ -48,5 +48,18 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.kotlinx.coroutines.core)
         }
+        androidMain.dependencies {
+            implementation(libs.maplibre.compose)
+        }
+        iosMain.dependencies {
+            implementation(libs.maplibre.compose)
+        }
+        jvmMain.dependencies {
+            implementation(libs.maplibre.compose)
+        }
+        jsMain.dependencies {
+        }
+        wasmJsMain.dependencies {
+        }
     }
 }

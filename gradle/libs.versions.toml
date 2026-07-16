@@ -20,6 +20,7 @@ kotlinx-coroutines = "1.11.0"
 kotlinx-serialization = "1.7.3"
 material3 = "1.11.0-alpha07"
 kotlinStdlib = "2.4.0"
+maplibre = "0.13.0"
 runner = "1.7.0"
 core = "1.7.0"
 
@@ -58,6 +59,8 @@ ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "kto
 ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlinStdlib" }
+maplibre-compose = { module = "org.maplibre.compose:maplibre-compose", version.ref = "maplibre" }
+maplibre-jni = { module = "org.maplibre.compose:maplibre-native-bindings-jni", version.ref = "maplibre" }
 androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
 androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
 
@@ -71,3 +74,4 @@ kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 androidLint = { id = "com.android.lint", version.ref = "agp" }
+kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }

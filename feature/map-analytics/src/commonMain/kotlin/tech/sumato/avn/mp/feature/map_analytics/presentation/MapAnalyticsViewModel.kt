@@ -17,9 +17,40 @@ class MapAnalyticsViewModel : ViewModel(), MviViewModel<MapAnalyticsState, MapAn
     private val _effects = Channel<MapAnalyticsEffect>(Channel.BUFFERED)
     override val effects: Flow<MapAnalyticsEffect> = _effects.receiveAsFlow()
 
+    init {
+        loadMap()
+    }
+
     fun onEvent(event: MapAnalyticsEvent) {
         when (event) {
-            else -> {}
+            MapAnalyticsEvent.Refresh -> loadMap()
         }
+    }
+
+    private fun loadMap() {
+        _state.value = MapAnalyticsState.Ready(
+            styleUrl = """
+                {
+                  "version": 8,
+                  "name": "MapLibre",
+                  "center": [93.7520957, 25.55711865],
+                  "zoom": 8.0,
+                  "sources": {
+                    "osm": {
+                      "type": "raster",
+                      "tiles": ["https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"],
+                      "tileSize": 256
+                    }
+                  },
+                  "layers": [
+                    {
+                      "id": "osmLayer",
+                      "type": "raster",
+                      "source": "osm"
+                    }
+                  ]
+                }
+            """.trimIndent(),
+        )
     }
 }

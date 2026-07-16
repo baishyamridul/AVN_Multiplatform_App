@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.androidMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+//    alias(libs.plugins.kotlinCocoapods)
 }
 
 kotlin {
@@ -18,6 +19,19 @@ kotlin {
             isStatic = true
         }
     }
+
+//    cocoapods {
+//        summary = "KMPMaplibre"
+//        homepage = "https://github.com/tech.sumato/kmpmaplibre"
+//        version = "1.0"
+//        ios.deploymentTarget = "15.0"
+//        podfile = project.file("../iosApp/Podfile")
+//        framework {
+//            baseName = "Shared"
+//            isStatic = true
+//        }
+//        pod("MapLibre")
+//    }
 
     jvm()
     js { browser() }
@@ -45,6 +59,7 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.feature.dashboard)
             implementation(projects.feature.login)
+            implementation(projects.feature.mapAnalytics)
             implementation(projects.data.dashboard)
             implementation(projects.data.user)
             implementation(projects.domain.user)

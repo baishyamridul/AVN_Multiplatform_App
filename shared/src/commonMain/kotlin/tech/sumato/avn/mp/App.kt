@@ -6,6 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import org.koin.compose.KoinApplication
+import org.koin.core.KoinApplication
+import org.koin.dsl.koinConfiguration
 import tech.sumato.avn.mp.core.navigation.Route
 import tech.sumato.avn.mp.core.network.di.NetworkModule
 import tech.sumato.avn.mp.data.dashboard.di.DashboardDataModule
@@ -15,30 +17,33 @@ import tech.sumato.avn.mp.feature.dashboard.di.DashboardFeatureModule
 import tech.sumato.avn.mp.feature.dashboard.presentation.DashboardRoute
 import tech.sumato.avn.mp.feature.login.di.LoginFeatureModule
 import tech.sumato.avn.mp.feature.login.presentation.LoginRoute
+import tech.sumato.avn.mp.feature.map_analytics.di.MapAnalyticsFeatureModule
+import tech.sumato.avn.mp.feature.map_analytics.presentation.MapAnalyticsRoute
 
 @Composable
 fun App() {
-    KoinApplication(application = {
+    KoinApplication(configuration = koinConfiguration(declaration = {
         modules(
             NetworkModule,
             DashboardDataModule,
             DashboardFeatureModule,
             UserDataModule,
             LoginFeatureModule,
+            MapAnalyticsFeatureModule,
         )
-    }) {
+    }), content = {
         AVNTheme {
             val navController = rememberNavController()
             AppNavGraph(navController = navController)
         }
-    }
+    })
 }
 
 @Composable
 fun AppNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = Route.LOGIN,
+        startDestination = Route.MAP_ANALYTICS,
     ) {
         composable(Route.LOGIN) {
             LoginRoute(
@@ -54,7 +59,7 @@ fun AppNavGraph(navController: NavHostController) {
         }
 
         composable(Route.MAP_ANALYTICS) {
-            //
+            MapAnalyticsRoute()
         }
 
     }
