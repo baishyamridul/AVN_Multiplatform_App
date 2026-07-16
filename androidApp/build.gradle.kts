@@ -21,11 +21,11 @@ dependencies {
 }
 
 android {
-    namespace = "tech.sumato.kmptemplate"
+    namespace = "tech.sumato.avn.mp"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "tech.sumato.kmptemplate"
+        applicationId = "tech.sumato.avn.mp"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

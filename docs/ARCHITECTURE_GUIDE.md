@@ -91,7 +91,7 @@ kotlin {
     @OptIn(ExperimentalWasmDsl::class) wasmJs { browser() }
 
     androidLibrary {
-        namespace = "tech.sumato.kmptemplate.domain.farmer"
+        namespace = "tech.sumato.avn.mp.domain.farmer"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
         compilerOptions { jvmTarget = JvmTarget.JVM_11 }
@@ -127,7 +127,7 @@ kotlin {
     @OptIn(ExperimentalWasmDsl::class) wasmJs { browser() }
 
     androidLibrary {
-        namespace = "tech.sumato.kmptemplate.data.farmer"
+        namespace = "tech.sumato.avn.mp.data.farmer"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
         compilerOptions { jvmTarget = JvmTarget.JVM_11 }
@@ -169,7 +169,7 @@ kotlin {
     @OptIn(ExperimentalWasmDsl::class) wasmJs { browser() }
 
     androidLibrary {
-        namespace = "tech.sumato.kmptemplate.feature.farmer.registration"
+        namespace = "tech.sumato.avn.mp.feature.farmer.registration"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
         compilerOptions { jvmTarget = JvmTarget.JVM_11 }
@@ -204,7 +204,7 @@ kotlin {
 ### Domain — `domain/<concept>/`
 
 ```
-src/commonMain/kotlin/tech/sumato/kmptemplate/domain/<concept>/
+src/commonMain/kotlin/tech/sumato/avn/mp/domain/<concept>/
   model/
     <ModelName>.kt
   repository/
@@ -223,7 +223,7 @@ src/commonMain/kotlin/tech/sumato/kmptemplate/domain/<concept>/
 **Example — model:**
 
 ```kotlin
-package tech.sumato.kmptemplate.domain.farmer.model
+package tech.sumato.avn.mp.domain.farmer.model
 
 data class Farmer(
     val id: String,
@@ -236,9 +236,9 @@ data class Farmer(
 **Example — repository interface:**
 
 ```kotlin
-package tech.sumato.kmptemplate.domain.farmer.repository
+package tech.sumato.avn.mp.domain.farmer.repository
 
-import tech.sumato.kmptemplate.domain.farmer.model.Farmer
+import tech.sumato.avn.mp.domain.farmer.model.Farmer
 
 interface FarmerRepository {
     suspend fun getFarmer(id: String): Farmer
@@ -250,10 +250,10 @@ interface FarmerRepository {
 **Example — use case:**
 
 ```kotlin
-package tech.sumato.kmptemplate.domain.farmer.usecase
+package tech.sumato.avn.mp.domain.farmer.usecase
 
-import tech.sumato.kmptemplate.domain.farmer.model.Farmer
-import tech.sumato.kmptemplate.domain.farmer.repository.FarmerRepository
+import tech.sumato.avn.mp.domain.farmer.model.Farmer
+import tech.sumato.avn.mp.domain.farmer.repository.FarmerRepository
 
 class SaveFarmerUseCase(
     private val farmerRepository: FarmerRepository,
@@ -267,7 +267,7 @@ class SaveFarmerUseCase(
 ### Data — `data/<concept>/`
 
 ```
-src/commonMain/kotlin/tech/sumato/kmptemplate/data/<concept>/
+src/commonMain/kotlin/tech/sumato/avn/mp/data/<concept>/
   remote/
     <Concept>Api.kt
     <Concept>Dto.kt
@@ -288,7 +288,7 @@ src/commonMain/kotlin/tech/sumato/kmptemplate/data/<concept>/
 **Example — DTO:**
 
 ```kotlin
-package tech.sumato.kmptemplate.data.farmer.remote
+package tech.sumato.avn.mp.data.farmer.remote
 
 import kotlinx.serialization.Serializable
 
@@ -311,7 +311,7 @@ data class FarmerResponseDto(
 **Example — API client:**
 
 ```kotlin
-package tech.sumato.kmptemplate.data.farmer.remote
+package tech.sumato.avn.mp.data.farmer.remote
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -337,10 +337,10 @@ class FarmerApi(
 **Example — mapper:**
 
 ```kotlin
-package tech.sumato.kmptemplate.data.farmer.mapper
+package tech.sumato.avn.mp.data.farmer.mapper
 
-import tech.sumato.kmptemplate.data.farmer.remote.FarmerResponseDto
-import tech.sumato.kmptemplate.domain.farmer.model.Farmer
+import tech.sumato.avn.mp.data.farmer.remote.FarmerResponseDto
+import tech.sumato.avn.mp.domain.farmer.model.Farmer
 
 class FarmerMapper {
     fun toDomain(dto: FarmerResponseDto): Farmer {
@@ -357,13 +357,13 @@ class FarmerMapper {
 **Example — repository implementation:**
 
 ```kotlin
-package tech.sumato.kmptemplate.data.farmer.repository
+package tech.sumato.avn.mp.data.farmer.repository
 
-import tech.sumato.kmptemplate.data.farmer.mapper.FarmerMapper
-import tech.sumato.kmptemplate.data.farmer.remote.FarmerApi
-import tech.sumato.kmptemplate.data.farmer.remote.FarmerRequestDto
-import tech.sumato.kmptemplate.domain.farmer.model.Farmer
-import tech.sumato.kmptemplate.domain.farmer.repository.FarmerRepository
+import tech.sumato.avn.mp.data.farmer.mapper.FarmerMapper
+import tech.sumato.avn.mp.data.farmer.remote.FarmerApi
+import tech.sumato.avn.mp.data.farmer.remote.FarmerRequestDto
+import tech.sumato.avn.mp.domain.farmer.model.Farmer
+import tech.sumato.avn.mp.domain.farmer.repository.FarmerRepository
 
 class FarmerRepositoryImpl(
     private val farmerApi: FarmerApi,
@@ -394,15 +394,15 @@ class FarmerRepositoryImpl(
 **Example — DI module (Koin 4.x):**
 
 ```kotlin
-package tech.sumato.kmptemplate.data.farmer.di
+package tech.sumato.avn.mp.data.farmer.di
 
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
-import tech.sumato.kmptemplate.data.farmer.mapper.FarmerMapper
-import tech.sumato.kmptemplate.data.farmer.remote.FarmerApi
-import tech.sumato.kmptemplate.data.farmer.repository.FarmerRepositoryImpl
-import tech.sumato.kmptemplate.domain.farmer.repository.FarmerRepository
+import tech.sumato.avn.mp.data.farmer.mapper.FarmerMapper
+import tech.sumato.avn.mp.data.farmer.remote.FarmerApi
+import tech.sumato.avn.mp.data.farmer.repository.FarmerRepositoryImpl
+import tech.sumato.avn.mp.domain.farmer.repository.FarmerRepository
 
 val FarmerDataModule = module {
     singleOf(::FarmerApi)
@@ -414,7 +414,7 @@ val FarmerDataModule = module {
 ### Feature — `feature/<name>/`
 
 ```
-src/commonMain/kotlin/tech/sumato/kmptemplate/feature/<name>/
+src/commonMain/kotlin/tech/sumato/avn/mp/feature/<name>/
   presentation/
     <Name>State.kt
     <Name>Event.kt
@@ -437,9 +437,9 @@ src/commonMain/kotlin/tech/sumato/kmptemplate/feature/<name>/
 **Example — state:**
 
 ```kotlin
-package tech.sumato.kmptemplate.feature.farmer.registration.presentation
+package tech.sumato.avn.mp.feature.farmer.registration.presentation
 
-import tech.sumato.kmptemplate.domain.farmer.model.Farmer
+import tech.sumato.avn.mp.domain.farmer.model.Farmer
 
 sealed interface FarmerRegistrationState {
     data object Idle : FarmerRegistrationState
@@ -452,7 +452,7 @@ sealed interface FarmerRegistrationState {
 **Example — event:**
 
 ```kotlin
-package tech.sumato.kmptemplate.feature.farmer.registration.presentation
+package tech.sumato.avn.mp.feature.farmer.registration.presentation
 
 sealed interface FarmerRegistrationEvent {
     data class NameChanged(val name: String) : FarmerRegistrationEvent
@@ -466,7 +466,7 @@ sealed interface FarmerRegistrationEvent {
 **Example — effect:**
 
 ```kotlin
-package tech.sumato.kmptemplate.feature.farmer.registration.presentation
+package tech.sumato.avn.mp.feature.farmer.registration.presentation
 
 sealed interface FarmerRegistrationEffect {
     data object NavigateToFarmerList : FarmerRegistrationEffect
@@ -477,7 +477,7 @@ sealed interface FarmerRegistrationEffect {
 **Example — ViewModel:**
 
 ```kotlin
-package tech.sumato.kmptemplate.feature.farmer.registration.presentation
+package tech.sumato.avn.mp.feature.farmer.registration.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -487,8 +487,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import tech.sumato.kmptemplate.domain.farmer.model.Farmer
-import tech.sumato.kmptemplate.domain.farmer.usecase.SaveFarmerUseCase
+import tech.sumato.avn.mp.domain.farmer.model.Farmer
+import tech.sumato.avn.mp.domain.farmer.usecase.SaveFarmerUseCase
 
 class FarmerRegistrationViewModel(
     private val saveFarmerUseCase: SaveFarmerUseCase,
@@ -529,12 +529,12 @@ class FarmerRegistrationViewModel(
 **Example — DI module:**
 
 ```kotlin
-package tech.sumato.kmptemplate.feature.farmer.registration.di
+package tech.sumato.avn.mp.feature.farmer.registration.di
 
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
-import tech.sumato.kmptemplate.domain.farmer.usecase.SaveFarmerUseCase
-import tech.sumato.kmptemplate.feature.farmer.registration.presentation.FarmerRegistrationViewModel
+import tech.sumato.avn.mp.domain.farmer.usecase.SaveFarmerUseCase
+import tech.sumato.avn.mp.feature.farmer.registration.presentation.FarmerRegistrationViewModel
 
 val FarmerRegistrationFeatureModule = module {
     factoryOf(::SaveFarmerUseCase)
@@ -561,9 +561,9 @@ commonMain.dependencies {
 **`shared/src/commonMain/.../App.kt`** — register DI modules:
 
 ```kotlin
-import tech.sumato.kmptemplate.core.network.di.NetworkModule
-import tech.sumato.kmptemplate.data.farmer.di.FarmerDataModule
-import tech.sumato.kmptemplate.feature.farmer.registration.di.FarmerRegistrationFeatureModule
+import tech.sumato.avn.mp.core.network.di.NetworkModule
+import tech.sumato.avn.mp.data.farmer.di.FarmerDataModule
+import tech.sumato.avn.mp.feature.farmer.registration.di.FarmerRegistrationFeatureModule
 
 @Composable
 fun App() {
@@ -575,7 +575,7 @@ fun App() {
             // ... all other modules
         )
     }) {
-        KMPTemplateTheme {
+        AVNTheme {
             // Root navigation or default screen
         }
     }

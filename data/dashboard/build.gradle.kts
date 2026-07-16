@@ -24,7 +24,7 @@ kotlin {
     wasmJs { browser() }
 
     androidLibrary {
-        namespace = "tech.sumato.kmptemplate.data.dashboard"
+        namespace = "tech.sumato.avn.mp.data.dashboard"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 

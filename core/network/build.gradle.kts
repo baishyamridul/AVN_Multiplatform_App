@@ -25,7 +25,7 @@ kotlin {
     wasmJs { browser() }
 
     androidLibrary {
-        namespace = "tech.sumato.kmptemplate.core.network"
+        namespace = "tech.sumato.avn.mp.core.network"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 

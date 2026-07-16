@@ -2,7 +2,7 @@
 set -e
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-NAMESPACE="tech.sumato.kmptemplate"
+NAMESPACE="tech.sumato.avn.mp"
 LOWERCASE_NAME=""
 MODULE_TYPE=""
 CAPITALIZED_NAME=""

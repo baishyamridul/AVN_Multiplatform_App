@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		44927F0299B523FB4679EF28 /* KMPTemplate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KMPTemplate.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		44927F0299B523FB4679EF28 /* AVN.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AVN.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -59,7 +59,7 @@
 		7D82E4AB3C72455C817BDEF3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				44927F0299B523FB4679EF28 /* KMPTemplate.app */,
+				44927F0299B523FB4679EF28 /* AVN.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -87,7 +87,7 @@
 			packageProductDependencies = (
 			);
 			productName = iosApp;
-			productReference = 44927F0299B523FB4679EF28 /* KMPTemplate.app */;
+			productReference = 44927F0299B523FB4679EF28 /* AVN.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */

@@ -17,11 +17,11 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "tech.sumato.kmptemplate.MainKt"
+        mainClass = "tech.sumato.avn.mp.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "tech.sumato.kmptemplate"
+            packageName = "tech.sumato.avn.mp"
             packageVersion = "1.0.0"
         }
     }

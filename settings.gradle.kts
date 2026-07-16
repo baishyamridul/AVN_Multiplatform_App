@@ -1,4 +1,4 @@
-rootProject.name = "cmpmultimodule"
+rootProject.name = "AVNMultiplatformApp"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

@@ -92,7 +92,7 @@ kotlin {
     @OptIn(ExperimentalWasmDsl::class) wasmJs { browser() }
 
     androidLibrary {
-        namespace = "tech.sumato.kmptemplate.core.navigation"
+        namespace = "tech.sumato.avn.mp.core.navigation"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
         compilerOptions { jvmTarget = JvmTarget.JVM_11 }
@@ -110,7 +110,7 @@ kotlin {
 
 ```kotlin
 // core/navigation/src/commonMain/.../core/navigation/Route.kt
-package tech.sumato.kmptemplate.core.navigation
+package tech.sumato.avn.mp.core.navigation
 
 object Route {
     const val LOGIN = "login"
@@ -185,7 +185,7 @@ commonMain.dependencies {
 ### `shared/src/commonMain/.../App.kt` — scaffold:
 
 ```kotlin
-package tech.sumato.kmptemplate
+package tech.sumato.avn.mp
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -198,17 +198,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import org.koin.compose.KoinApplication
 import org.koin.compose.koinInject
-import tech.sumato.kmptemplate.core.navigation.Route
-import tech.sumato.kmptemplate.core.network.di.NetworkModule
-import tech.sumato.kmptemplate.data.dashboard.di.DashboardDataModule
-import tech.sumato.kmptemplate.data.user.di.UserDataModule
-import tech.sumato.kmptemplate.designsystem.theme.KMPTemplateTheme
-import tech.sumato.kmptemplate.feature.dashboard.di.DashboardFeatureModule
-import tech.sumato.kmptemplate.feature.dashboard.presentation.DashboardEffect
-import tech.sumato.kmptemplate.feature.dashboard.presentation.DashboardRoute
-import tech.sumato.kmptemplate.feature.login.di.LoginFeatureModule
-import tech.sumato.kmptemplate.feature.login.presentation.LoginEffect
-import tech.sumato.kmptemplate.feature.login.presentation.LoginRoute
+import tech.sumato.avn.mp.core.navigation.Route
+import tech.sumato.avn.mp.core.network.di.NetworkModule
+import tech.sumato.avn.mp.data.dashboard.di.DashboardDataModule
+import tech.sumato.avn.mp.data.user.di.UserDataModule
+import tech.sumato.avn.mp.designsystem.theme.AVNTheme
+import tech.sumato.avn.mp.feature.dashboard.di.DashboardFeatureModule
+import tech.sumato.avn.mp.feature.dashboard.presentation.DashboardEffect
+import tech.sumato.avn.mp.feature.dashboard.presentation.DashboardRoute
+import tech.sumato.avn.mp.feature.login.di.LoginFeatureModule
+import tech.sumato.avn.mp.feature.login.presentation.LoginEffect
+import tech.sumato.avn.mp.feature.login.presentation.LoginRoute
 
 @Composable
 fun App() {
@@ -221,7 +221,7 @@ fun App() {
             LoginFeatureModule,
         )
     }) {
-        KMPTemplateTheme {
+        AVNTheme {
             val navController = rememberNavController()
             AppNavGraph(navController = navController)
         }
