@@ -1,0 +1,73 @@
+name: Build native distributions
+
+on:
+  push:
+    branches: [ build ]
+  pull_request:
+    branches: [ build ]
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          architecture: arm64
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew :desktopApp:packageDmg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KMPMaplibre-macOS-ARM64
+          path: desktopApp/build/compose/binaries/main/dmg/*.dmg
+
+  build-macos-intel:
+    runs-on: macos-15-intel
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          architecture: x64
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew :desktopApp:packageDmg -PmaplibreTarget=macos-amd64-metal
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KMPMaplibre-macOS-Intel
+          path: desktopApp/build/compose/binaries/main/dmg/*.dmg
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          architecture: x64
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew :desktopApp:packageMsi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KMPMaplibre-Windows-x64
+          path: desktopApp/build/compose/binaries/main/msi/*.msi
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          architecture: x64
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew :desktopApp:packageDeb
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KMPMaplibre-Linux-x64
+          path: desktopApp/build/compose/binaries/main/deb/*.deb
