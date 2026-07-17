@@ -20,19 +20,6 @@ kotlin {
         }
     }
 
-//    cocoapods {
-//        summary = "KMPMaplibre"
-//        homepage = "https://github.com/tech.sumato/kmpmaplibre"
-//        version = "1.0"
-//        ios.deploymentTarget = "15.0"
-//        podfile = project.file("../iosApp/Podfile")
-//        framework {
-//            baseName = "Shared"
-//            isStatic = true
-//        }
-//        pod("MapLibre")
-//    }
-
     jvm()
     js { browser() }
 
@@ -67,6 +54,8 @@ kotlin {
             implementation(projects.designsystem)
             implementation(projects.core.common)
             implementation(projects.core.navigation)
+
+//            implementation(projects.feature.districtDashboard)
 
             implementation(libs.androidx.navigation.compose)
 

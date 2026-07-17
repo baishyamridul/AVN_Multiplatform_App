@@ -11,7 +11,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		44927F0299B523FB4679EF28 /* AVN.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AVN.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		44927F0299B523FB4679EF28 /* ArunachalVidyaNidhi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ArunachalVidyaNidhi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		50E28388C5F7DCDA92D6C77D /* Pods_iosApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iosApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C12626A7469E24E1737E1F2F /* Pods-iosApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.release.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.release.xcconfig"; sourceTree = "<group>"; };
 		FDAB86FCCD9CC93CE977E300 /* Pods-iosApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.debug.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.debug.xcconfig"; sourceTree = "<group>"; };
@@ -71,14 +71,13 @@
 				FDAB86FCCD9CC93CE977E300 /* Pods-iosApp.debug.xcconfig */,
 				C12626A7469E24E1737E1F2F /* Pods-iosApp.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
 		7D82E4AB3C72455C817BDEF3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				44927F0299B523FB4679EF28 /* AVN.app */,
+				44927F0299B523FB4679EF28 /* ArunachalVidyaNidhi.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -117,7 +116,7 @@
 			);
 			name = iosApp;
 			productName = iosApp;
-			productReference = 44927F0299B523FB4679EF28 /* AVN.app */;
+			productReference = 44927F0299B523FB4679EF28 /* ArunachalVidyaNidhi.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */

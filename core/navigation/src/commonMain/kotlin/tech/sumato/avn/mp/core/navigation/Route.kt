@@ -10,4 +10,6 @@ object Route {
 
     const val MAP_ANALYTICS = "map_analytics"
 
+    const val DISTRICT_DASHBOARD = "district-dashboard"
+
 }

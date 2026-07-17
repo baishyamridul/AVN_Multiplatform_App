@@ -51,3 +51,4 @@ include(":feature:dashboard")
 
 
 include(":feature:map-analytics")
+

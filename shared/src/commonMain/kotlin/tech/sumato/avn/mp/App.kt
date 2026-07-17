@@ -30,6 +30,7 @@ fun App() {
             UserDataModule,
             LoginFeatureModule,
             MapAnalyticsFeatureModule,
+//            DistrictDashboardFeatureModule,
         )
     }), content = {
         AVNTheme {
@@ -43,7 +44,7 @@ fun App() {
 fun AppNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = Route.MAP_ANALYTICS,
+        startDestination = Route.LOGIN,
     ) {
         composable(Route.LOGIN) {
             LoginRoute(
@@ -61,6 +62,10 @@ fun AppNavGraph(navController: NavHostController) {
         composable(Route.MAP_ANALYTICS) {
             MapAnalyticsRoute()
         }
+
+//        composable(Route.DISTRICT_DASHBOARD) {
+//            DistrictDashboardRoute()
+//        }
 
     }
 }

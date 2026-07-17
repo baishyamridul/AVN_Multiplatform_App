@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import tech.sumato.avn.mp.designsystem.components.AppTextField
 
@@ -44,6 +45,8 @@ fun LoginScreen(
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onBackground,
             )
+
+            Text("h", fontFamily = FontFamily.Default)
 
             Spacer(Modifier.height(8.dp))
 

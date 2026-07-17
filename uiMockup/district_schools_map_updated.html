@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>District Schools Map - Arunachal Vidya Nidhi</title>
+    <!-- Google Fonts & Tailwind CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b1329;
+            color: #f8fafc;
+        }
+        .glass-card {
+            background: rgba(22, 33, 62, 0.7);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        /* Custom scrollbar for sidebar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5); 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(71, 85, 105, 0.8); 
+            border-radius: 4px;
+        }
+        .map-pin {
+            transition: all 0.3s ease;
+        }
+        .map-pin:hover, .map-pin.active {
+            transform: scale(1.5);
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.8);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- HEADER -->
+    <header class="glass-card border-b border-slate-800 p-4 px-6 sticky top-0 z-50 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center font-bold text-slate-950 shadow-lg shadow-amber-500/20">
+                AVN
+            </div>
+            <div>
+                <h1 class="font-bold text-base text-white tracking-wide">ARUNACHAL VIDYA NIDHI</h1>
+                <p class="text-xs text-amber-400 font-medium">District Boundary Level: Spatial School View</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="text-xs text-slate-300 bg-slate-900 border border-slate-700 px-4 py-2 rounded-lg">
+                Current District: <span class="text-white font-bold tracking-wide uppercase">Tawang</span>
+            </div>
+            <button class="text-sm bg-slate-800 hover:bg-slate-700 border border-slate-600 px-4 py-2 rounded-lg text-white transition">
+                ← Back to Dashboard
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="flex-1 p-4 md:p-6 max-w-[1800px] w-full mx-auto flex flex-col lg:flex-row gap-6 relative">
+        
+        <!-- LEFT COLUMN: MAP -->
+        <div class="flex-1 flex flex-col gap-6">
+            <div class="glass-card rounded-2xl shadow-xl p-4 flex flex-col relative h-[60vh] lg:h-[82vh]">
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <h2 class="font-bold text-lg text-white flex items-center gap-2">
+                        📍 Tawang District - Geospatial Mapping
+                    </h2>
+                    <span class="text-xs text-slate-400 bg-slate-900 px-3 py-1 rounded-full border border-slate-700">145 Active Institutes</span>
+                </div>
+                
+                <div class="flex-1 bg-slate-950/80 border border-slate-800 rounded-xl relative overflow-hidden group cursor-crosshair shadow-inner" style="background-image: radial-gradient(rgba(71, 85, 105, 0.2) 1px, transparent 1px); background-size: 20px 20px;">
+                    <div class="absolute inset-0 bg-blue-900/10 mix-blend-overlay"></div>
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] border-2 border-slate-700/50 rounded-[40%] bg-slate-800/20 blur-sm pointer-events-none"></div>
+                    <div id="map-layer" class="absolute inset-0"></div>
+                    <div class="absolute bottom-4 right-4 bg-slate-900/90 border border-slate-700 p-3 rounded-lg text-[10px] text-slate-300 space-y-2 backdrop-blur-md">
+                        <div class="flex items-center gap-2"><div class="w-3 h-3 bg-emerald-500 rounded-full border border-emerald-300"></div> High/Hr Secondary</div>
+                        <div class="flex items-center gap-2"><div class="w-3 h-3 bg-amber-500 rounded-full border border-amber-300"></div> Middle School</div>
+                        <div class="flex items-center gap-2"><div class="w-3 h-3 bg-cyan-500 rounded-full border border-cyan-300"></div> Primary School</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: SIDEBAR -->
+        <div id="sidebar-container" class="w-full lg:w-[460px] xl:w-[500px] flex-shrink-0">
+            <div class="glass-card rounded-2xl shadow-xl h-full lg:h-[82vh] overflow-hidden flex flex-col border-t-4 border-slate-700 transition-colors duration-300" id="sidebar-card">
+                
+                <!-- Placeholder -->
+                <div id="sidebar-placeholder" class="flex flex-col items-center justify-center h-full text-center p-8 opacity-100 transition-opacity">
+                    <div class="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mb-4 border border-slate-700">
+                        <span class="text-3xl">🖱️</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-300 mb-2">No School Selected</h3>
+                    <p class="text-xs text-slate-500">Select a map pin to view full institutional details, projects, staff, and live stats.</p>
+                </div>
+
+                <!-- Active Content -->
+                <div id="sidebar-content" class="hidden flex-col h-full overflow-y-auto pb-6">
+                    
+                    <!-- Header -->
+                    <div class="p-5 border-b border-slate-800 bg-slate-900/50 relative">
+                        <div class="absolute top-5 right-5 w-16 h-16 bg-white rounded flex items-center justify-center p-1 border-2 border-slate-700">
+                            <img id="detail-qr" src="" alt="QR Code" class="w-full h-full object-cover">
+                        </div>
+                        <span id="detail-category" class="text-[10px] font-bold bg-amber-500/20 text-amber-400 px-2.5 py-1 rounded-full uppercase tracking-widest border border-amber-500/30">Category</span>
+                        <h2 id="detail-name" class="text-xl font-bold text-white mt-3 pr-20 leading-tight">School Name</h2>
+                        <div class="flex items-center gap-4 mt-2 text-[11px] text-slate-400 font-mono">
+                            <span>UDISE: <span id="detail-udise" class="text-slate-200">--</span></span>
+                            <span>Est: <span id="detail-est" class="text-amber-400 font-bold">--</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Media & 360 -->
+                    <div class="p-5 border-b border-slate-800">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">📸 Virtual Tour</h3>
+                        <div class="relative w-full h-36 bg-slate-800 rounded-xl overflow-hidden group cursor-pointer border border-slate-700">
+                            <img id="detail-img-main" src="https://via.placeholder.com/600x300/1e293b/94a3b8?text=School+Front+View" alt="School" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-300">
+                            <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+                                <button class="bg-amber-500 text-slate-900 font-bold px-4 py-2 rounded-lg shadow-lg text-sm">🔄 Launch 360° View</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attendance -->
+                    <div class="p-5 border-b border-slate-800 bg-slate-950/30">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">📊 Live Attendance (Today)</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-xs mb-1.5">
+                                    <span class="text-slate-300 font-medium">Students</span>
+                                    <span id="detail-att-stu-text" class="text-emerald-400 font-bold">--</span>
+                                </div>
+                                <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden border border-slate-700">
+                                    <div id="detail-att-stu-bar" class="bg-gradient-to-r from-emerald-500 to-emerald-400 h-full w-0 transition-all duration-1000"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs mb-1.5">
+                                    <span class="text-slate-300 font-medium">Faculty (Bio-Metric)</span>
+                                    <span id="detail-att-tea-text" class="text-cyan-400 font-bold">--</span>
+                                </div>
+                                <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden border border-slate-700">
+                                    <div id="detail-att-tea-bar" class="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full w-0 transition-all duration-1000"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 🆕 INFRASTRUCTURE PROJECTS -->
+                    <div class="p-5 border-b border-slate-800 bg-slate-900/40">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">🚧 Infrastructure Projects</h3>
+                        <div id="detail-projects" class="space-y-3">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+
+                    <!-- 🆕 STAFF DIRECTORY -->
+                    <div class="p-5 border-b border-slate-800">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">👥 Staff Directory</h3>
+                        <div class="grid grid-cols-1 gap-4">
+                            <!-- Teachers -->
+                            <div class="bg-slate-950/50 p-3 rounded-lg border border-slate-800">
+                                <h4 class="text-[10px] font-bold text-cyan-400 uppercase mb-2 border-b border-slate-700 pb-1 flex justify-between">
+                                    Teaching Faculty <span class="bg-cyan-500/20 px-1.5 rounded text-cyan-300" id="count-teachers">0</span>
+                                </h4>
+                                <ul id="detail-teachers" class="text-[11px] text-slate-300 space-y-1 pl-1"></ul>
+                            </div>
+                            <!-- Support Staff -->
+                            <div class="bg-slate-950/50 p-3 rounded-lg border border-slate-800">
+                                <h4 class="text-[10px] font-bold text-amber-400 uppercase mb-2 border-b border-slate-700 pb-1 flex justify-between">
+                                    Support Staff <span class="bg-amber-500/20 px-1.5 rounded text-amber-300" id="count-support">0</span>
+                                </h4>
+                                <ul id="detail-support" class="text-[11px] text-slate-300 space-y-1 pl-1"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rooms & Facilities -->
+                    <div class="p-5 border-b border-slate-800">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">🏗️ Room Details & Utilities</h3>
+                        <div class="grid grid-cols-3 gap-3 mb-4">
+                            <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 text-center"><span class="block text-[10px] text-slate-400">Total Rooms</span><span id="detail-rooms-total" class="text-lg font-bold text-white">--</span></div>
+                            <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 text-center"><span class="block text-[10px] text-slate-400">Usable %</span><span id="detail-rooms-usable" class="text-lg font-bold text-amber-400">--</span></div>
+                            <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 text-center"><span class="block text-[10px] text-slate-400">Smart Labs</span><span id="detail-rooms-smart" class="text-lg font-bold text-purple-400">--</span></div>
+                        </div>
+                        <div class="flex flex-wrap gap-2 text-[10px] font-semibold" id="detail-facilities"></div>
+                    </div>
+
+                    <!-- Sports -->
+                    <div class="p-5">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">🏅 Sports Facilities</h3>
+                        <div class="grid grid-cols-2 gap-3" id="detail-sports"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- SCRIPT -->
+    <script>
+        const schoolData = [
+            {
+                id: 1,
+                name: "Govt. Higher Secondary School, Tawang HQ",
+                category: "Higher Secondary",
+                color: "bg-emerald-500", border: "border-emerald-300", sidebarBorder: "border-emerald-500",
+                pos: { top: '35%', left: '45%' },
+                udise: "12010100402", est: "1985",
+                attendance: { stu_pres: 612, stu_tot: 640, tea_pres: 24, tea_tot: 25 },
+                rooms: { total: 42, usable: "95%", smart: 4 },
+                facilities: [
+                    { icon: "⚡", name: "Grid Power", color: "text-amber-400 bg-amber-400/10" },
+                    { icon: "🚰", name: "RO Water", color: "text-cyan-400 bg-cyan-400/10" },
+                    { icon: "🌐", name: "VSAT Internet", color: "text-blue-400 bg-blue-400/10" }
+                ],
+                sports: [
+                    { icon: "⚽", name: "Football Ground", status: "Functional" },
+                    { icon: "🏐", name: "Volleyball Court", status: "Functional" }
+                ],
+                // NEW: Projects Data
+                projects: [
+                    { name: "Smart Classroom Block B (2 Labs)", status: "Ongoing", progress: 75, cost: "₹45.5 Lakhs" },
+                    { name: "RO Water Treatment Plant", status: "Completed", progress: 100, cost: "₹8.2 Lakhs" },
+                    { name: "Boys Hostel Renovation", status: "Ongoing", progress: 40, cost: "₹22.0 Lakhs" }
+                ],
+                // NEW: Staff Data
+                staff: {
+                    teachers: ["Mr. Lobsang Tsering (Principal)", "Mrs. Pema Choden (Math PGT)", "Mr. Tenzin Gyatso (Physics PGT)", "Miss Karma Doma (English TGT)", "Mr. Dorjee Khandu (History PGT)"],
+                    support: ["Sonam Tashi (Head Clerk)", "Tashi Lhamo (Accountant)", "Wangchu (Peon)", "Pasang (Security Guard)", "Deki (Sweeper)"]
+                }
+            },
+            {
+                id: 2,
+                name: "Govt. Middle School, Jang Village",
+                category: "Middle School",
+                color: "bg-amber-500", border: "border-amber-300", sidebarBorder: "border-amber-500",
+                pos: { top: '55%', left: '60%' },
+                udise: "12010201105", est: "1992",
+                attendance: { stu_pres: 185, stu_tot: 210, tea_pres: 8, tea_tot: 9 },
+                rooms: { total: 14, usable: "80%", smart: 1 },
+                facilities: [
+                    { icon: "☀️", name: "Solar Micro-grid", color: "text-amber-400 bg-amber-400/10" },
+                    { icon: "🚰", name: "Tap Water", color: "text-cyan-400 bg-cyan-400/10" }
+                ],
+                sports: [
+                    { icon: "🏸", name: "Badminton Court", status: "Functional" }
+                ],
+                projects: [
+                    { name: "Solar Panel Grid Integration", status: "Ongoing", progress: 85, cost: "₹12.0 Lakhs" },
+                    { name: "Boundary Wall Construction", status: "Completed", progress: 100, cost: "₹18.5 Lakhs" }
+                ],
+                staff: {
+                    teachers: ["Mr. Thupten (Headmaster)", "Ms. Yeshi (Science)", "Mr. Rinchen (Math)"],
+                    support: ["Kezang (Clerk)", "Pema (Peon)", "Chimi (Cook - MDM)"]
+                }
+            },
+            {
+                id: 3,
+                name: "Primary School, Mukto",
+                category: "Primary School",
+                color: "bg-cyan-500", border: "border-cyan-300", sidebarBorder: "border-cyan-500",
+                pos: { top: '70%', left: '30%' },
+                udise: "12010300801", est: "2005",
+                attendance: { stu_pres: 58, stu_tot: 62, tea_pres: 3, tea_tot: 3 },
+                rooms: { total: 5, usable: "100%", smart: 0 },
+                facilities: [
+                    { icon: "⚡", name: "Grid Power", color: "text-amber-400 bg-amber-400/10" },
+                    { icon: "🍲", name: "MDM Shed", color: "text-orange-400 bg-orange-400/10" }
+                ],
+                sports: [
+                    { icon: "🤸", name: "Kids Play Area", status: "Functional" }
+                ],
+                projects: [
+                    { name: "Mid-Day Meal Kitchen Shed", status: "Completed", progress: 100, cost: "₹4.5 Lakhs" },
+                    { name: "Toilets Upgradation (WASH)", status: "Ongoing", progress: 20, cost: "₹3.0 Lakhs" }
+                ],
+                staff: {
+                    teachers: ["Mrs. Sangay Lhamo (Head Teacher)", "Miss Tsering Dolma (Primary Tr.)"],
+                    support: ["Phurpa (Cook - MDM)", "Nima (Helper)"]
+                }
+            }
+        ];
+
+        const mapLayer = document.getElementById('map-layer');
+        schoolData.forEach(school => {
+            const pin = document.createElement('div');
+            pin.className = `absolute w-4 h-4 rounded-full border-2 cursor-pointer shadow-lg map-pin ${school.color} ${school.border}`;
+            pin.style.top = school.pos.top;
+            pin.style.left = school.pos.left;
+            pin.title = school.name;
+            pin.onclick = () => loadSchoolDetails(school, pin);
+            
+            if(school.id === 1) {
+                const ping = document.createElement('div');
+                ping.className = `absolute inset-0 rounded-full animate-ping opacity-75 ${school.color}`;
+                pin.appendChild(ping);
+            }
+            mapLayer.appendChild(pin);
+        });
+
+        function loadSchoolDetails(school, pinElement) {
+            document.querySelectorAll('.map-pin').forEach(p => p.classList.remove('active', 'scale-150', 'z-20'));
+            pinElement.classList.add('active', 'scale-150', 'z-20');
+
+            document.getElementById('sidebar-placeholder').classList.add('hidden');
+            document.getElementById('sidebar-content').classList.remove('hidden');
+            document.getElementById('sidebar-content').classList.add('flex');
+
+            const sidebarCard = document.getElementById('sidebar-card');
+            sidebarCard.className = `glass-card rounded-2xl shadow-xl h-full lg:h-[82vh] overflow-hidden flex flex-col border-t-4 transition-colors duration-300 ${school.sidebarBorder}`;
+
+            document.getElementById('detail-name').innerText = school.name;
+            const catBadge = document.getElementById('detail-category');
+            catBadge.innerText = school.category;
+            catBadge.className = `text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest border ${school.color.replace('bg-', 'text-')} bg-slate-900`;
+            
+            document.getElementById('detail-udise').innerText = school.udise;
+            document.getElementById('detail-est').innerText = school.est;
+            document.getElementById('detail-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=AVN_UDISE_${school.udise}`;
+
+            // Attendance
+            const stuPct = Math.round((school.attendance.stu_pres / school.attendance.stu_tot) * 100);
+            const teaPct = Math.round((school.attendance.tea_pres / school.attendance.tea_tot) * 100);
+            document.getElementById('detail-att-stu-text').innerText = `${school.attendance.stu_pres} / ${school.attendance.stu_tot} (${stuPct}%)`;
+            document.getElementById('detail-att-tea-text').innerText = `${school.attendance.tea_pres} / ${school.attendance.tea_tot} (${teaPct}%)`;
+            const stuBar = document.getElementById('detail-att-stu-bar');
+            const teaBar = document.getElementById('detail-att-tea-bar');
+            stuBar.style.width = '0%'; teaBar.style.width = '0%';
+            setTimeout(() => { stuBar.style.width = `${stuPct}%`; teaBar.style.width = `${teaPct}%`; }, 100);
+
+            // Rooms & Facilities & Sports
+            document.getElementById('detail-rooms-total').innerText = school.rooms.total;
+            document.getElementById('detail-rooms-usable').innerText = school.rooms.usable;
+            document.getElementById('detail-rooms-smart').innerText = school.rooms.smart;
+            document.getElementById('detail-facilities').innerHTML = school.facilities.map(fac => `<div class="px-2.5 py-1.5 rounded border border-slate-700/50 flex items-center gap-1.5 ${fac.color}"><span class="text-sm">${fac.icon}</span> ${fac.name}</div>`).join('');
+            document.getElementById('detail-sports').innerHTML = school.sports.map(sport => `<div class="bg-slate-900/80 p-2.5 rounded border border-slate-800 flex items-start gap-2"><div class="text-lg bg-slate-800 p-1 rounded border border-slate-700">${sport.icon}</div><div><p class="text-[11px] font-bold text-slate-200">${sport.name}</p><p class="text-[9px] text-slate-500">${sport.status}</p></div></div>`).join('');
+
+            // NEW: Populate Projects
+            const projContainer = document.getElementById('detail-projects');
+            projContainer.innerHTML = '';
+            school.projects.forEach(proj => {
+                const isCompleted = proj.progress === 100;
+                const barColor = isCompleted ? 'bg-emerald-500' : 'bg-amber-500';
+                const statusColor = isCompleted ? 'text-emerald-400' : 'text-amber-400';
+                
+                projContainer.innerHTML += `
+                    <div class="bg-slate-950/50 p-3 rounded-lg border border-slate-800">
+                        <div class="flex justify-between text-[11px] mb-1.5">
+                            <span class="font-bold text-slate-200">${proj.name}</span>
+                            <span class="font-mono text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-700">${proj.cost}</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-1.5">
+                            <div class="${barColor} h-full" style="width: ${proj.progress}%"></div>
+                        </div>
+                        <div class="flex justify-between text-[9px] font-bold uppercase tracking-wider">
+                            <span class="${statusColor}">${proj.status}</span>
+                            <span class="text-slate-500">${proj.progress}%</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // NEW: Populate Staff
+            document.getElementById('count-teachers').innerText = school.staff.teachers.length;
+            document.getElementById('count-support').innerText = school.staff.support.length;
+            
+            document.getElementById('detail-teachers').innerHTML = school.staff.teachers.map(t => `<li class="flex items-center before:content-['•'] before:mr-2 before:text-cyan-500">${t}</li>`).join('');
+            document.getElementById('detail-support').innerHTML = school.staff.support.map(s => `<li class="flex items-center before:content-['•'] before:mr-2 before:text-amber-500">${s}</li>`).join('');
+        }
+    </script>
+</body>
+</html>

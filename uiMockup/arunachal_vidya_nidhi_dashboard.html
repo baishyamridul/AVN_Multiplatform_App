@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arunachal Vidya Nidhi - CM Executive Command Center</title>
+    <!-- Google Fonts & Tailwind CSS via CDN -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b1329;
+            color: #f8fafc;
+        }
+        .glass-card {
+            background: rgba(22, 33, 62, 0.7);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- TOP GLOBAL CONFIGURATION HEADER BAR -->
+    <header class="glass-card border-b border-slate-800 p-4 px-6 sticky top-0 z-50 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center font-bold text-slate-950 shadow-lg shadow-amber-500/20">
+                AVN
+            </div>
+            <div>
+                <h1 class="font-bold text-base text-white tracking-wide">ARUNACHAL VIDYA NIDHI</h1>
+                <p class="text-xs text-amber-400 font-medium">शिक्षित अरुणाचल, विकसित अरुणाचल • CM Executive Dashboard</p>
+            </div>
+        </div>
+
+        <!-- GLOBAL DISTRICT FILTER PLACED AT THE TOP -->
+        <div class="flex flex-wrap items-center gap-4 w-full md:w-auto justify-end">
+            <div class="flex items-center space-x-2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5">
+                <label for="districtSelect" class="text-xs text-slate-400 uppercase font-semibold">Filter District:</label>
+                <select id="districtSelect" onchange="filterDistrictData()" class="bg-transparent text-sm text-white focus:outline-none cursor-pointer font-medium p-1">
+                    <option value="all" class="bg-slate-900 text-white">All Districts (Consolidated)</option>
+                    <option value="papumpare" class="bg-slate-900 text-white">Papum Pare</option>
+                    <option value="tawang" class="bg-slate-900 text-white">Tawang</option>
+                    <option value="changlang" class="bg-slate-900 text-white">Changlang</option>
+                    <option value="lower_subansiri" class="bg-slate-900 text-white">Lower Subansiri</option>
+                </select>
+            </div>
+            <div class="hidden sm:block text-xs bg-slate-950/60 border border-slate-800 px-3 py-2 rounded-lg text-slate-400">
+                System Time: <span id="clock" class="text-emerald-400 font-mono font-bold">--:--:--</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- CORE WORKSPACE WRAPPER -->
+    <main class="flex-1 p-6 max-w-[1700px] w-full mx-auto space-y-6">
+
+        <!-- NEWLY ADDED METRIC CARDS AND CONSOLIDATED STATS -->
+        <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div class="glass-card p-4 rounded-xl shadow-md">
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Schools</p>
+                <p class="text-2xl font-black text-white mt-1" id="stat-schools">3,248</p>
+                <span class="text-[10px] text-slate-500">Across 26 Districts</span>
+            </div>
+            <div class="glass-card p-4 rounded-xl shadow-md border-b-2 border-cyan-500">
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Internet Facility</p>
+                <p class="text-2xl font-black text-cyan-400 mt-1" id="stat-internet">68.4%</p>
+                <span class="text-[10px] text-slate-400">High-Speed FTTH / VSAT</span>
+            </div>
+            <div class="glass-card p-4 rounded-xl shadow-md border-b-2 border-emerald-500">
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">MDM Kitchen Sheds</p>
+                <p class="text-2xl font-black text-emerald-400 mt-1" id="stat-mdm">91.2%</p>
+                <span class="text-[10px] text-emerald-400">Functional Hot Meals</span>
+            </div>
+            <div class="glass-card p-4 rounded-xl shadow-md border-b-2 border-red-400">
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Without Hostel</p>
+                <p class="text-2xl font-black text-red-400 mt-1" id="stat-hostel">1,842</p>
+                <span class="text-[10px] text-slate-400">Day Scholar Institutes</span>
+            </div>
+            <div class="glass-card p-4 rounded-xl shadow-md">
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Student Attendance</p>
+                <p class="text-2xl font-black text-white mt-1" id="stat-attendance-student">91.4%</p>
+                <span class="text-[10px] text-emerald-400 font-mono">● Live Today</span>
+            </div>
+            <div class="glass-card p-4 rounded-xl shadow-md">
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Teacher Attendance</p>
+                <p class="text-2xl font-black text-white mt-1" id="stat-attendance-teacher">95.8%</p>
+                <span class="text-[10px] text-emerald-400 font-mono">● Bio-Metric Log</span>
+            </div>
+        </section>
+
+        <!-- MAP VISUALIZATION AND CATEGORY COMPILING ENVIRONMENT -->
+        <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            
+            <!-- MAP ELEMENT REPRESENTATION -->
+            <div class="glass-card p-6 rounded-2xl shadow-xl xl:col-span-2 flex flex-col justify-between">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-base text-slate-200 flex items-center gap-2">
+                        🗺️ Spatial District Command Center (Representative Map)
+                    </h3>
+                    <span class="text-xs bg-amber-500/10 text-amber-400 font-semibold px-2 py-1 rounded">Click Map to Drill Down</span>
+                </div>
+
+                <!-- Representative Map Framework -->
+                <div onclick="navigateToDistrictSchools()" class="bg-slate-950/60 rounded-xl border border-slate-800 p-8 flex flex-col items-center justify-center min-h-[340px] cursor-pointer hover:border-amber-500/50 group transition-all duration-300 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    
+                    <div class="relative w-56 h-56 bg-slate-900/90 rounded-full flex flex-col items-center justify-center border border-slate-700/60 shadow-inner group-hover:scale-105 transition-transform duration-300">
+                        <span class="text-xs text-slate-500 font-mono tracking-widest">[MAP INTERFACE]</span>
+                        <span class="text-[10px] text-amber-400/80 font-semibold mt-2 animate-pulse text-center px-4">Click to navigate to full district boundary view</span>
+                        
+                        <!-- Pulse Points -->
+                        <div class="absolute top-12 left-16 w-3 h-3 bg-cyan-400 rounded-full animate-ping"></div>
+                        <div class="absolute top-12 left-16 w-3 h-3 bg-cyan-400 rounded-full"></div>
+                        <div class="absolute bottom-16 right-16 w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
+                    </div>
+                    
+                    <p class="text-xs text-slate-400 mt-6 text-center group-hover:text-slate-200">
+                        🔒 Click map container to open the dedicated secondary page list detailing schools within boundary layers.
+                    </p>
+                </div>
+            </div>
+
+            <!-- SCHOOL CATEGORIES & CLASSROOM INDEX -->
+            <div class="glass-card p-6 rounded-2xl shadow-xl flex flex-col justify-between space-y-6">
+                <div>
+                    <h3 class="font-bold text-base text-slate-200 mb-4">🏫 Categorized Distribution Analytics</h3>
+                    
+                    <div class="space-y-3">
+                        <div class="bg-slate-950/40 p-2.5 rounded-lg border border-slate-800/80 flex justify-between items-center">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-300">Primary Schools</p>
+                                <span class="text-[10px] text-slate-500">Classes I - V</span>
+                            </div>
+                            <span class="text-sm font-bold text-white font-mono" id="cat-primary">1,420</span>
+                        </div>
+                        <div class="bg-slate-950/40 p-2.5 rounded-lg border border-slate-800/80 flex justify-between items-center">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-300">Middle Schools</p>
+                                <span class="text-[10px] text-slate-500">Classes VI - VIII</span>
+                            </div>
+                            <span class="text-sm font-bold text-white font-mono" id="cat-middle">984</span>
+                        </div>
+                        <div class="bg-slate-950/40 p-2.5 rounded-lg border border-slate-800/80 flex justify-between items-center">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-300">High Schools</p>
+                                <span class="text-[10px] text-slate-500">Classes IX - X</span>
+                            </div>
+                            <span class="text-sm font-bold text-white font-mono" id="cat-high">512</span>
+                        </div>
+                        <div class="bg-slate-950/40 p-2.5 rounded-lg border border-slate-800/80 flex justify-between items-center">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-300">Higher Secondary Schools</p>
+                                <span class="text-[10px] text-slate-500">Classes XI - XII</span>
+                            </div>
+                            <span class="text-sm font-bold text-white font-mono" id="cat-highersec">332</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CRITICAL METRIC: USABLE CLASSROOM CONDITION INDEX -->
+                <div class="pt-4 border-t border-slate-800">
+                    <div class="flex justify-between items-center mb-1.5">
+                        <span class="text-xs font-bold text-slate-300 uppercase tracking-wide">Usable Classroom Index (District Avg)</span>
+                        <span class="text-sm font-bold text-emerald-400 font-mono" id="usableClassroomProgress">84.2%</span>
+                    </div>
+                    <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-800">
+                        <div id="usableClassroomBar" class="bg-gradient-to-r from-amber-500 to-emerald-400 h-full transition-all duration-500" style="width: 84.2%"></div>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-1.5">
+                        Percentage of structurally sound, safe, and fully usable academic learning spaces.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DISTRICT WISE PARAMETER LEDGER -->
+        <section class="glass-card p-6 rounded-2xl shadow-xl">
+            <h3 class="font-bold text-base text-slate-200 mb-4">📋 District-Wise Consolidated Analytics</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold bg-slate-950/40">
+                            <th class="p-3">District Name</th>
+                            <th class="p-3">Total Schools</th>
+                            <th class="p-3">Usable Classrooms (%)</th>
+                            <th class="p-3">Power Status (Grid/Solar/No)</th>
+                            <th class="p-3">WASH Compliance</th>
+                            <th class="p-3">Active Projects</th>
+                            <th class="p-3 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/60 font-medium text-slate-300">
+                        <tr class="hover:bg-slate-900/40 transition">
+                            <td class="p-3 text-white font-semibold">Papum Pare</td>
+                            <td class="p-3">312</td>
+                            <td class="p-3 text-emerald-400">89.5%</td>
+                            <td class="p-3 text-xs">70% / 25% / <span class="text-red-400">5%</span></td>
+                            <td class="p-3 font-semibold text-emerald-400">92%</td>
+                            <td class="p-3">42 Active</td>
+                            <td class="p-3 text-right"><button onclick="navigateToDistrictSchools()" class="text-xs text-amber-400 hover:underline">View Schools →</button></td>
+                        </tr>
+                        <tr class="hover:bg-slate-900/40 transition">
+                            <td class="p-3 text-white font-semibold">Tawang</td>
+                            <td class="p-3">145</td>
+                            <td class="p-3 text-emerald-400">86.2%</td>
+                            <td class="p-3 text-xs">55% / 40% / <span class="text-red-400">5%</span></td>
+                            <td class="p-3 font-semibold text-emerald-400">88%</td>
+                            <td class="p-3">12 Active</td>
+                            <td class="p-3 text-right"><button onclick="navigateToDistrictSchools()" class="text-xs text-amber-400 hover:underline">View Schools →</button></td>
+                        </tr>
+                        <tr class="hover:bg-slate-900/40 transition">
+                            <td class="p-3 text-white font-semibold">Changlang</td>
+                            <td class="p-3">280</td>
+                            <td class="p-3 text-amber-400">79.8%</td>
+                            <td class="p-3 text-xs">60% / 20% / <span class="text-red-400">20%</span></td>
+                            <td class="p-3 font-semibold text-amber-400">76%</td>
+                            <td class="p-3">19 Active</td>
+                            <td class="p-3 text-right"><button onclick="navigateToDistrictSchools()" class="text-xs text-amber-400 hover:underline">View Schools →</button></td>
+                        </tr>
+                        <tr class="hover:bg-slate-900/40 transition">
+                            <td class="p-3 text-white font-semibold">Lower Subansiri</td>
+                            <td class="p-3">198</td>
+                            <td class="p-3 text-emerald-400">83.4%</td>
+                            <td class="p-3 text-xs">68% / 22% / <span class="text-red-400">10%</span></td>
+                            <td class="p-3 font-semibold text-emerald-400">84%</td>
+                            <td class="p-3">8 Active</td>
+                            <td class="p-3 text-right"><button onclick="navigateToDistrictSchools()" class="text-xs text-amber-400 hover:underline">View Schools →</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- TIMELINE COMPILERS LAYER: PROJECTS PROGRESSION & EXAM TICKERS -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- ONGOING INFRASTRUCTURE PROJECT IMPLEMENTATION MODULE -->
+            <div class="glass-card p-6 rounded-2xl shadow-xl space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <h3 class="font-bold text-base text-slate-200">🏗️ Ongoing Infrastructure Projects & Completion Status</h3>
+                    <span class="text-xs text-slate-400 font-mono" id="project-count">418 Total Blocks</span>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
+                            <span>Deployment of 45 Virtual Smart Labs</span>
+                            <span class="text-amber-400 font-bold">75% Complete</span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+                            <div class="bg-amber-400 h-full" style="width: 75%"></div>
+                        </div>
+                        <span class="text-[10px] text-slate-500">Tawang Region • Target Commissioning: Oct 2026</span>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
+                            <span>WASH Hygiene Infrastructure Upgrades</span>
+                            <span class="text-emerald-400 font-bold">90% Complete</span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+                            <div class="bg-emerald-400 h-full" style="width: 90%"></div>
+                        </div>
+                        <span class="text-[10px] text-slate-500">Changlang Block-B • Final Verification Drive</span>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
+                            <span>Solar Micro-Grid Integrations</span>
+                            <span class="text-cyan-400 font-bold">45% Complete</span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+                            <div class="bg-cyan-400 h-full" style="width: 45%"></div>
+                        </div>
+                        <span class="text-[10px] text-slate-500">Lower Subansiri Clusters • Phase 2 Structural Fitting</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UPCOMING EXAMINATION SCHEDULE MATRIX -->
+            <div class="glass-card p-6 rounded-2xl shadow-xl space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <h3 class="font-bold text-base text-slate-200">📅 Upcoming Examination Schedule</h3>
+                    <span class="text-xs text-cyan-400 font-semibold">State Academic Calendar</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="bg-slate-950/50 p-3 rounded-xl border border-slate-800 flex items-start space-x-3">
+                        <div class="p-2 bg-amber-500/10 text-amber-400 rounded-lg text-xs font-bold font-mono text-center min-w-[42px]">
+                            SEP<br><span class="text-base">14</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-white">Class X & XII Board Prep</h4>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Statewide Mock Assessments</p>
+                            <span class="text-[9px] bg-slate-900 text-slate-400 px-1.5 py-0.5 rounded mt-1 inline-block">High & Higher Sec.</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950/50 p-3 rounded-xl border border-slate-800 flex items-start space-x-3">
+                        <div class="p-2 bg-cyan-500/10 text-cyan-400 rounded-lg text-xs font-bold font-mono text-center min-w-[42px]">
+                            OCT<br><span class="text-base">05</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-white">Mid-Term Evaluation</h4>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Classes V to VIII Syllabus</p>
+                            <span class="text-[9px] bg-slate-900 text-slate-400 px-1.5 py-0.5 rounded mt-1 inline-block">Primary & Middle</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950/50 p-3 rounded-xl border border-slate-800 flex items-start space-x-3">
+                        <div class="p-2 bg-purple-500/10 text-purple-400 rounded-lg text-xs font-bold font-mono text-center min-w-[42px]">
+                            NOV<br><span class="text-base">20</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-white">NAS Verification</h4>
+                            <p class="text-[10px] text-slate-400 mt-0.5">National Achievement Survey</p>
+                            <span class="text-[9px] bg-slate-900 text-slate-400 px-1.5 py-0.5 rounded mt-1 inline-block">All Categories</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950/50 p-3 rounded-xl border border-slate-800 flex items-start space-x-3">
+                        <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg text-xs font-bold font-mono text-center min-w-[42px]">
+                            DEC<br><span class="text-base">18</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-white">Annual Assessments</h4>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Evaluation Phase Tier 1</p>
+                            <span class="text-[9px] bg-slate-900 text-slate-400 px-1.5 py-0.5 rounded mt-1 inline-block">Primary</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- INTERACTIVE PAGE NAVIGATION SIMULATOR SCRIPT -->
+    <script>
+        function runClock() {
+            const timeObj = new Date();
+            document.getElementById('clock').innerText = timeObj.toLocaleString('en-US', { hour12: true });
+        }
+        setInterval(runClock, 1000);
+        runClock();
+
+        function filterDistrictData() {
+            const selectedVal = document.getElementById('districtSelect').value;
+            
+            if(selectedVal === "tawang") {
+                document.getElementById('stat-schools').innerText = "145";
+                document.getElementById('stat-internet').innerText = "52.4%";
+                document.getElementById('stat-mdm').innerText = "96.5%";
+                document.getElementById('stat-hostel').innerText = "82";
+                document.getElementById('cat-primary').innerText = "65";
+                document.getElementById('cat-middle').innerText = "40";
+                document.getElementById('cat-high').innerText = "25";
+                document.getElementById('cat-highersec').innerText = "15";
+                document.getElementById('usableClassroomProgress').innerText = "86.2%";
+                document.getElementById('usableClassroomBar').style.width = "86.2%";
+                document.getElementById('project-count').innerText = "12 Active Blocks";
+            } else if(selectedVal === "papumpare") {
+                document.getElementById('stat-schools').innerText = "312";
+                document.getElementById('stat-internet').innerText = "91.8%";
+                document.getElementById('stat-mdm').innerText = "88.2%";
+                document.getElementById('stat-hostel').innerText = "140";
+                document.getElementById('cat-primary').innerText = "130";
+                document.getElementById('cat-middle').innerText = "95";
+                document.getElementById('cat-high').innerText = "52";
+                document.getElementById('cat-highersec').innerText = "35";
+                document.getElementById('usableClassroomProgress').innerText = "89.5%";
+                document.getElementById('usableClassroomBar').style.width = "89.5%";
+                document.getElementById('project-count').innerText = "42 Active Blocks";
+            } else {
+                // Consolidated defaults
+                document.getElementById('stat-schools').innerText = "3,248";
+                document.getElementById('stat-internet').innerText = "68.4%";
+                document.getElementById('stat-mdm').innerText = "91.2%";
+                document.getElementById('stat-hostel').innerText = "1,842";
+                document.getElementById('cat-primary').innerText = "1,420";
+                document.getElementById('cat-middle').innerText = "984";
+                document.getElementById('cat-high').innerText = "512";
+                document.getElementById('cat-highersec').innerText = "332";
+                document.getElementById('usableClassroomProgress').innerText = "84.2%";
+                document.getElementById('usableClassroomBar').style.width = "84.2%";
+                document.getElementById('project-count').innerText = "418 Total Blocks";
+            }
+        }
+
+        function navigateToDistrictSchools() {
+            const currentDist = document.getElementById('districtSelect').value;
+            alert("🔗 [Multi-Page Navigation Blueprint Integration]\n\nRedirecting to the District Boundary Page View...\nAll schools localized within " + currentDist.toUpperCase() + " boundaries will be rendered inside a list layout. Clicking any specific school will then open its verified Digital Twin profile summary page.");
+        }
+    </script>
+</body>
+</html>
