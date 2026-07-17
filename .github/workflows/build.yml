@@ -21,7 +21,7 @@ jobs:
       - run: ./gradlew :desktopApp:packageDmg
       - uses: actions/upload-artifact@v4
         with:
-          name: KMPMaplibre-macOS-ARM64
+          name: AVN-macOS-ARM64
           path: desktopApp/build/compose/binaries/main/dmg/*.dmg
 
   build-macos-intel:
@@ -34,10 +34,10 @@ jobs:
           java-version: 21
           architecture: x64
       - uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew :desktopApp:packageDmg -PmaplibreTarget=macos-amd64-metal
+      - run: ./gradlew :desktopApp:packageDmg
       - uses: actions/upload-artifact@v4
         with:
-          name: KMPMaplibre-macOS-Intel
+          name: AVN-macOS-Intel
           path: desktopApp/build/compose/binaries/main/dmg/*.dmg
 
   build-windows:
@@ -53,7 +53,7 @@ jobs:
       - run: ./gradlew :desktopApp:packageMsi
       - uses: actions/upload-artifact@v4
         with:
-          name: KMPMaplibre-Windows-x64
+          name: AVN-Windows-x64
           path: desktopApp/build/compose/binaries/main/msi/*.msi
 
   build-linux:
@@ -69,5 +69,5 @@ jobs:
       - run: ./gradlew :desktopApp:packageDeb
       - uses: actions/upload-artifact@v4
         with:
-          name: KMPMaplibre-Linux-x64
+          name: AVN-Linux-x64
           path: desktopApp/build/compose/binaries/main/deb/*.deb
