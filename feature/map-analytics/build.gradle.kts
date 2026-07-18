@@ -52,7 +52,6 @@ kotlin {
             implementation(libs.maplibre.compose)
         }
         iosMain.dependencies {
-            implementation(libs.maplibre.compose)
         }
         jvmMain.dependencies {
             implementation(libs.maplibre.compose)

@@ -46,8 +46,6 @@ fun LoginScreen(
                 color = MaterialTheme.colorScheme.onBackground,
             )
 
-            Text("h", fontFamily = FontFamily.Default)
-
             Spacer(Modifier.height(8.dp))
 
             AppTextField(
