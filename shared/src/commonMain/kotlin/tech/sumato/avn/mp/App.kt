@@ -15,6 +15,8 @@ import tech.sumato.avn.mp.data.user.di.UserDataModule
 import tech.sumato.avn.mp.designsystem.theme.AVNTheme
 import tech.sumato.avn.mp.feature.dashboard.di.DashboardFeatureModule
 import tech.sumato.avn.mp.feature.dashboard.presentation.DashboardRoute
+import tech.sumato.avn.mp.feature.district_dashboard.di.DistrictDashboardFeatureModule
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.DistrictDashboardRoute
 import tech.sumato.avn.mp.feature.login.di.LoginFeatureModule
 import tech.sumato.avn.mp.feature.login.presentation.LoginRoute
 import tech.sumato.avn.mp.feature.map_analytics.di.MapAnalyticsFeatureModule
@@ -30,7 +32,7 @@ fun App() {
             UserDataModule,
             LoginFeatureModule,
             MapAnalyticsFeatureModule,
-//            DistrictDashboardFeatureModule,
+            DistrictDashboardFeatureModule,
         )
     }), content = {
         AVNTheme {
@@ -44,7 +46,7 @@ fun App() {
 fun AppNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = Route.LOGIN,
+        startDestination = Route.DISTRICT_DASHBOARD,
     ) {
         composable(Route.LOGIN) {
             LoginRoute(
@@ -63,9 +65,9 @@ fun AppNavGraph(navController: NavHostController) {
             MapAnalyticsRoute()
         }
 
-//        composable(Route.DISTRICT_DASHBOARD) {
-//            DistrictDashboardRoute()
-//        }
+        composable(Route.DISTRICT_DASHBOARD) {
+            DistrictDashboardRoute()
+        }
 
     }
 }

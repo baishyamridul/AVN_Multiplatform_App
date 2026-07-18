@@ -47,6 +47,12 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.kotlinx.coroutines.core)
+
+            implementation(libs.material.icons)
+            implementation(libs.material.icons.extended)
+
+            implementation(libs.compose.uiToolingPreview)
+
         }
     }
 }

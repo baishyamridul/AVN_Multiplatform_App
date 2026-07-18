@@ -55,7 +55,7 @@ kotlin {
             implementation(projects.core.common)
             implementation(projects.core.navigation)
 
-//            implementation(projects.feature.districtDashboard)
+            implementation(projects.feature.districtDashboard)
 
             implementation(libs.androidx.navigation.compose)
 
@@ -71,6 +71,10 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
+
+            implementation(libs.material.icons)
+            implementation(libs.material.icons.extended)
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

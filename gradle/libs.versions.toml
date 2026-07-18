@@ -24,6 +24,8 @@ maplibre = "0.13.0"
 runner = "1.7.0"
 core = "1.7.0"
 
+material-icons = "1.7.3"
+
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
@@ -63,6 +65,9 @@ maplibre-compose = { module = "org.maplibre.compose:maplibre-compose", version.r
 maplibre-jni = { module = "org.maplibre.compose:maplibre-native-bindings-jni", version.ref = "maplibre" }
 androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
 androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
+
+material-icons = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "material-icons" }
+material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material-icons" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

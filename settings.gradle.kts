@@ -47,6 +47,7 @@ include(":designsystem")
 include(":domain:dashboard")
 include(":data:dashboard")
 include(":feature:dashboard")
+include(":feature:district-dashboard")
 
 
 
