@@ -37,7 +37,9 @@ fun App() {
     }), content = {
         AVNTheme {
             val navController = rememberNavController()
-            AppNavGraph(navController = navController)
+            AdaptiveScaffold(navController = navController) {
+                AppNavGraph(navController = navController)
+            }
         }
     })
 }

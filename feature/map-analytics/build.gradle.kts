@@ -47,6 +47,7 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.material.icons.extended)
         }
         androidMain.dependencies {
             implementation(libs.maplibre.compose)

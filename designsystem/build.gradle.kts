@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.invoke
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -42,9 +43,14 @@ kotlin {
             implementation(libs.compose.material3)
             implementation(libs.compose.ui)
             implementation(libs.compose.components.resources)
-        }
-        androidMain.dependencies {
+            implementation(libs.material.icons.extended)
+
+
             implementation(libs.compose.uiToolingPreview)
         }
+
+
+
+
     }
 }

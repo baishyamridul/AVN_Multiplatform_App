@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import tech.sumato.avn.mp.designsystem.theme.MainColor
 
+
 @Composable
 fun AppCard(
     modifier: Modifier = Modifier,

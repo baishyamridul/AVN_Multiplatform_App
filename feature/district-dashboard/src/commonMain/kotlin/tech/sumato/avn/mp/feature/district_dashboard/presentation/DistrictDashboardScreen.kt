@@ -1,47 +1,100 @@
 package tech.sumato.avn.mp.feature.district_dashboard.presentation
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import tech.sumato.avn.mp.designsystem.FormFactor
+import tech.sumato.avn.mp.designsystem.LocalFormFactor
+import tech.sumato.avn.mp.designsystem.components.AppCard
+import tech.sumato.avn.mp.designsystem.components.ScreenHeader
+import tech.sumato.avn.mp.designsystem.components.StatCard
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.screen_variants.DistrictDashboardCompact
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.screen_variants.DistrictDashboardExpanded
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.screen_variants.DistrictDashboardMedium
 
 @Composable
 fun DistrictDashboardScreen(
     state: DistrictDashboardState,
     onEvent: (DistrictDashboardEvent) -> Unit,
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-    ) {
+    val formFactor = LocalFormFactor.current
 
-        TopAppBar(
-            title = {
-                Text(
-                    "District Dashboard",
-                    style = MaterialTheme.typography.titleLarge
-                )
-            },
-            navigationIcon = {
-                IconButton(onClick = {}) {
-                    Icon(Icons.AutoMirrored.Default.ArrowBack, "")
+    when (formFactor) {
+        FormFactor.Compact -> DistrictDashboardCompact()
+        FormFactor.Medium -> DistrictDashboardMedium()
+        FormFactor.Expanded -> DistrictDashboardExpanded()
+    }
+}
+
+@Composable
+fun DistrictStatsGrid(columns: Int) {
+    val stats = listOf(
+        "Total Districts" to "24",
+        "Active" to "18",
+        "Pending Review" to "4",
+        "Issues" to "2",
+    )
+
+    val rows = stats.chunked(columns)
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        rows.forEach { row ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                row.forEach { (label, value) ->
+                    StatCard(
+                        label = label,
+                        value = value,
+                        modifier = Modifier.weight(1f),
+                    )
                 }
             }
-        )
+        }
+    }
+}
 
+@Composable
+fun DistrictList() {
+    val districts = listOf(
+        "North District" to "256 reports",
+        "South District" to "189 reports",
+        "East District" to "312 reports",
+        "West District" to "145 reports",
+        "Central District" to "198 reports",
+    )
+
+    AppCard {
         Text(
-            "DistrictDashboard", style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onBackground,
+            "Districts",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 12.dp),
         )
+        districts.forEach { (name, reports) ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(name, style = MaterialTheme.typography.bodyMedium)
+                Text(reports, style = MaterialTheme.typography.bodySmall)
+            }
+        }
     }
 }
