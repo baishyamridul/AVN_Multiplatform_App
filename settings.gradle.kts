@@ -51,5 +51,6 @@ include(":feature:district-dashboard")
 
 
 
+include(":component:map")
 include(":feature:map-analytics")
 

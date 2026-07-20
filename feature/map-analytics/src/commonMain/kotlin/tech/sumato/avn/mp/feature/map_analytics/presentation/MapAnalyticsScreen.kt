@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import tech.sumato.avn.mp.designsystem.FormFactor
 import tech.sumato.avn.mp.designsystem.LocalFormFactor
 import tech.sumato.avn.mp.designsystem.components.AppCard
+import tech.sumato.avn.mp.component.map.MapView
 import tech.sumato.avn.mp.designsystem.theme.MainColor
 
 @Composable

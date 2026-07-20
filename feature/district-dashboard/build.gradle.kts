@@ -53,6 +53,10 @@ kotlin {
 
             implementation(libs.compose.uiToolingPreview)
 
+            implementation(libs.kotlinx.serialization.json)
+
+            implementation(projects.component.map)
+
         }
     }
 }

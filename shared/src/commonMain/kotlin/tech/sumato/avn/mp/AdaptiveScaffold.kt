@@ -124,11 +124,13 @@ private fun MediumScaffold(
     showNav: Boolean,
     content: @Composable () -> Unit,
 ) {
-    Row(modifier = Modifier.fillMaxSize()) {
-        if (showNav) {
-            MediumNavRail(navController)
+    Scaffold { paddingValues ->
+        Row(modifier = Modifier.fillMaxSize().padding(paddingValues = paddingValues)) {
+            if (showNav) {
+                MediumNavRail(navController)
+            }
+            content()
         }
-        content()
     }
 }
 
@@ -156,18 +158,25 @@ private fun ExpandedScaffold(
     showNav: Boolean,
     content: @Composable () -> Unit,
 ) {
-    if (!showNav) {
-        content()
-        return
+
+    Scaffold { paddingValues ->
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            if (!showNav) {
+                content()
+                return@Scaffold
+            }
+
+            PermanentNavigationDrawer(
+                drawerContent = {
+                    ExpandedDrawerContent(navController)
+                },
+            ) {
+                content()
+            }
+        }
     }
 
-    PermanentNavigationDrawer(
-        drawerContent = {
-            ExpandedDrawerContent(navController)
-        },
-    ) {
-        content()
-    }
+
 }
 
 @Composable

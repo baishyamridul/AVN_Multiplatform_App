@@ -14,7 +14,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "FeatureMapAnalytics"
+            baseName = "ComponentMap"
             isStatic = true
         }
     }
@@ -26,7 +26,7 @@ kotlin {
     wasmJs { browser() }
 
     androidLibrary {
-        namespace = "tech.sumato.avn.mp.feature.map_analytics"
+        namespace = "tech.sumato.avn.mp.component.map"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
         compilerOptions { jvmTarget = JvmTarget.JVM_11 }
@@ -34,33 +34,19 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.component.map)
-            implementation(projects.core.common)
-            implementation(projects.core.navigation)
-            implementation(projects.designsystem)
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
             implementation(libs.compose.ui)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(libs.koin.core)
-            implementation(libs.koin.compose)
-            implementation(libs.koin.compose.viewmodel)
-            implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.material.icons.extended)
         }
         androidMain.dependencies {
             implementation(libs.maplibre.compose)
         }
         iosMain.dependencies {
+            implementation(libs.maplibre.compose)
         }
         jvmMain.dependencies {
             implementation(libs.maplibre.compose)
-        }
-        jsMain.dependencies {
-        }
-        wasmJsMain.dependencies {
         }
     }
 }

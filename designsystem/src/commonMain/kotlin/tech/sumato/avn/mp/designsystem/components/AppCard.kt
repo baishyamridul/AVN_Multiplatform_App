@@ -1,23 +1,24 @@
 package tech.sumato.avn.mp.designsystem.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.BrushPainter
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import tech.sumato.avn.mp.designsystem.theme.MainColor
 
@@ -26,12 +27,14 @@ import tech.sumato.avn.mp.designsystem.theme.MainColor
 fun AppCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
+    border: BorderStroke? = null,
     content: @Composable () -> Unit,
 ) {
     val shape = RoundedCornerShape(12.dp)
     Card(
         modifier = if (onClick != null) modifier.clickable(onClick = onClick) else modifier,
         shape = shape,
+        border = border,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
@@ -42,6 +45,32 @@ fun AppCard(
         }
     }
 }
+
+@Composable
+fun AppCardBordered(
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    border: BorderStroke = CardDefaults.outlinedCardBorder(),
+    paddingLess: Boolean = false,
+    content: @Composable () -> Unit,
+) {
+    val shape = RoundedCornerShape(12.dp)
+    val padding = if (paddingLess) 0.dp else 16.dp
+    OutlinedCard(
+        modifier = if (onClick != null) modifier.clickable(onClick = onClick) else modifier,
+        shape = shape,
+        border = border,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+    ) {
+        Column(modifier = Modifier.padding(padding)) {
+            content()
+        }
+    }
+}
+
 
 @Composable
 fun StatCard(
