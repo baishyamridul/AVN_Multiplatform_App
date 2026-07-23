@@ -1,10 +1,12 @@
 package tech.sumato.avn.mp
 
+import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.KoinApplication
 import org.koin.core.KoinApplication
 import org.koin.dsl.koinConfiguration

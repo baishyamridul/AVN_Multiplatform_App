@@ -47,10 +47,16 @@ kotlin {
 
 
             implementation(libs.compose.uiToolingPreview)
+
+            implementation(libs.kotlinx.date.time)
+
         }
 
-
-
-
     }
+}
+
+compose.resources {
+
+    publicResClass = true
+
 }

@@ -41,12 +41,14 @@ kotlin {
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
             implementation(libs.compose.ui)
+            implementation(libs.compose.components.resources)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.kotlinx.coroutines.core)
+
 
             implementation(libs.material.icons)
             implementation(libs.material.icons.extended)
@@ -56,6 +58,9 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
 
             implementation(projects.component.map)
+
+            implementation(libs.kotlinx.date.time)
+
 
         }
     }

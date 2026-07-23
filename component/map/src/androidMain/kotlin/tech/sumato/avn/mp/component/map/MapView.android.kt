@@ -1,5 +1,7 @@
 package tech.sumato.avn.mp.component.map
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.maplibre.compose.camera.CameraPosition
@@ -13,7 +15,7 @@ actual fun MapView(
     modifier: Modifier,
     styleUrl: String,
 ) {
-    MaplibreMap(
+    /*MaplibreMap(
         modifier = modifier,
         baseStyle = BaseStyle.Demo,
         cameraState = CameraState(
@@ -24,5 +26,10 @@ actual fun MapView(
                 tilt = 0.0,
             ),
         ),
-    )
+    )*/
+
+    Box(modifier = modifier) {
+        Text("Android emulator does not support")
+    }
+
 }

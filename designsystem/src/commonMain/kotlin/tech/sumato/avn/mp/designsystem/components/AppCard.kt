@@ -52,10 +52,11 @@ fun AppCardBordered(
     onClick: (() -> Unit)? = null,
     border: BorderStroke = CardDefaults.outlinedCardBorder(),
     paddingLess: Boolean = false,
+    padding: Dp = 16.dp,
     content: @Composable () -> Unit,
 ) {
     val shape = RoundedCornerShape(12.dp)
-    val padding = if (paddingLess) 0.dp else 16.dp
+    val applicablePadding = if (paddingLess) 0.dp else padding
     OutlinedCard(
         modifier = if (onClick != null) modifier.clickable(onClick = onClick) else modifier,
         shape = shape,
@@ -65,7 +66,7 @@ fun AppCardBordered(
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
-        Column(modifier = Modifier.padding(padding)) {
+        Column(modifier = Modifier.padding(applicablePadding)) {
             content()
         }
     }

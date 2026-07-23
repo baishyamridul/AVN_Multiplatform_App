@@ -37,7 +37,7 @@ fun AppSchoolCategoryCard(
             )
             Text(
                 schoolCount,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )
         }
