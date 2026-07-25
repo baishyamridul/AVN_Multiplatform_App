@@ -15,7 +15,7 @@ actual fun MapView(
     modifier: Modifier,
     styleUrl: String,
 ) {
-    /*MaplibreMap(
+    MaplibreMap(
         modifier = modifier,
         baseStyle = BaseStyle.Demo,
         cameraState = CameraState(
@@ -26,10 +26,10 @@ actual fun MapView(
                 tilt = 0.0,
             ),
         ),
-    )*/
+    )
 
-    Box(modifier = modifier) {
-        Text("Android emulator does not support")
-    }
+//    Box(modifier = modifier) {
+//        Text("Android emulator does not support")
+//    }
 
 }

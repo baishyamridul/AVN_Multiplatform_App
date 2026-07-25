@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,7 +32,7 @@ fun DistrictDashboardSchoolCategoriesAnalytics(modifier: Modifier) {
         Spacer(Modifier.height(24.dp))
 
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.wrapContentHeight(),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
 
