@@ -4,11 +4,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.CameraState
+import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.map.MapOptions
 import org.maplibre.compose.map.MaplibreMap
 import org.maplibre.compose.map.RenderOptions
@@ -21,20 +23,23 @@ actual fun MapView(
     styleUrl: String,
 ) {
 
-        MaplibreMap(
-            modifier = modifier,
-            baseStyle = BaseStyle.Demo,
-            cameraState = CameraState(
-                firstPosition = CameraPosition(
-                    target = Position(longitude = 93.7520957, latitude = 25.55711865),
-                    zoom = 8.0,
-                    bearing = 0.0,
-                    tilt = 0.0,
-                ),
-            ),
-            options = MapOptions(
-            )
+
+    val cameraState = rememberCameraState(
+        firstPosition = CameraPosition(
+            target = Position(longitude = 93.7520957, latitude = 25.55711865),
+            zoom = 8.0,
+            bearing = 0.0,
+            tilt = 0.0,
+        ),
+    )
+
+    MaplibreMap(
+        modifier = modifier,
+        baseStyle = BaseStyle.Demo,
+        cameraState = cameraState,
+        options = MapOptions(
         )
+    )
 
 
 }

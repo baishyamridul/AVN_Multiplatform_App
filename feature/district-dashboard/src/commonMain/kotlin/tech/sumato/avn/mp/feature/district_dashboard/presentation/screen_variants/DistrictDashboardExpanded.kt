@@ -10,23 +10,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.koin.compose.viewmodel.koinViewModel
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.DistrictDashboardViewModel
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.DistrictDashboardHeader
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.DistrictDashboardMap
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.DistrictDashboardSchoolCategoriesAnalytics
-import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.HorizontalStatusBar
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.HorizontalStatsBar
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.OngoingProjects
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.UpcomingEvents
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.DashboardStatsUiModel
 
 @Composable
-fun DistrictDashboardExpanded() {
+fun DistrictDashboardExpanded(viewModel: DistrictDashboardViewModel = koinViewModel()) {
     val scrollState = rememberScrollState()
+
 
 
     Column(
@@ -39,7 +41,7 @@ fun DistrictDashboardExpanded() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        HorizontalStatusBar(
+        HorizontalStatsBar(
             modifier = Modifier, stats = listOf(
                 DashboardStatsUiModel("Total Schools", "3,248", "Across the district", 0xff0284c7),
                 DashboardStatsUiModel(
@@ -67,7 +69,10 @@ fun DistrictDashboardExpanded() {
                     "● Bio-Metric Log",
                     0xff00D492
                 ),
-            )
+            ),
+            onStatsClicked = { statsUiModel ->
+                viewModel.navigateToSchoolDashboard()
+            }
         )
 
         Spacer(Modifier.height(8.dp))

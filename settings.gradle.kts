@@ -35,7 +35,7 @@ plugins {
 include(":androidApp")
 include(":desktopApp")
 include(":shared")
-include(":webApp")
+//include(":webApp")
 
 include(":core:common")
 include(":core:network")
@@ -54,3 +54,5 @@ include(":feature:district-dashboard")
 include(":component:map")
 include(":feature:map-analytics")
 
+
+include(":feature:school-dashboard")

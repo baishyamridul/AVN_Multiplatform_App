@@ -20,10 +20,10 @@ kotlin {
     }
 
     jvm()
-    js { browser() }
+//    js { browser() }
 
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs { browser() }
+//    @OptIn(ExperimentalWasmDsl::class)
+//    wasmJs { browser() }
 
     androidLibrary {
         namespace = "tech.sumato.avn.mp.feature.district_dashboard"

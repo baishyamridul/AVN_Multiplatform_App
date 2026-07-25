@@ -21,10 +21,10 @@ kotlin {
     }
 
     jvm()
-    js { browser() }
+//    js { browser() }
 
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs { browser() }
+//    @OptIn(ExperimentalWasmDsl::class)
+//    wasmJs { browser() }
 
     androidLibrary {
        namespace = "tech.sumato.avn.mp.shared"
@@ -56,6 +56,7 @@ kotlin {
             implementation(projects.core.navigation)
 
             implementation(projects.feature.districtDashboard)
+            implementation(projects.feature.schoolDashboard)
 
             implementation(libs.androidx.navigation.compose)
 
@@ -84,9 +85,9 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
         }
-        jsMain.dependencies {
-            implementation(libs.wrappers.browser)
-        }
+//        jsMain.dependencies {
+//            implementation(libs.wrappers.browser)
+//        }
     }
 }
 

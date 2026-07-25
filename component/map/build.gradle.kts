@@ -20,10 +20,10 @@ kotlin {
     }
 
     jvm()
-    js { browser() }
+//    js { browser() }
 
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs { browser() }
+//    @OptIn(ExperimentalWasmDsl::class)
+//    wasmJs { browser() }
 
     androidLibrary {
         namespace = "tech.sumato.avn.mp.component.map"
@@ -38,15 +38,16 @@ kotlin {
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
             implementation(libs.compose.ui)
+            implementation(libs.maplibre.compose)
         }
         androidMain.dependencies {
-            implementation(libs.maplibre.compose)
+//            implementation(libs.maplibre.compose)
         }
         iosMain.dependencies {
-            implementation(libs.maplibre.compose)
+//            implementation(libs.maplibre.compose)
         }
         jvmMain.dependencies {
-            implementation(libs.maplibre.compose)
+//            implementation(libs.maplibre.compose)
         }
     }
 }

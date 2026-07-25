@@ -39,7 +39,7 @@ import tech.sumato.avn.mp.core.navigation.Route
 import tech.sumato.avn.mp.designsystem.FormFactor
 import tech.sumato.avn.mp.designsystem.LocalFormFactor
 
-private val fullScreenRoutes = setOf(Route.LOGIN, Route.DISTRICT_DASHBOARD)
+private val fullScreenRoutes = setOf(Route.LOGIN, Route.DISTRICT_DASHBOARD, Route.SCHOOL_DASHBOARD)
 
 private data class NavDestination(
     val route: String,

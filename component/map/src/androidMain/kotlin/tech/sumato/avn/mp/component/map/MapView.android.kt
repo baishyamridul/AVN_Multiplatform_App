@@ -15,21 +15,21 @@ actual fun MapView(
     modifier: Modifier,
     styleUrl: String,
 ) {
-    MaplibreMap(
-        modifier = modifier,
-        baseStyle = BaseStyle.Demo,
-        cameraState = CameraState(
-            firstPosition = CameraPosition(
-                target = Position(longitude = 93.7520957, latitude = 25.55711865),
-                zoom = 8.0,
-                bearing = 0.0,
-                tilt = 0.0,
-            ),
-        ),
-    )
+//    MaplibreMap(
+//        modifier = modifier,
+//        baseStyle = BaseStyle.Demo,
+//        cameraState = CameraState(
+//            firstPosition = CameraPosition(
+//                target = Position(longitude = 93.7520957, latitude = 25.55711865),
+//                zoom = 8.0,
+//                bearing = 0.0,
+//                tilt = 0.0,
+//            ),
+//        ),
+//    )
 
-//    Box(modifier = modifier) {
-//        Text("Android emulator does not support")
-//    }
+    Box(modifier = modifier) {
+        Text("Android emulator does not support")
+    }
 
 }

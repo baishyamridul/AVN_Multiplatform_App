@@ -12,4 +12,6 @@ object Route {
 
     const val DISTRICT_DASHBOARD = "district-dashboard"
 
+    const val SCHOOL_DASHBOARD = "school_dashboard"
+
 }

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import tech.sumato.avn.mp.core.navigation.MviViewModel
+import tech.sumato.avn.mp.core.navigation.Route
 
 class DistrictDashboardViewModel : ViewModel(), MviViewModel<DistrictDashboardState, DistrictDashboardEffect> {
 
@@ -23,4 +24,9 @@ class DistrictDashboardViewModel : ViewModel(), MviViewModel<DistrictDashboardSt
             else -> {}
         }
     }
+
+    fun navigateToSchoolDashboard() {
+        _effects.trySend(DistrictDashboardEffect.Navigate(Route.SCHOOL_DASHBOARD))
+    }
+
 }

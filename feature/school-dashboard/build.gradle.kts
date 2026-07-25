@@ -14,7 +14,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "FeatureLogin"
+            baseName = "FeatureSchoolDashboard"
             isStatic = true
         }
     }
@@ -26,7 +26,7 @@ kotlin {
 //    wasmJs { browser() }
 
     androidLibrary {
-        namespace = "tech.sumato.avn.mp.feature.login"
+        namespace = "tech.sumato.avn.mp.feature.school_dashboard"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
         compilerOptions { jvmTarget = JvmTarget.JVM_11 }
@@ -34,22 +34,32 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.domain.user)
-            implementation(projects.designsystem)
             implementation(projects.core.common)
             implementation(projects.core.navigation)
-
+            implementation(projects.designsystem)
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
             implementation(libs.compose.ui)
-
+            implementation(libs.compose.components.resources)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.kotlinx.coroutines.core)
+
+            implementation(libs.material.icons)
+            implementation(libs.material.icons.extended)
+
+            implementation(libs.compose.uiToolingPreview)
+
+            implementation(libs.kotlinx.serialization.json)
+
+            implementation(projects.component.map)
+
+            implementation(libs.kotlinx.date.time)
+
         }
     }
 }

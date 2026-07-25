@@ -23,6 +23,8 @@ import tech.sumato.avn.mp.feature.login.di.LoginFeatureModule
 import tech.sumato.avn.mp.feature.login.presentation.LoginRoute
 import tech.sumato.avn.mp.feature.map_analytics.di.MapAnalyticsFeatureModule
 import tech.sumato.avn.mp.feature.map_analytics.presentation.MapAnalyticsRoute
+import tech.sumato.avn.mp.feature.school_dashboard.di.SchoolDashboardFeatureModule
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.SchoolDashboardRoute
 
 @Composable
 fun App() {
@@ -35,6 +37,7 @@ fun App() {
             LoginFeatureModule,
             MapAnalyticsFeatureModule,
             DistrictDashboardFeatureModule,
+            SchoolDashboardFeatureModule
         )
     }), content = {
         AVNTheme {
@@ -70,7 +73,17 @@ fun AppNavGraph(navController: NavHostController) {
         }
 
         composable(Route.DISTRICT_DASHBOARD) {
-            DistrictDashboardRoute()
+            DistrictDashboardRoute(
+                onNavigation = { route ->
+                    navController.navigate(route)
+                }
+            )
+        }
+
+        composable(Route.SCHOOL_DASHBOARD) {
+            SchoolDashboardRoute(onNavigateBack = {
+                navController.popBackStack()
+            })
         }
 
     }

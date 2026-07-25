@@ -20,10 +20,10 @@ kotlin {
     }
 
     jvm()
-    js { browser() }
-
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs { browser() }
+//    js { browser() }
+//
+//    @OptIn(ExperimentalWasmDsl::class)
+//    wasmJs { browser() }
 
     androidLibrary {
         namespace = "tech.sumato.avn.mp.feature.map_analytics"
@@ -58,9 +58,9 @@ kotlin {
         jvmMain.dependencies {
             implementation(libs.maplibre.compose)
         }
-        jsMain.dependencies {
-        }
-        wasmJsMain.dependencies {
-        }
+//        jsMain.dependencies {
+//        }
+//        wasmJsMain.dependencies {
+//        }
     }
 }

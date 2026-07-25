@@ -13,7 +13,11 @@ import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.Dashboar
 
 
 @Composable
-fun HorizontalStatusBar(modifier: Modifier, stats: List<DashboardStatsUiModel>) {
+fun HorizontalStatsBar(
+    modifier: Modifier,
+    stats: List<DashboardStatsUiModel>,
+    onStatsClicked: (stats: DashboardStatsUiModel) -> Unit = {}
+) {
 
     Row(
         modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min),
@@ -22,7 +26,8 @@ fun HorizontalStatusBar(modifier: Modifier, stats: List<DashboardStatsUiModel>) 
         stats.forEach { it ->
             StatsCard(
                 modifier = Modifier.weight(1f).fillMaxWidth().fillMaxHeight(),
-                statsDto = it,
+                statsModel = it,
+                onClick = onStatsClicked
             )
         }
     }

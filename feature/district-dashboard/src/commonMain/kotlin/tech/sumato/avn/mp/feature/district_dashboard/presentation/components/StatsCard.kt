@@ -18,30 +18,32 @@ import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.Dashboar
 @Composable
 fun StatsCard(
     modifier: Modifier,
-    statsDto: DashboardStatsUiModel
+    statsModel: DashboardStatsUiModel,
+    onClick: (DashboardStatsUiModel) -> Unit
 ) {
 
     AppCard(
         modifier = modifier,
-        border = BorderStroke(Dp.Hairline, MaterialTheme.colorScheme.outline)
+        border = BorderStroke(Dp.Hairline, MaterialTheme.colorScheme.outline),
+        onClick = { onClick(statsModel) }
     ) {
         Text(
-            statsDto.label.uppercase(),
+            statsModel.label.uppercase(),
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.W500
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            statsDto.value,
+            statsModel.value,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
-            color = Color(statsDto.valueColor)
+            color = Color(statsModel.valueColor)
         )
         Spacer(modifier = Modifier.height(6.dp))
         Text(
-            statsDto.supporting,
+            statsModel.supporting,
             style = MaterialTheme.typography.bodySmall,
-            color = Color(statsDto.valueColor)
+            color = Color(statsModel.valueColor)
         )
     }
 
