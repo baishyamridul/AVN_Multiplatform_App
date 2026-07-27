@@ -2,6 +2,7 @@ package tech.sumato.avn.mp.component.map
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,8 +34,9 @@ actual fun MapView(
         ),
     )
 
+
     MaplibreMap(
-        modifier = modifier,
+        modifier = modifier.padding(16.dp).clip(RoundedCornerShape(8.dp)),
         baseStyle = BaseStyle.Demo,
         cameraState = cameraState,
         options = MapOptions(

@@ -50,6 +50,8 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
 
 
+
+
             implementation(libs.material.icons)
             implementation(libs.material.icons.extended)
 
@@ -60,6 +62,8 @@ kotlin {
             implementation(projects.component.map)
 
             implementation(libs.kotlinx.date.time)
+
+//            implementation(projects.domain.)
 
 
         }
