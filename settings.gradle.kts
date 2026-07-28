@@ -25,6 +25,7 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
+        maven("https://jogamp.org/deployment/maven")
     }
 }
 
@@ -57,3 +58,4 @@ include(":feature:map-analytics")
 
 
 include(":feature:school-dashboard")
+include(":component:image360")

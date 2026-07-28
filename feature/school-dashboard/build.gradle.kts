@@ -58,6 +58,8 @@ kotlin {
 
             implementation(projects.component.map)
 
+            implementation(projects.component.image360)
+
             implementation(libs.kotlinx.date.time)
 
         }

@@ -28,6 +28,8 @@ material-icons = "1.7.3"
 
 kotlinx-date-time = "0.8.0"
 
+compose-webview = "1.8.4"
+
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
@@ -72,6 +74,9 @@ material-icons = { module = "org.jetbrains.compose.material:material-icons-core"
 material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material-icons" }
 
 kotlinx-date-time = {module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-date-time"}
+
+# webview
+compose-webview = {module = "io.github.kevinnzou:compose-webview-multiplatform", version.ref = "compose-webview"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
