@@ -53,6 +53,7 @@ include(":feature:district-dashboard")
 
 
 include(":component:map")
+include(":component:panorama")
 include(":feature:map-analytics")
 
 

@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
 import tech.sumato.avn.mp.component.map.MapView
+import tech.sumato.avn.mp.component.panorama.PanoramaViewer
 import tech.sumato.avn.mp.designsystem.components.AppCardBordered
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.SchoolDashboardEvent
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.SchoolDashboardViewModel
@@ -74,18 +75,24 @@ fun SchoolDashboardScreenExpanded(viewModel: SchoolDashboardViewModel = koinView
                 paddingLess = true,
             ) {
 
-                if (loadMap)
-                    MapView(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(12.dp)),
-                        styleUrl = "",
-                    )
-                else
-                    Box(
-                        modifier = Modifier.fillMaxSize()
-                            .background(MaterialTheme.colorScheme.surface)
-                    )
+                PanoramaViewer(
+                    configUrl = "https://mridx.github.io/360img/config.json",
+                    modifier = Modifier.fillMaxSize(),
+                    onLoadingChanged = { v -> println(v.toString()) },
+                    onError = { e -> e.printStackTrace() })
+
+//                if (loadMap)
+//                    MapView(
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .clip(RoundedCornerShape(12.dp)),
+//                        styleUrl = "",
+//                    )
+//                else
+//                    Box(
+//                        modifier = Modifier.fillMaxSize()
+//                            .background(MaterialTheme.colorScheme.surface)
+//                    )
             }
 
             AppCardBordered(
