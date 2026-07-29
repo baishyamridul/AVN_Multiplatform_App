@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -21,17 +20,14 @@ kotlin {
 
     jvm()
 
-
-    androidLibrary {
+    android {
         namespace = "tech.sumato.avn.mp.component.image360"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
         compilerOptions { jvmTarget = JvmTarget.JVM_11 }
     }
 
-
     sourceSets {
-
         commonMain.dependencies {
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
@@ -39,10 +35,7 @@ kotlin {
             implementation(libs.compose.ui)
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.compose.components.resources)
-
             api(libs.saralapps.webview)
-
         }
     }
 }

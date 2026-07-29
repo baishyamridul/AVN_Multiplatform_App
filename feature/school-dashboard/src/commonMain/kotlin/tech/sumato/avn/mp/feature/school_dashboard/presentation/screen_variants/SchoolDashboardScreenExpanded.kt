@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
-import tech.sumato.avn.mp.component.image360.ImgViewer
 import tech.sumato.avn.mp.component.image360.PanoImageViewer
 import tech.sumato.avn.mp.component.map.MapView
 import tech.sumato.avn.mp.designsystem.components.AppCardBordered
@@ -77,9 +76,9 @@ fun SchoolDashboardScreenExpanded(viewModel: SchoolDashboardViewModel = koinView
                 paddingLess = true,
             ) {
 
-//                PanoImageViewer("https://mridx.github.io/360img/config.json")
+                PanoImageViewer("https://mridx.github.io/360img/config.json")
 
-                ImgViewer()
+//                ImgViewer()
 
 //                if (loadMap)
 //                    MapView(
