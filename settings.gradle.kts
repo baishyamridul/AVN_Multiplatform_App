@@ -48,6 +48,7 @@ include(":feature:login")
 include(":designsystem")
 include(":domain:dashboard")
 include(":data:dashboard")
+include(":data:districtDashboard")
 include(":feature:dashboard")
 include(":feature:district-dashboard")
 
@@ -59,3 +60,5 @@ include(":feature:map-analytics")
 
 include(":feature:school-dashboard")
 include(":component:image360")
+
+include(":data:districtDashboard")

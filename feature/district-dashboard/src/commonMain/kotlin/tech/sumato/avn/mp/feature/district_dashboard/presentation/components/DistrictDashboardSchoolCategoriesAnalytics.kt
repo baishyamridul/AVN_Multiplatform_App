@@ -15,10 +15,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import tech.sumato.avn.mp.designsystem.components.AppCardBordered
 import tech.sumato.avn.mp.designsystem.components.school.AppSchoolCategoryCard
+import tech.sumato.avn.mp.domain.districtDashboard.model.SchoolCategoryModel
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.SchoolCategoryUiModel
 
 @Composable
-fun DistrictDashboardSchoolCategoriesAnalytics(modifier: Modifier) {
+fun DistrictDashboardSchoolCategoriesAnalytics(modifier: Modifier, categories: List<SchoolCategoryModel>) {
 
     AppCardBordered(
     modifier = modifier,

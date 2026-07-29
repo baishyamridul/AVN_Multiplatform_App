@@ -1,6 +1,6 @@
 package tech.sumato.avn.mp.domain.districtDashboard.model
 
-data class PlaceholderModel(
-    val id: String,
+data class DistrictModel(
+    val id: Int,
     val name: String,
 )
