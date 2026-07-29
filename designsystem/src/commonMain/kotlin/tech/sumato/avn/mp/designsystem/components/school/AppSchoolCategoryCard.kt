@@ -45,7 +45,7 @@ fun AppSchoolCategoryCard(
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            "Class $classRange",
+            classRange,
             style = MaterialTheme.typography.bodySmall,
         )
 

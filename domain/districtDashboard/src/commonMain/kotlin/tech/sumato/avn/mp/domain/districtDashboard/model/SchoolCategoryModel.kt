@@ -4,4 +4,6 @@ data class SchoolCategoryModel(
     val schoolCategory: String,
     val className: String,
     val totalSchools: Int,
-)
+) {
+
+}

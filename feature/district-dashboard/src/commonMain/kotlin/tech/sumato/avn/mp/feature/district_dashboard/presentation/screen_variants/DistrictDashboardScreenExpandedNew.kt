@@ -23,10 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import tech.sumato.avn.mp.domain.districtDashboard.model.DashboardProjectModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.DashboardStatModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.DistrictDashboardData
-import tech.sumato.avn.mp.domain.districtDashboard.model.SchoolCategoryModel
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.DistrictDashboardEvent
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.DistrictDashboardState
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.DistrictDashboardHeader
@@ -34,11 +32,11 @@ import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.Dis
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.DistrictDashboardSchoolCategoriesAnalytics
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.HorizontalStatsBar
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.OngoingProjects
-import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.ProjectProgress
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.UpcomingEvents
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.DashboardStatsUiModel
-import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.OngoingProjectStatsUiModel
-import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.SchoolCategoryUiModel
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.toDistrictUiModel
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.toOngoingProjectStatsUiModel
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.toSchoolCategoryUiModel
 
 @Composable
 fun DistrictDashboardScreenExpandedNew(
@@ -52,6 +50,7 @@ fun DistrictDashboardScreenExpandedNew(
             message = state.message,
             onRetry = { onEvent(DistrictDashboardEvent.Retry) },
         )
+
         is DistrictDashboardState.Success -> ExpandedDashboardContent(
             data = state.data,
             onNavigateToSchoolDashboard = onNavigateToSchoolDashboard,
@@ -107,8 +106,7 @@ private fun ExpandedDashboardContent(
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        DistrictDashboardHeader(modifier = Modifier.fillMaxWidth())
-
+        DistrictDashboardHeader(modifier = Modifier.fillMaxWidth(), data.districts.map { it.toDistrictUiModel() })
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -127,6 +125,7 @@ private fun ExpandedDashboardContent(
             DistrictDashboardMap(modifier = Modifier.weight(4f).fillMaxSize())
             DistrictDashboardSchoolCategoriesAnalytics(
                 modifier = Modifier.weight(2f).fillMaxSize(),
+                categories = data.schoolCategoryList.map { it.toSchoolCategoryUiModel() }.toList()
             )
         }
 
@@ -136,7 +135,11 @@ private fun ExpandedDashboardContent(
             modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            OngoingProjects(modifier = Modifier.weight(1f).fillMaxWidth().fillMaxHeight())
+            OngoingProjects(
+                modifier = Modifier.weight(1f).fillMaxWidth().fillMaxHeight(),
+                projects = data.ongoingProjects.projects.map { it.toOngoingProjectStatsUiModel() },
+                totalProjects = data.ongoingProjects.totalProjects
+            )
             UpcomingEvents(modifier = Modifier.weight(1f).fillMaxWidth().fillMaxHeight())
         }
     }

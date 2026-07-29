@@ -1,6 +1,8 @@
 package tech.sumato.avn.mp.feature.district_dashboard.presentation.model
 
 import androidx.compose.ui.graphics.Color
+import tech.sumato.avn.mp.domain.districtDashboard.model.DashboardProjectModel
+import tech.sumato.avn.mp.domain.districtDashboard.model.OngoingProjectModel
 
 data class OngoingProjectStatsUiModel(
     val id: String,
@@ -32,4 +34,14 @@ fun OngoingProjectStatsUiModel.progressColors(darkTheme: Boolean): Color {
     }
 
 
+}
+
+
+fun DashboardProjectModel.toOngoingProjectStatsUiModel(): OngoingProjectStatsUiModel {
+    return OngoingProjectStatsUiModel(
+        id = id,
+        name = projectName,
+        region = districtName,
+        progress = progressPercent.toDouble(),
+    )
 }

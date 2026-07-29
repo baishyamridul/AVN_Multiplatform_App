@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -21,12 +20,19 @@ import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.OngoingP
 
 
 @Composable
-fun OngoingProjects(modifier: Modifier) {
+fun OngoingProjects(
+    modifier: Modifier,
+    projects: List<OngoingProjectStatsUiModel> = emptyList(),
+    totalProjects: Int = 0,
+) {
 
 
     AppCardBordered(modifier = modifier) {
 
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
             Text(
                 "\uD83C\uDFD7\uFE0F Ongoing Infrastructure Projects & Completion Status",
                 style = MaterialTheme.typography.titleSmall,
@@ -35,7 +41,7 @@ fun OngoingProjects(modifier: Modifier) {
             )
 
             Text(
-                "418 Total Blocks",
+                "$totalProjects total projects",
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.W400,
                 color = LocalContentColor.current.copy(alpha = 0.85f)
@@ -48,27 +54,32 @@ fun OngoingProjects(modifier: Modifier) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(32.dp)) {
-            listOf(
-                OngoingProjectStatsUiModel(
-                    id = "1",
-                    name = "Deployment of 45 Virtual Smart Labs",
-                    region = "Tawang",
-                    progress = 75.0
-                ),
-                OngoingProjectStatsUiModel(
-                    id = "2",
-                    name = "WASH Hygiene Infrastructure Upgrades",
-                    region = "Tawang",
-                    progress = 90.0
-                ),
-                OngoingProjectStatsUiModel(
-                    id = "3",
-                    name = "Solar Micro-Grid Integrations",
-                    region = "Lower Subansiri",
-                    progress = 45.0
-                ),
-            ).forEach {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(32.dp)
+        ) {
+//            listOf(
+//                OngoingProjectStatsUiModel(
+//                    id = "1",
+//                    name = "Deployment of 45 Virtual Smart Labs",
+//                    region = "Tawang",
+//                    progress = 75.0
+//                ),
+//                OngoingProjectStatsUiModel(
+//                    id = "2",
+//                    name = "WASH Hygiene Infrastructure Upgrades",
+//                    region = "Tawang",
+//                    progress = 90.0
+//                ),
+//                OngoingProjectStatsUiModel(
+//                    id = "3",
+//                    name = "Solar Micro-Grid Integrations",
+//                    region = "Lower Subansiri",
+//                    progress = 45.0
+//                ),
+//            )
+
+            projects.forEach {
                 ProjectProgress(project = it)
             }
         }

@@ -76,29 +76,29 @@ actual fun MapView(
         }
     }
 
-    MaplibreMap(
-        modifier = modifier,
-        baseStyle = mapBaseStyle,
-        options = MapOptions(
-            renderOptions = RenderOptions(),
-            ornamentOptions = OrnamentOptions(
-                isLogoEnabled = false,
-                isAttributionEnabled = false
-            )
-        ),
-        cameraState = CameraState(
-            firstPosition = CameraPosition(
-                target = Position(longitude = 93.609159, latitude = 27.085558),
-                zoom = 8.0,
-                bearing = 0.0,
-                tilt = 0.0,
-            ),
-        ),
+//    MaplibreMap(
+//        modifier = modifier,
+//        baseStyle = mapBaseStyle,
+//        options = MapOptions(
+//            renderOptions = RenderOptions(),
+//            ornamentOptions = OrnamentOptions(
+//                isLogoEnabled = false,
+//                isAttributionEnabled = false
+//            )
+//        ),
+//        cameraState = CameraState(
+//            firstPosition = CameraPosition(
+//                target = Position(longitude = 93.609159, latitude = 27.085558),
+//                zoom = 8.0,
+//                bearing = 0.0,
+//                tilt = 0.0,
+//            ),
+//        ),
+//
+//    )
 
-    )
-
-//    Box(modifier = modifier) {
-//        Text("Android emulator does not support")
-//    }
+    Box(modifier = modifier) {
+        Text("Android emulator does not support")
+    }
 
 }
