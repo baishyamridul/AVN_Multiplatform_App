@@ -11,6 +11,8 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -24,6 +26,8 @@ fun AppTextField(
     readOnly: Boolean = false,
     singleLine: Boolean = true,
     trailing: @Composable (() -> Unit)? = null,
+    isSecured: Boolean = false,
+    error: String? = null,
 ) {
     Column(modifier = modifier) {
         Text(
@@ -35,6 +39,7 @@ fun AppTextField(
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
+            isError = error != null,
             placeholder = if (placeholder.isNotEmpty()) {
                 { Text(placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             } else null,
@@ -48,8 +53,20 @@ fun AppTextField(
                 unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                 focusedContainerColor = MaterialTheme.colorScheme.surface,
                 unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                errorBorderColor = MaterialTheme.colorScheme.error,
+                errorContainerColor = MaterialTheme.colorScheme.surface,
             ),
             modifier = Modifier.fillMaxWidth(),
+            visualTransformation = if (isSecured) PasswordVisualTransformation() else VisualTransformation.None,
+
         )
+        if (error != null) {
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = error,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
     }
 }
