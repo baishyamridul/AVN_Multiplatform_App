@@ -94,7 +94,7 @@ fun DistrictDashboardExpanded(viewModel: DistrictDashboardViewModel = koinViewMo
             modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            OngoingProjects(modifier = Modifier.weight(1f).fillMaxWidth().fillMaxHeight())
+            OngoingProjects(modifier = Modifier.weight(1f).fillMaxWidth().fillMaxHeight(),)
 
             UpcomingEvents(modifier = Modifier.weight(1f).fillMaxWidth().fillMaxHeight())
         }

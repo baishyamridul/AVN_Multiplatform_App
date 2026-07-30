@@ -26,6 +26,7 @@ import tech.sumato.avn.mp.designsystem.components.StatCard
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.screen_variants.DistrictDashboardCompact
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.screen_variants.DistrictDashboardExpanded
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.screen_variants.DistrictDashboardMedium
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.screen_variants.DistrictDashboardScreenExpandedNew
 
 @Composable
 fun DistrictDashboardScreen(
@@ -37,7 +38,8 @@ fun DistrictDashboardScreen(
     when (formFactor) {
         FormFactor.Compact -> DistrictDashboardCompact()
         FormFactor.Medium -> DistrictDashboardMedium()
-        FormFactor.Expanded -> DistrictDashboardExpanded()
+        FormFactor.Expanded -> DistrictDashboardScreenExpandedNew(state, onEvent)
+//        FormFactor.Expanded -> DistrictDashboardExpanded()
     }
 }
 

@@ -13,6 +13,7 @@ import org.koin.dsl.koinConfiguration
 import tech.sumato.avn.mp.core.navigation.Route
 import tech.sumato.avn.mp.core.network.di.NetworkModule
 import tech.sumato.avn.mp.data.dashboard.di.DashboardDataModule
+import tech.sumato.avn.mp.data.districtDashboard.di.DistrictDashboardDataModule
 import tech.sumato.avn.mp.data.user.di.UserDataModule
 import tech.sumato.avn.mp.designsystem.theme.AVNTheme
 import tech.sumato.avn.mp.feature.dashboard.di.DashboardFeatureModule
@@ -33,6 +34,7 @@ fun App() {
             NetworkModule,
             DashboardDataModule,
             DashboardFeatureModule,
+            DistrictDashboardDataModule,
             UserDataModule,
             LoginFeatureModule,
             MapAnalyticsFeatureModule,

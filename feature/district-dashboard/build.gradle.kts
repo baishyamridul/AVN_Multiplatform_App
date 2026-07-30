@@ -63,7 +63,7 @@ kotlin {
 
             implementation(libs.kotlinx.date.time)
 
-//            implementation(projects.domain.)
+            implementation(projects.domain.districtDashboard)
 
 
         }

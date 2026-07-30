@@ -57,6 +57,7 @@ kotlin {
 
             implementation(projects.feature.districtDashboard)
             implementation(projects.feature.schoolDashboard)
+            implementation(projects.data.districtDashboard)
 
             implementation(libs.androidx.navigation.compose)
 
