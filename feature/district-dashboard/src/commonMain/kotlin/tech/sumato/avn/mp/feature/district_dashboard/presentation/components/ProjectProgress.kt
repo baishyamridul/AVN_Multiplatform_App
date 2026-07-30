@@ -39,6 +39,7 @@ fun ProjectProgress(project: OngoingProjectStatsUiModel) {
             Text(
                 project.name,
                 style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f)
             )
 
             Text(
