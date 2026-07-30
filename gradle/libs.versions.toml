@@ -77,6 +77,8 @@ kotlinx-date-time = {module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 
 # webview
 saralapps-webview = {module = "com.saralapps:composemultiplatformwebview", version.ref = "saralapps-webview"}
+datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version = "1.2.1" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

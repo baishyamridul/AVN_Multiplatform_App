@@ -9,7 +9,7 @@ class AuthApi(
     private val httpClient: HttpClient,
 ) {
     suspend fun login(request: LoginRequestDto): LoginResponseDto {
-        return httpClient.post("auth/login") {
+        return httpClient.post("login") {
             setBody(request)
         }.body()
     }
