@@ -60,6 +60,11 @@ class LoginViewModel(
             LoginEvent.Retry -> {
                 login()
             }
+            is LoginEvent.SessionExpired -> {
+                _email.value = ""
+                _password.value = ""
+                _state.value = LoginState.Error(message = event.message)
+            }
         }
     }
 

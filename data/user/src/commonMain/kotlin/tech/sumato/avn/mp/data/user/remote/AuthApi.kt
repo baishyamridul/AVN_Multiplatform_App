@@ -13,4 +13,12 @@ class AuthApi(
             setBody(request)
         }.body()
     }
+
+//    suspend fun me() :
+
+
+    suspend fun logout() {
+        httpClient.post("logout")
+    }
+
 }

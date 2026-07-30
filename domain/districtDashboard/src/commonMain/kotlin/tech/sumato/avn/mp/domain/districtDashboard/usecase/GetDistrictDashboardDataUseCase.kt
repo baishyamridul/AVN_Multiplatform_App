@@ -6,7 +6,7 @@ import tech.sumato.avn.mp.domain.districtDashboard.repository.DistrictDashboardR
 class GetDistrictDashboardDataUseCase(
     private val repository: DistrictDashboardRepository,
 ) {
-    suspend operator fun invoke(): DistrictDashboardData {
-        return repository.getDistrictDashboardData()
+    suspend operator fun invoke(districtId: Int): DistrictDashboardData {
+        return repository.getDistrictDashboardData(districtId = districtId)
     }
 }

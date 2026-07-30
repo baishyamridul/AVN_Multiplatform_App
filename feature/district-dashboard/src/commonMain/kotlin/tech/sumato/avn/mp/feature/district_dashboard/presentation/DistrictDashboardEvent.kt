@@ -1,6 +1,9 @@
 package tech.sumato.avn.mp.feature.district_dashboard.presentation
 
 sealed interface DistrictDashboardEvent {
-    data object LoadData : DistrictDashboardEvent
-    data object Retry : DistrictDashboardEvent
+    data class LoadData(val districtId: Int = -1) : DistrictDashboardEvent
+    data class Retry(val districtId: Int = -1) : DistrictDashboardEvent
+
+    data object Logout : DistrictDashboardEvent
+
 }

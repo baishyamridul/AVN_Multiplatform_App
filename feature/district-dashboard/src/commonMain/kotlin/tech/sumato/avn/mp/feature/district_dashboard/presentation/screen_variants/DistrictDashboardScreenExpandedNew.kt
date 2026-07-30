@@ -48,12 +48,13 @@ fun DistrictDashboardScreenExpandedNew(
         is DistrictDashboardState.Loading -> LoadingContent()
         is DistrictDashboardState.Error -> ErrorContent(
             message = state.message,
-            onRetry = { onEvent(DistrictDashboardEvent.Retry) },
+            onRetry = { onEvent(DistrictDashboardEvent.Retry()) },
         )
 
         is DistrictDashboardState.Success -> ExpandedDashboardContent(
             data = state.data,
             onNavigateToSchoolDashboard = onNavigateToSchoolDashboard,
+            onEvent = onEvent
         )
     }
 }
@@ -96,6 +97,7 @@ private fun ErrorContent(
 private fun ExpandedDashboardContent(
     data: DistrictDashboardData,
     onNavigateToSchoolDashboard: () -> Unit,
+    onEvent: (DistrictDashboardEvent) -> Unit,
 ) {
     val scrollState = rememberScrollState()
 
@@ -106,7 +108,16 @@ private fun ExpandedDashboardContent(
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        DistrictDashboardHeader(modifier = Modifier.fillMaxWidth(), data.districts.map { it.toDistrictUiModel() })
+        DistrictDashboardHeader(
+            modifier = Modifier.fillMaxWidth(),
+            data.districts.map { it.toDistrictUiModel() },
+            onDistrictSelected = { district ->
+                onEvent(DistrictDashboardEvent.LoadData(district.id))
+            },
+            onUserClicked = {
+                onEvent(DistrictDashboardEvent.Logout)
+            }
+        )
 
         Spacer(modifier = Modifier.height(8.dp))
 

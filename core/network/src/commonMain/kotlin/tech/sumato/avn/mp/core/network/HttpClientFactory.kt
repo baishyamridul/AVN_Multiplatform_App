@@ -9,6 +9,7 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -19,6 +20,7 @@ object HttpClientFactory {
         config: NetworkConfig,
         json: Json,
         tokenProvider: suspend () -> String? = { null },
+        onUnauthorized: suspend () -> Unit = {},
     ): HttpClient {
         val authPlugin = createClientPlugin("AuthBearer") {
             onRequest { request, _ ->
@@ -29,10 +31,18 @@ object HttpClientFactory {
             }
         }
 
-
+        val logoutHandlerPlugin = createClientPlugin("logoutHandler") {
+            onResponse { response ->
+                if (response.status == HttpStatusCode.Unauthorized) {
+                    onUnauthorized()
+                }
+            }
+        }
 
         return HttpClient {
             install(authPlugin)
+
+            install(logoutHandlerPlugin)
 
             install(ContentNegotiation) {
                 json(json)

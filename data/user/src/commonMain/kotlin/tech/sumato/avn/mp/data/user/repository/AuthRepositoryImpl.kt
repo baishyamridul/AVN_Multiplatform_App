@@ -40,6 +40,12 @@ class AuthRepositoryImpl(
     }
 
     override suspend fun logout() {
+        try {
+            authApi.logout()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
         storage.clear()
     }
 

@@ -10,8 +10,8 @@ class DistrictDashboardRepositoryImpl(
     private val mapper: DistrictDashboardMapper,
 ) : DistrictDashboardRepository {
 
-    override suspend fun getDistrictDashboardData(): DistrictDashboardData {
-        val response = api.getDistrictDashboard()
+    override suspend fun getDistrictDashboardData(districtId: Int): DistrictDashboardData {
+        val response = api.getDistrictDashboard(districtId)
         return mapper.toDomain(response.data)
     }
 }

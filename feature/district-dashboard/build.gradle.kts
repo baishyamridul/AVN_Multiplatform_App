@@ -65,6 +65,9 @@ kotlin {
 
             implementation(projects.domain.districtDashboard)
 
+            // TODO: remove user domain 
+            implementation(projects.domain.user)
+            
 
         }
     }
