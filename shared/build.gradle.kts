@@ -54,6 +54,7 @@ kotlin {
             implementation(projects.designsystem)
             implementation(projects.core.common)
             implementation(projects.core.navigation)
+            implementation(projects.core.datastore)
 
             implementation(projects.feature.districtDashboard)
             implementation(projects.feature.schoolDashboard)

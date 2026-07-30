@@ -9,7 +9,8 @@ import androidx.navigation.compose.rememberNavController
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.KoinApplication
 import org.koin.core.KoinApplication
-import org.koin.dsl.koinConfiguration
+import org.koin.dsl.KoinConfiguration
+import tech.sumato.avn.mp.core.datastore.DataStoreModule
 import tech.sumato.avn.mp.core.navigation.Route
 import tech.sumato.avn.mp.core.network.di.NetworkModule
 import tech.sumato.avn.mp.data.dashboard.di.DashboardDataModule
@@ -28,9 +29,13 @@ import tech.sumato.avn.mp.feature.school_dashboard.di.SchoolDashboardFeatureModu
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.SchoolDashboardRoute
 
 @Composable
-fun App() {
-    KoinApplication(configuration = koinConfiguration(declaration = {
+fun App(
+    platformConfiguration: KoinApplication.() -> Unit = {},
+) {
+    KoinApplication(configuration = KoinConfiguration {
+        platformConfiguration()
         modules(
+            DataStoreModule,
             NetworkModule,
             DashboardDataModule,
             DashboardFeatureModule,
@@ -41,7 +46,7 @@ fun App() {
             DistrictDashboardFeatureModule,
             SchoolDashboardFeatureModule
         )
-    }), content = {
+    }, content = {
         AVNTheme {
             val navController = rememberNavController()
             AdaptiveScaffold(navController = navController) {
@@ -55,12 +60,12 @@ fun App() {
 fun AppNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = Route.DISTRICT_DASHBOARD,
+        startDestination = Route.LOGIN,
     ) {
         composable(Route.LOGIN) {
             LoginRoute(
                 onNavigateToDashboard = {
-                    navController.navigate(Route.DASHBOARD) {
+                    navController.navigate(Route.DISTRICT_DASHBOARD) {
                         popUpTo(Route.LOGIN) { inclusive = true }
                     }
                 },

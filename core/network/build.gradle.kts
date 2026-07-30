@@ -34,6 +34,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.core.datastore)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.koin.core)

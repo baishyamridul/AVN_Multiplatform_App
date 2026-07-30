@@ -2,27 +2,43 @@ package tech.sumato.avn.mp.core.network
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 object HttpClientFactory {
 
-    fun create(config: NetworkConfig): HttpClient {
-        return HttpClient {
-            install(ContentNegotiation) {
-                json(Json {
-                    ignoreUnknownKeys = true
-                    isLenient = true
-                    prettyPrint = false
-                    encodeDefaults = true
-                })
+    fun create(
+        config: NetworkConfig,
+        json: Json,
+        tokenProvider: suspend () -> String? = { null },
+    ): HttpClient {
+        val authPlugin = createClientPlugin("AuthBearer") {
+            onRequest { request, _ ->
+                val token = tokenProvider()
+                if (!token.isNullOrBlank()) {
+                    request.headers.append(HttpHeaders.Authorization, "Bearer $token")
+                }
             }
+        }
+
+
+
+        return HttpClient {
+            install(authPlugin)
+
+            install(ContentNegotiation) {
+                json(json)
+            }
+
+            expectSuccess = true
 
             if (config.enableLogging) {
                 install(Logging) {
@@ -31,7 +47,7 @@ object HttpClientFactory {
                             println(message)
                         }
                     }
-                    level = LogLevel.HEADERS
+                    level = LogLevel.ALL
                 }
             }
 

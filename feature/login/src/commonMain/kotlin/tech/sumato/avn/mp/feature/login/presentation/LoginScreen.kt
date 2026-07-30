@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import tech.sumato.avn.mp.designsystem.FormFactor
 import tech.sumato.avn.mp.designsystem.LocalFormFactor
 import tech.sumato.avn.mp.designsystem.components.AppTextField
+import tech.sumato.avn.mp.feature.login.presentation.screen_variants.LoginScreenExpanded
 
 @Composable
 fun LoginScreen(
@@ -43,7 +45,7 @@ fun LoginScreen(
         when (formFactor) {
             FormFactor.Compact -> LoginCompact(email, password, state, onEvent)
             FormFactor.Medium -> LoginWide(email, password, state, onEvent, 480.dp)
-            FormFactor.Expanded -> LoginWide(email, password, state, onEvent, 560.dp)
+            FormFactor.Expanded -> LoginScreenExpanded(email, password, state, onEvent, 560.dp)
         }
     }
 }
@@ -55,6 +57,9 @@ private fun LoginCompact(
     state: LoginState,
     onEvent: (LoginEvent) -> Unit,
 ) {
+    val emailError = (state as? LoginState.Error)?.emailError
+    val passwordError = (state as? LoginState.Error)?.passwordError
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -67,12 +72,15 @@ private fun LoginCompact(
             onValueChange = { onEvent(LoginEvent.EmailChanged(it)) },
             label = "Email",
             placeholder = "Enter your email",
+            error = emailError,
         )
         AppTextField(
             value = password,
             onValueChange = { onEvent(LoginEvent.PasswordChanged(it)) },
             label = "Password",
             placeholder = "Enter your password",
+            isSecured = true,
+            error = passwordError,
         )
         Spacer(Modifier.height(8.dp))
         LoginButton(state, onEvent)
@@ -88,6 +96,9 @@ private fun LoginWide(
     onEvent: (LoginEvent) -> Unit,
     maxWidth: Dp,
 ) {
+    val emailError = (state as? LoginState.Error)?.emailError
+    val passwordError = (state as? LoginState.Error)?.passwordError
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -105,12 +116,15 @@ private fun LoginWide(
                 onValueChange = { onEvent(LoginEvent.EmailChanged(it)) },
                 label = "Email",
                 placeholder = "Enter your email",
+                error = emailError,
             )
             AppTextField(
                 value = password,
                 onValueChange = { onEvent(LoginEvent.PasswordChanged(it)) },
                 label = "Password",
                 placeholder = "Enter your password",
+                isSecured = true,
+                error = passwordError,
             )
             Spacer(Modifier.height(8.dp))
             LoginButton(state, onEvent)
@@ -131,7 +145,7 @@ private fun LoginTitle() {
 }
 
 @Composable
-private fun LoginButton(
+fun LoginButton(
     state: LoginState,
     onEvent: (LoginEvent) -> Unit,
 ) {
@@ -146,7 +160,7 @@ private fun LoginButton(
         if (state is LoginState.Loading) {
             CircularProgressIndicator(
                 color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.height(24.dp),
+                modifier = Modifier.size(24.dp),
             )
         } else {
             Text("Login")
@@ -155,8 +169,8 @@ private fun LoginButton(
 }
 
 @Composable
-private fun LoginError(state: LoginState) {
-    if (state is LoginState.Error) {
+fun LoginError(state: LoginState) {
+    if (state is LoginState.Error && state.emailError == null && state.passwordError == null) {
         Text(
             text = state.message,
             color = MaterialTheme.colorScheme.error,
