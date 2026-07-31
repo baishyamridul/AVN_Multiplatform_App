@@ -5,4 +5,5 @@ sealed interface LoginEvent {
     data class PasswordChanged(val password: String) : LoginEvent
     data object LoginClicked : LoginEvent
     data object Retry : LoginEvent
+    data class SessionExpired(val message: String) : LoginEvent
 }

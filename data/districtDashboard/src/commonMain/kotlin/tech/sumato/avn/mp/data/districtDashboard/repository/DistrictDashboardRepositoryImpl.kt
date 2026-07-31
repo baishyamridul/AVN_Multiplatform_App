@@ -10,8 +10,9 @@ class DistrictDashboardRepositoryImpl(
     private val mapper: DistrictDashboardMapper,
 ) : DistrictDashboardRepository {
 
-    override suspend fun getDistrictDashboardData(): DistrictDashboardData {
-        val response = api.getDistrictDashboard()
-        return mapper.toDomain(response.data)
+    override suspend fun getDistrictDashboardData(districtId: Int): DistrictDashboardData {
+        val response = api.getDistrictDashboard(districtId)
+        val data = response.data ?: throw IllegalStateException("Dashboard data is missing")
+        return mapper.toDomain(data)
     }
 }

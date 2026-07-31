@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import tech.sumato.avn.mp.domain.common.model.DistrictModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.DashboardStatModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.DistrictDashboardData
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.DistrictDashboardEvent
@@ -48,12 +49,14 @@ fun DistrictDashboardScreenExpandedNew(
         is DistrictDashboardState.Loading -> LoadingContent()
         is DistrictDashboardState.Error -> ErrorContent(
             message = state.message,
-            onRetry = { onEvent(DistrictDashboardEvent.Retry) },
+            onRetry = { onEvent(DistrictDashboardEvent.Retry()) },
         )
 
         is DistrictDashboardState.Success -> ExpandedDashboardContent(
             data = state.data,
+            userDistricts = state.userDistricts,
             onNavigateToSchoolDashboard = onNavigateToSchoolDashboard,
+            onEvent = onEvent
         )
     }
 }
@@ -95,7 +98,9 @@ private fun ErrorContent(
 @Composable
 private fun ExpandedDashboardContent(
     data: DistrictDashboardData,
+    userDistricts: List<DistrictModel>,
     onNavigateToSchoolDashboard: () -> Unit,
+    onEvent: (DistrictDashboardEvent) -> Unit,
 ) {
     val scrollState = rememberScrollState()
 
@@ -106,7 +111,16 @@ private fun ExpandedDashboardContent(
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        DistrictDashboardHeader(modifier = Modifier.fillMaxWidth(), data.districts.map { it.toDistrictUiModel() })
+        DistrictDashboardHeader(
+            modifier = Modifier.fillMaxWidth(),
+            userDistricts.map { it.toDistrictUiModel() },
+            onDistrictSelected = { district ->
+                onEvent(DistrictDashboardEvent.LoadData(district.id))
+            },
+            onUserClicked = {
+                onEvent(DistrictDashboardEvent.Logout)
+            }
+        )
 
         Spacer(modifier = Modifier.height(8.dp))
 

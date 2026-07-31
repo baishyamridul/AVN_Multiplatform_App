@@ -30,6 +30,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.domain.districtDashboard)
+            implementation(projects.domain.common)
             implementation(projects.core.common)
             implementation(projects.core.network)
             implementation(libs.kotlinx.coroutines.core)

@@ -14,4 +14,9 @@ class LoginUseCase(
     suspend fun getCurrentUser(): User? {
         return authRepository.getCurrentUser()
     }
+
+    suspend fun logoutCurrentUser() {
+        authRepository.logout()
+    }
+
 }

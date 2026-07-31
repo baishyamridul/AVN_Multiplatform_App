@@ -2,13 +2,7 @@ package tech.sumato.avn.mp.data.districtDashboard.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-
-@Serializable
-data class DistrictDashboardResponseDto(
-    val status: Int,
-    val message: String,
-    val data: DistrictDashboardDataDto,
-)
+import tech.sumato.avn.mp.core.network.model.DateDto
 
 @Serializable
 data class DistrictDashboardDataDto(
@@ -60,12 +54,5 @@ data class DashboardProjectDto(
     @SerialName("district_name")
     val districtName: String,
     @SerialName("updated_at")
-    val updatedAt: UpdatedAtDto,
-)
-
-@Serializable
-data class UpdatedAtDto(
-    val human: String,
-    val date: String,
-    val formatted: String,
+    val updatedAt: DateDto,
 )

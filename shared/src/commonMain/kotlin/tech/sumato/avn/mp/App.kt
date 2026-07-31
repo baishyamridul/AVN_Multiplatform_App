@@ -2,12 +2,20 @@ package tech.sumato.avn.mp
 
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.emptyFlow
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.KoinApplication
+import org.koin.compose.koinInject
 import org.koin.core.KoinApplication
 import org.koin.dsl.KoinConfiguration
 import tech.sumato.avn.mp.core.datastore.DataStoreModule
@@ -58,17 +66,32 @@ fun App(
 
 @Composable
 fun AppNavGraph(navController: NavHostController) {
+    val logoutEvent: SharedFlow<String> = koinInject()
+    var pendingLogoutMessage by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        logoutEvent.collect { message ->
+            pendingLogoutMessage = message
+            navController.navigate(Route.LOGIN) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = Route.LOGIN,
     ) {
         composable(Route.LOGIN) {
+            val msg = pendingLogoutMessage
+            if (msg != null) pendingLogoutMessage = null
             LoginRoute(
                 onNavigateToDashboard = {
                     navController.navigate(Route.DISTRICT_DASHBOARD) {
                         popUpTo(Route.LOGIN) { inclusive = true }
                     }
                 },
+                sessionExpiredMessage = msg,
             )
         }
         composable(Route.DASHBOARD) {

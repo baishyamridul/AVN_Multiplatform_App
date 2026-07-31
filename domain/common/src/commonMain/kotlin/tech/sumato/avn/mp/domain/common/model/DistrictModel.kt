@@ -1,4 +1,4 @@
-package tech.sumato.avn.mp.domain.districtDashboard.model
+package tech.sumato.avn.mp.domain.common.model
 
 data class DistrictModel(
     val id: Int,

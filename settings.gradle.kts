@@ -42,6 +42,7 @@ include(":core:common")
 include(":core:network")
 include(":core:navigation")
 include(":core:datastore")
+include(":domain:common")
 include(":domain:user")
 include(":data:user")
 include(":domain:districtDashboard")
@@ -61,5 +62,3 @@ include(":feature:map-analytics")
 
 include(":feature:school-dashboard")
 include(":component:image360")
-
-include(":data:districtDashboard")

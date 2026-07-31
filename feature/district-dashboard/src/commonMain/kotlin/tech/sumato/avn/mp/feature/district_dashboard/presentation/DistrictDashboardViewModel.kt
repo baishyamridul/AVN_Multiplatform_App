@@ -12,9 +12,13 @@ import kotlinx.coroutines.launch
 import tech.sumato.avn.mp.core.navigation.MviViewModel
 import tech.sumato.avn.mp.core.navigation.Route
 import tech.sumato.avn.mp.domain.districtDashboard.usecase.GetDistrictDashboardDataUseCase
+import tech.sumato.avn.mp.domain.user.usecase.GetStoredUserDetailsUseCase
+import tech.sumato.avn.mp.domain.user.usecase.LoginUseCase
 
 class DistrictDashboardViewModel(
     private val getDistrictDashboardDataUseCase: GetDistrictDashboardDataUseCase,
+    private val getStoredUserDetailsUseCase: GetStoredUserDetailsUseCase,
+    private val loginUseCase: LoginUseCase,
 ) : ViewModel(), MviViewModel<DistrictDashboardState, DistrictDashboardEffect> {
 
     private val _state = MutableStateFlow<DistrictDashboardState>(DistrictDashboardState.Loading)
@@ -29,17 +33,23 @@ class DistrictDashboardViewModel(
 
     fun onEvent(event: DistrictDashboardEvent) {
         when (event) {
-            DistrictDashboardEvent.LoadData -> loadData()
-            DistrictDashboardEvent.Retry -> loadData()
+            is DistrictDashboardEvent.LoadData -> loadData(event.districtId)
+            is DistrictDashboardEvent.Retry -> loadData(event.districtId)
+            is DistrictDashboardEvent.Logout -> logout()
         }
     }
 
-    private fun loadData() {
+
+    private fun loadData(districtId: Int = -1) {
         viewModelScope.launch {
             _state.value = DistrictDashboardState.Loading
             try {
-                val data = getDistrictDashboardDataUseCase()
-                _state.value = DistrictDashboardState.Success(data)
+                val data = getDistrictDashboardDataUseCase(districtId)
+                val storedDetails = getStoredUserDetailsUseCase()
+                _state.value = DistrictDashboardState.Success(
+                    data = data,
+                    userDistricts = storedDetails?.districts.orEmpty(),
+                )
             } catch (e: Exception) {
                 _state.value = DistrictDashboardState.Error(e.message ?: "Unknown error")
                 _effects.send(DistrictDashboardEffect.ShowSnackbar("Failed to load dashboard data"))
@@ -50,4 +60,13 @@ class DistrictDashboardViewModel(
     fun navigateToSchoolDashboard() {
         _effects.trySend(DistrictDashboardEffect.Navigate(Route.SCHOOL_DASHBOARD))
     }
+
+    private fun logout() {
+        viewModelScope.launch {
+            loginUseCase.logoutCurrentUser()
+            _effects.trySend(DistrictDashboardEffect.Navigate(Route.LOGIN))
+        }
+
+    }
+
 }

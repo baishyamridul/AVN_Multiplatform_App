@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +30,9 @@ import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.District
 @Composable
 fun DistrictDashboardHeader(
     modifier: Modifier,
-    districts: List<DistrictUiModel> = emptyList()
+    districts: List<DistrictUiModel> = emptyList(),
+    onDistrictSelected: (district: DistrictUiModel) -> Unit = {},
+    onUserClicked: () -> Unit = {},
 ) {
 
     val options = buildList {
@@ -59,7 +63,9 @@ fun DistrictDashboardHeader(
                     ),
                 options = options,
                 labelTransformer = { it.toString() },
-                onSelected = { it -> },
+                onSelected = { it ->
+                    onDistrictSelected(it)
+                },
                 selected = options.first(),
             ) { currentOption ->
 
@@ -82,6 +88,11 @@ fun DistrictDashboardHeader(
 
 
             AppDateTime(modifier = Modifier)
+
+            IconButton(onClick = onUserClicked) {
+                Icon(Icons.Default.Person, "")
+            }
+
         }
     }
 
