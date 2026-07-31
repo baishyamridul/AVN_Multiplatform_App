@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import tech.sumato.avn.mp.core.navigation.Route
 import tech.sumato.avn.mp.domain.common.model.DistrictModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.DashboardStatModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.DistrictDashboardData
@@ -127,7 +128,7 @@ private fun ExpandedDashboardContent(
         HorizontalStatsBar(
             modifier = Modifier,
             stats = data.stats.map { it.toStatsUiModel() },
-            onStatsClicked = { onNavigateToSchoolDashboard() },
+            onStatsClicked = {  },
         )
 
         Spacer(Modifier.height(8.dp))
@@ -139,7 +140,10 @@ private fun ExpandedDashboardContent(
             DistrictDashboardMap(modifier = Modifier.weight(4f).fillMaxSize())
             DistrictDashboardSchoolCategoriesAnalytics(
                 modifier = Modifier.weight(2f).fillMaxSize(),
-                categories = data.schoolCategoryList.map { it.toSchoolCategoryUiModel() }.toList()
+                categories = data.schoolCategoryList.map { it.toSchoolCategoryUiModel() }.toList(),
+                onViewAllClicked = {
+                    onEvent(DistrictDashboardEvent.Navigate(Route.SCHOOL_DASHBOARD))
+                }
             )
         }
 

@@ -1,7 +1,9 @@
 package tech.sumato.avn.mp.feature.district_dashboard.presentation.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,17 +26,35 @@ import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.SchoolCa
 @Composable
 fun DistrictDashboardSchoolCategoriesAnalytics(
     modifier: Modifier,
-    categories: List<SchoolCategoryUiModel> = emptyList()
+    categories: List<SchoolCategoryUiModel> = emptyList(),
+    onViewAllClicked: () -> Unit = {}
 ) {
 
     AppCardBordered(
         modifier = modifier,
     ) {
-        Text(
-            "\uD83C\uDFEB School Categories Analytics",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                "\uD83C\uDFEB School Categories Analytics",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f).fillMaxWidth()
+            )
+
+            Text(
+                "View All",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Normal,
+                modifier = Modifier.clickable(onClick = {
+                    onViewAllClicked()
+                })
+            )
+
+        }
+
 
         Spacer(Modifier.height(24.dp))
 

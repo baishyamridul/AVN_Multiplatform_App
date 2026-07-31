@@ -36,7 +36,12 @@ class DistrictDashboardViewModel(
             is DistrictDashboardEvent.LoadData -> loadData(event.districtId)
             is DistrictDashboardEvent.Retry -> loadData(event.districtId)
             is DistrictDashboardEvent.Logout -> logout()
+            is DistrictDashboardEvent.Navigate -> handleNavigation(event)
         }
+    }
+
+    private fun handleNavigation(event: DistrictDashboardEvent.Navigate) {
+        _effects.trySend(DistrictDashboardEffect.Navigate(event.route))
     }
 
 

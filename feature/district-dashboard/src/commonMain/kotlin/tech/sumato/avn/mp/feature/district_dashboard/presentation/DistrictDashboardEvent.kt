@@ -6,4 +6,6 @@ sealed interface DistrictDashboardEvent {
 
     data object Logout : DistrictDashboardEvent
 
+    data class Navigate(val route: String) : DistrictDashboardEvent
+
 }
