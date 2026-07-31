@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import tech.sumato.avn.mp.domain.common.model.DistrictModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.DashboardStatModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.DistrictDashboardData
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.DistrictDashboardEvent
@@ -53,6 +54,7 @@ fun DistrictDashboardScreenExpandedNew(
 
         is DistrictDashboardState.Success -> ExpandedDashboardContent(
             data = state.data,
+            userDistricts = state.userDistricts,
             onNavigateToSchoolDashboard = onNavigateToSchoolDashboard,
             onEvent = onEvent
         )
@@ -96,6 +98,7 @@ private fun ErrorContent(
 @Composable
 private fun ExpandedDashboardContent(
     data: DistrictDashboardData,
+    userDistricts: List<DistrictModel>,
     onNavigateToSchoolDashboard: () -> Unit,
     onEvent: (DistrictDashboardEvent) -> Unit,
 ) {
@@ -110,7 +113,7 @@ private fun ExpandedDashboardContent(
     ) {
         DistrictDashboardHeader(
             modifier = Modifier.fillMaxWidth(),
-            data.districts.map { it.toDistrictUiModel() },
+            userDistricts.map { it.toDistrictUiModel() },
             onDistrictSelected = { district ->
                 onEvent(DistrictDashboardEvent.LoadData(district.id))
             },

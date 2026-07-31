@@ -28,7 +28,7 @@ val NetworkModule = module {
         HttpClientFactory.create(
             config = get(),
             json = get(),
-            tokenProvider = { storage.getAuth()?.accessToken },
+            tokenProvider = { storage.getAccessToken() },
             onUnauthorized = {
                 storage.clear()
                 _logoutEvent.emit("Session expired. Please login again.")

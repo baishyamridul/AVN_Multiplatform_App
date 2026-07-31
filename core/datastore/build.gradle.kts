@@ -28,7 +28,6 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.domain.user)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.koin.core)
             implementation(libs.datastore.preferences.core)

@@ -1,6 +1,6 @@
 package tech.sumato.avn.mp.feature.district_dashboard.presentation.model
 
-import tech.sumato.avn.mp.domain.districtDashboard.model.DistrictModel
+import tech.sumato.avn.mp.domain.common.model.DistrictModel
 
 data class DistrictUiModel(
     val id: Int,

@@ -12,10 +12,12 @@ import kotlinx.coroutines.launch
 import tech.sumato.avn.mp.core.navigation.MviViewModel
 import tech.sumato.avn.mp.core.navigation.Route
 import tech.sumato.avn.mp.domain.districtDashboard.usecase.GetDistrictDashboardDataUseCase
+import tech.sumato.avn.mp.domain.user.usecase.GetStoredUserDetailsUseCase
 import tech.sumato.avn.mp.domain.user.usecase.LoginUseCase
 
 class DistrictDashboardViewModel(
     private val getDistrictDashboardDataUseCase: GetDistrictDashboardDataUseCase,
+    private val getStoredUserDetailsUseCase: GetStoredUserDetailsUseCase,
     private val loginUseCase: LoginUseCase,
 ) : ViewModel(), MviViewModel<DistrictDashboardState, DistrictDashboardEffect> {
 
@@ -43,7 +45,11 @@ class DistrictDashboardViewModel(
             _state.value = DistrictDashboardState.Loading
             try {
                 val data = getDistrictDashboardDataUseCase(districtId)
-                _state.value = DistrictDashboardState.Success(data)
+                val storedDetails = getStoredUserDetailsUseCase()
+                _state.value = DistrictDashboardState.Success(
+                    data = data,
+                    userDistricts = storedDetails?.districts.orEmpty(),
+                )
             } catch (e: Exception) {
                 _state.value = DistrictDashboardState.Error(e.message ?: "Unknown error")
                 _effects.send(DistrictDashboardEffect.ShowSnackbar("Failed to load dashboard data"))

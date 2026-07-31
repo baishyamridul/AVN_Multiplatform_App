@@ -1,22 +1,24 @@
 package tech.sumato.avn.mp.data.user.mapper
 
-import tech.sumato.avn.mp.data.user.remote.LoginResponseDto
+import tech.sumato.avn.mp.core.network.model.SuccessResponseWrapper
+import tech.sumato.avn.mp.data.user.remote.LoginDataDto
 import tech.sumato.avn.mp.domain.user.model.AuthResult
 import tech.sumato.avn.mp.domain.user.model.User
 
 class AuthMapper {
-    fun toDomain(dto: LoginResponseDto): AuthResult {
+    fun toDomain(dto: SuccessResponseWrapper<LoginDataDto>): AuthResult {
+        val data = dto.data ?: throw IllegalStateException("Login data is missing")
         return AuthResult(
-            tokenType = dto.data!!.tokenType,
-            accessToken = dto.data.accessToken,
+            tokenType = data.tokenType,
+            accessToken = data.accessToken,
             user = User(
-                id = dto.data.user.id,
-                name = dto.data.user.attributes.name,
-                email = dto.data.user.attributes.email,
-                role = dto.data.user.attributes.role,
-                phone = dto.data.user.attributes.phone,
-                photo = dto.data.user.attributes.photo,
-                designation = dto.data.user.attributes.designation,
+                id = data.user.id,
+                name = data.user.attributes.name,
+                email = data.user.attributes.email,
+                role = data.user.attributes.role,
+                phone = data.user.attributes.phone,
+                photo = data.user.attributes.photo,
+                designation = data.user.attributes.designation,
             ),
         )
     }

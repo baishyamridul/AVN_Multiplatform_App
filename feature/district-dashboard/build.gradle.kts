@@ -64,6 +64,7 @@ kotlin {
             implementation(libs.kotlinx.date.time)
 
             implementation(projects.domain.districtDashboard)
+            implementation(projects.domain.common)
 
             // TODO: remove user domain 
             implementation(projects.domain.user)

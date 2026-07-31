@@ -1,15 +1,7 @@
 package tech.sumato.avn.mp.data.user.dto
 
 import kotlinx.serialization.Serializable
-import tech.sumato.avn.mp.data.user.remote.CreatedDto
-import tech.sumato.avn.mp.data.user.remote.LoginDataDto
-
-@Serializable
-data class MeResponseDto(
-    val status: Int,
-    val message: String,
-    val data: LoginDataDto? = null,
-)
+import tech.sumato.avn.mp.core.network.model.DateDto
 
 
 @Serializable
@@ -21,5 +13,6 @@ data class MeDataDto(
     val phone: String? = null,
     val photo: String? = null,
     val designation: String? = null,
-    val created: CreatedDto? = null,
+    val created: DateDto? = null,
+    val district: List<DistrictDto>? = null,
 )

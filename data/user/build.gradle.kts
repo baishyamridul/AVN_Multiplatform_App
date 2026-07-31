@@ -34,6 +34,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.domain.user)
+            implementation(projects.domain.common)
             implementation(projects.core.network)
             implementation(projects.core.common)
             implementation(projects.core.datastore)

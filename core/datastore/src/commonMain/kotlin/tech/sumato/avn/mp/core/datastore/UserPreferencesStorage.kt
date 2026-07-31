@@ -7,8 +7,20 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import tech.sumato.avn.mp.domain.user.model.AuthResult
-import tech.sumato.avn.mp.domain.user.model.User
+
+data class StoredAuth(
+    val accessToken: String,
+    val tokenType: String,
+    val userId: String,
+    val name: String,
+    val email: String,
+    val role: String? = null,
+    val phone: String? = null,
+    val photo: String? = null,
+    val designation: String? = null,
+    val createdJson: String? = null,
+    val districtsJson: String? = null,
+)
 
 class UserPreferencesStorage(private val dataStore: DataStore<Preferences>) {
 
@@ -22,54 +34,88 @@ class UserPreferencesStorage(private val dataStore: DataStore<Preferences>) {
         val KEY_USER_PHONE = stringPreferencesKey("user_phone")
         val KEY_USER_PHOTO = stringPreferencesKey("user_photo")
         val KEY_USER_DESIGNATION = stringPreferencesKey("user_designation")
+        val KEY_USER_CREATED = stringPreferencesKey("user_created")
+        val KEY_USER_DISTRICTS = stringPreferencesKey("user_districts")
     }
 
-    suspend fun saveAuth(result: AuthResult) {
+    suspend fun saveAuth(
+        accessToken: String,
+        tokenType: String,
+        userId: String,
+        name: String,
+        email: String,
+        role: String? = null,
+        phone: String? = null,
+        photo: String? = null,
+        designation: String? = null,
+    ) {
         dataStore.edit { prefs ->
-            prefs[KEY_ACCESS_TOKEN] = result.accessToken
-            prefs[KEY_TOKEN_TYPE] = result.tokenType
-            prefs[KEY_USER_ID] = result.user.id
-            prefs[KEY_USER_NAME] = result.user.name
-            prefs[KEY_USER_EMAIL] = result.user.email
-            result.user.role?.let { prefs[KEY_USER_ROLE] = it }
-            result.user.phone?.let { prefs[KEY_USER_PHONE] = it }
-            result.user.photo?.let { prefs[KEY_USER_PHOTO] = it }
-            result.user.designation?.let { prefs[KEY_USER_DESIGNATION] = it }
+            prefs[KEY_ACCESS_TOKEN] = accessToken
+            prefs[KEY_TOKEN_TYPE] = tokenType
+            prefs[KEY_USER_ID] = userId
+            prefs[KEY_USER_NAME] = name
+            prefs[KEY_USER_EMAIL] = email
+            role?.let { prefs[KEY_USER_ROLE] = it }
+            phone?.let { prefs[KEY_USER_PHONE] = it }
+            photo?.let { prefs[KEY_USER_PHOTO] = it }
+            designation?.let { prefs[KEY_USER_DESIGNATION] = it }
         }
     }
 
-    data class AuthData(
-        val accessToken: String,
-        val tokenType: String,
-        val user: User,
-    )
+    suspend fun saveUser(
+        userId: String,
+        name: String,
+        email: String,
+        role: String? = null,
+        phone: String? = null,
+        photo: String? = null,
+        designation: String? = null,
+        createdJson: String? = null,
+        districtsJson: String? = null,
+    ) {
+        dataStore.edit { prefs ->
+            prefs[KEY_USER_ID] = userId
+            prefs[KEY_USER_NAME] = name
+            prefs[KEY_USER_EMAIL] = email
+            role?.let { prefs[KEY_USER_ROLE] = it }
+            phone?.let { prefs[KEY_USER_PHONE] = it }
+            photo?.let { prefs[KEY_USER_PHOTO] = it }
+            designation?.let { prefs[KEY_USER_DESIGNATION] = it }
+            createdJson?.let { prefs[KEY_USER_CREATED] = it }
+            districtsJson?.let { prefs[KEY_USER_DISTRICTS] = it }
+        }
+    }
 
-    private fun readAuth(prefs: Preferences): AuthData? {
+    suspend fun getAccessToken(): String? {
+        return dataStore.data.first()[KEY_ACCESS_TOKEN]
+    }
+
+    private fun readAuth(prefs: Preferences): StoredAuth? {
         val token = prefs[KEY_ACCESS_TOKEN] ?: return null
         val type = prefs[KEY_TOKEN_TYPE] ?: return null
         val id = prefs[KEY_USER_ID] ?: return null
         val name = prefs[KEY_USER_NAME] ?: return null
         val email = prefs[KEY_USER_EMAIL] ?: return null
-        return AuthData(
+        return StoredAuth(
             accessToken = token,
             tokenType = type,
-            user = User(
-                id = id,
-                name = name,
-                email = email,
-                role = prefs[KEY_USER_ROLE],
-                phone = prefs[KEY_USER_PHONE],
-                photo = prefs[KEY_USER_PHOTO],
-                designation = prefs[KEY_USER_DESIGNATION],
-            ),
+            userId = id,
+            name = name,
+            email = email,
+            role = prefs[KEY_USER_ROLE],
+            phone = prefs[KEY_USER_PHONE],
+            photo = prefs[KEY_USER_PHOTO],
+            designation = prefs[KEY_USER_DESIGNATION],
+            createdJson = prefs[KEY_USER_CREATED],
+            districtsJson = prefs[KEY_USER_DISTRICTS],
         )
     }
 
-    fun observeAuth(): Flow<AuthData?> {
+    fun observeAuth(): Flow<StoredAuth?> {
         return dataStore.data.map { readAuth(it) }
     }
 
-    suspend fun getAuth(): AuthData? {
+    suspend fun getAuth(): StoredAuth? {
         return readAuth(dataStore.data.first())
     }
 

@@ -2,13 +2,7 @@ package tech.sumato.avn.mp.data.user.remote
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-
-@Serializable
-data class LoginResponseDto(
-    val status: Int,
-    val message: String,
-    val data: LoginDataDto? = null,
-)
+import tech.sumato.avn.mp.core.network.model.DateDto
 
 @Serializable
 data class LoginDataDto(
@@ -34,19 +28,5 @@ data class UserAttributesDto(
     val phone: String? = null,
     val photo: String? = null,
     val designation: String? = null,
-    val created: CreatedDto? = null,
-)
-
-@Serializable
-data class CreatedDto(
-    val human: String,
-    val date: String,
-    val formatted: String,
-)
-
-@Serializable
-data class ErrorResponseDto(
-    val status: Int,
-    val message: String,
-    val errors: Map<String, List<String>>? = null,
+    val created: DateDto? = null,
 )

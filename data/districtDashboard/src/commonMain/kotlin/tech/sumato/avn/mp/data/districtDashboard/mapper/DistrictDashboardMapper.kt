@@ -1,19 +1,19 @@
 package tech.sumato.avn.mp.data.districtDashboard.mapper
 
+import tech.sumato.avn.mp.core.network.model.DateDto
 import tech.sumato.avn.mp.data.districtDashboard.dto.DashboardProjectDto
 import tech.sumato.avn.mp.data.districtDashboard.dto.DashboardStatDto
 import tech.sumato.avn.mp.data.districtDashboard.dto.DistrictDashboardDataDto
 import tech.sumato.avn.mp.data.districtDashboard.dto.DistrictDto
 import tech.sumato.avn.mp.data.districtDashboard.dto.OngoingProjectDto
 import tech.sumato.avn.mp.data.districtDashboard.dto.SchoolCategoryDto
-import tech.sumato.avn.mp.data.districtDashboard.dto.UpdatedAtDto
+import tech.sumato.avn.mp.domain.common.model.DateModel
+import tech.sumato.avn.mp.domain.common.model.DistrictModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.DashboardProjectModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.DashboardStatModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.DistrictDashboardData
-import tech.sumato.avn.mp.domain.districtDashboard.model.DistrictModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.OngoingProjectModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.SchoolCategoryModel
-import tech.sumato.avn.mp.domain.districtDashboard.model.UpdatedAtModel
 
 class DistrictDashboardMapper {
 
@@ -53,7 +53,7 @@ class DistrictDashboardMapper {
         updatedAt = updatedAt.toDomain(),
     )
 
-    private fun UpdatedAtDto.toDomain() = UpdatedAtModel(
+    private fun DateDto.toDomain() = DateModel(
         human = human,
         date = date,
         formatted = formatted,
