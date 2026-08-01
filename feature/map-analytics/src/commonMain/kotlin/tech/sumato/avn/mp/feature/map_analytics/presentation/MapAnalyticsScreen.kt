@@ -32,6 +32,8 @@ import tech.sumato.avn.mp.designsystem.LocalFormFactor
 import tech.sumato.avn.mp.designsystem.components.AppCard
 import tech.sumato.avn.mp.component.map.MapView
 import tech.sumato.avn.mp.designsystem.theme.MainColor
+import tech.sumato.avn.mp.feature.map_analytics.presentation.event.MapAnalyticsEvent
+import tech.sumato.avn.mp.feature.map_analytics.presentation.state.MapAnalyticsState
 
 @Composable
 fun MapAnalyticsScreen(

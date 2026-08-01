@@ -1,4 +1,4 @@
-package tech.sumato.avn.mp.feature.login.presentation
+package tech.sumato.avn.mp.feature.login.presentation.state
 
 import tech.sumato.avn.mp.domain.user.model.User
 

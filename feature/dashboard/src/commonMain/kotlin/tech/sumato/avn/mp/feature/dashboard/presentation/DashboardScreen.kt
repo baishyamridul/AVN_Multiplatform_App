@@ -37,6 +37,8 @@ import tech.sumato.avn.mp.designsystem.theme.MainColor
 import tech.sumato.avn.mp.domain.dashboard.model.DashboardData
 import tech.sumato.avn.mp.domain.dashboard.model.RevenueItem
 import tech.sumato.avn.mp.domain.dashboard.model.Transaction
+import tech.sumato.avn.mp.feature.dashboard.presentation.event.DashboardEvent
+import tech.sumato.avn.mp.feature.dashboard.presentation.state.DashboardState
 
 @Composable
 fun DashboardScreen(

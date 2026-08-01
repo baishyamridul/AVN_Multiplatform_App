@@ -10,8 +10,8 @@ data class DistrictDashboardDataDto(
     val stats: List<DashboardStatDto>,
     @SerialName("school_category_list")
     val schoolCategoryList: List<SchoolCategoryDto>,
-    @SerialName("ongoing_projects")
-    val ongoingProjects: OngoingProjectDto,
+//    @SerialName("ongoing_projects")
+//    val ongoingProjects: OngoingProjectDto,
 )
 
 @Serializable

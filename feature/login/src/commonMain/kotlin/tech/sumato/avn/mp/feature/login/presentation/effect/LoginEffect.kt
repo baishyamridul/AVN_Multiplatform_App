@@ -1,4 +1,4 @@
-package tech.sumato.avn.mp.feature.login.presentation
+package tech.sumato.avn.mp.feature.login.presentation.effect
 
 sealed interface LoginEffect {
     data object NavigateToDashboard : LoginEffect

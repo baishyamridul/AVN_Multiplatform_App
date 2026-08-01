@@ -1,4 +1,4 @@
-package tech.sumato.avn.mp.feature.login.presentation
+package tech.sumato.avn.mp.feature.login.presentation.event
 
 sealed interface LoginEvent {
     data class EmailChanged(val email: String) : LoginEvent

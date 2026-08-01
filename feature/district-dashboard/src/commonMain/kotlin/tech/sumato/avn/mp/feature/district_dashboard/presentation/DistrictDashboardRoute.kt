@@ -3,6 +3,8 @@ package tech.sumato.avn.mp.feature.district_dashboard.presentation
 import androidx.compose.runtime.Composable
 import tech.sumato.avn.mp.core.navigation.BaseRoute
 import tech.sumato.avn.mp.core.navigation.Route
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.effect.DistrictDashboardEffect
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.state.DistrictDashboardState
 
 @Composable
 fun DistrictDashboardRoute(

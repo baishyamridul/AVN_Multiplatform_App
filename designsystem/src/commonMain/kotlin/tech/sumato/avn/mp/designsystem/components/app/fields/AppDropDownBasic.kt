@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,12 @@ fun <T> AppDropDownBasic(
 
     var expanded by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<T?>(null) }
+
+    LaunchedEffect(selected) {
+        if (selected != null) {
+            selectedItem = selected
+        }
+    }
 
     Box(
         modifier = modifier.clickable(

@@ -1,4 +1,4 @@
-package tech.sumato.avn.mp.feature.district_dashboard.presentation
+package tech.sumato.avn.mp.feature.district_dashboard.presentation.effect
 
 import tech.sumato.avn.mp.core.navigation.Route
 

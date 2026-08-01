@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,18 +28,19 @@ import tech.sumato.avn.mp.core.navigation.Route
 import tech.sumato.avn.mp.domain.common.model.DistrictModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.DashboardStatModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.DistrictDashboardData
-import tech.sumato.avn.mp.feature.district_dashboard.presentation.DistrictDashboardEvent
-import tech.sumato.avn.mp.feature.district_dashboard.presentation.DistrictDashboardState
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.DistrictDashboardHeader
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.DistrictDashboardMap
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.DistrictDashboardSchoolCategoriesAnalytics
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.HorizontalStatsBar
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.OngoingProjects
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.UpcomingEvents
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.event.DistrictDashboardEvent
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.DashboardStatsUiModel
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.DistrictUiModel
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.toDistrictUiModel
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.toOngoingProjectStatsUiModel
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.toSchoolCategoryUiModel
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.state.DistrictDashboardState
 
 @Composable
 fun DistrictDashboardScreenExpandedNew(
@@ -56,6 +58,8 @@ fun DistrictDashboardScreenExpandedNew(
         is DistrictDashboardState.Success -> ExpandedDashboardContent(
             data = state.data,
             userDistricts = state.userDistricts,
+            selectedDistrictId = state.selectedDistrictId,
+            isRefreshing = state.isRefreshing,
             onNavigateToSchoolDashboard = onNavigateToSchoolDashboard,
             onEvent = onEvent
         )
@@ -100,6 +104,8 @@ private fun ErrorContent(
 private fun ExpandedDashboardContent(
     data: DistrictDashboardData,
     userDistricts: List<DistrictModel>,
+    selectedDistrictId: Int,
+    isRefreshing: Boolean,
     onNavigateToSchoolDashboard: () -> Unit,
     onEvent: (DistrictDashboardEvent) -> Unit,
 ) {
@@ -112,9 +118,18 @@ private fun ExpandedDashboardContent(
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
+        if (isRefreshing) {
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(3.dp),
+            )
+        }
+
         DistrictDashboardHeader(
             modifier = Modifier.fillMaxWidth(),
-            userDistricts.map { it.toDistrictUiModel() },
+            districts = userDistricts.map { it.toDistrictUiModel() },
+            selectedDistrictId = selectedDistrictId,
             onDistrictSelected = { district ->
                 onEvent(DistrictDashboardEvent.LoadData(district.id))
             },

@@ -1,4 +1,4 @@
-package tech.sumato.avn.mp.feature.dashboard.presentation
+package tech.sumato.avn.mp.feature.dashboard.presentation.state
 
 import tech.sumato.avn.mp.domain.dashboard.model.DashboardData
 

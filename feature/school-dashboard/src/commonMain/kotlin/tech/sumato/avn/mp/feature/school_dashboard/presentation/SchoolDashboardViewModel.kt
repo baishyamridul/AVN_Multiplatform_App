@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import tech.sumato.avn.mp.core.navigation.MviViewModel
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.effect.SchoolDashboardEffect
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.event.SchoolDashboardEvent
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.state.SchoolDashboardState
 
 class SchoolDashboardViewModel : ViewModel(), MviViewModel<SchoolDashboardState, SchoolDashboardEffect> {
 

@@ -22,7 +22,8 @@ class DistrictDashboardMapper {
             districts = dto.districts.map { it.toDomain() },
             stats = dto.stats.map { it.toDomain() },
             schoolCategoryList = dto.schoolCategoryList.map { it.toDomain() },
-            ongoingProjects = dto.ongoingProjects.toDomain(),
+//            ongoingProjects = dto.ongoingProjects.toDomain(),
+            ongoingProjects = OngoingProjectModel(emptyList(), 0),
         )
     }
 

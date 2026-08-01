@@ -15,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import org.koin.compose.viewmodel.koinViewModel
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.DistrictDashboardViewModel
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.DistrictDashboardHeader
@@ -23,13 +24,18 @@ import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.Dis
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.HorizontalStatsBar
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.OngoingProjects
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.UpcomingEvents
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.event.DistrictDashboardEvent
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.DashboardStatsUiModel
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.toDistrictUiModel
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.state.DistrictDashboardState
 
 @Composable
-fun DistrictDashboardExpanded(viewModel: DistrictDashboardViewModel = koinViewModel()) {
+fun DistrictDashboardExpanded(
+    state: DistrictDashboardState,
+    onEvent: (event: DistrictDashboardEvent) -> Unit = {}
+) {
+
     val scrollState = rememberScrollState()
-
-
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -37,12 +43,16 @@ fun DistrictDashboardExpanded(viewModel: DistrictDashboardViewModel = koinViewMo
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        DistrictDashboardHeader(modifier = Modifier.fillMaxWidth())
+        DistrictDashboardHeader(
+            modifier = Modifier.fillMaxWidth(),
+            districts = if (state is DistrictDashboardState.Success) state.userDistricts.map { it.toDistrictUiModel() } else emptyList()
+        )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         HorizontalStatsBar(
-            modifier = Modifier, stats = listOf(
+            modifier = Modifier,
+            stats = listOf(
                 DashboardStatsUiModel("Total Schools", "3,248", "Across the district", 0xff0284c7),
                 DashboardStatsUiModel(
                     "Internet Facility",
@@ -71,7 +81,7 @@ fun DistrictDashboardExpanded(viewModel: DistrictDashboardViewModel = koinViewMo
                 ),
             ),
             onStatsClicked = { statsUiModel ->
-                viewModel.navigateToSchoolDashboard()
+                //
             }
         )
 
@@ -94,7 +104,7 @@ fun DistrictDashboardExpanded(viewModel: DistrictDashboardViewModel = koinViewMo
             modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            OngoingProjects(modifier = Modifier.weight(1f).fillMaxWidth().fillMaxHeight(),)
+            OngoingProjects(modifier = Modifier.weight(1f).fillMaxWidth().fillMaxHeight())
 
             UpcomingEvents(modifier = Modifier.weight(1f).fillMaxWidth().fillMaxHeight())
         }

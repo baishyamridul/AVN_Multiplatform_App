@@ -1,4 +1,4 @@
-package tech.sumato.avn.mp.feature.map_analytics.presentation
+package tech.sumato.avn.mp.feature.map_analytics.presentation.state
 
 sealed interface MapAnalyticsState {
     data object Loading : MapAnalyticsState

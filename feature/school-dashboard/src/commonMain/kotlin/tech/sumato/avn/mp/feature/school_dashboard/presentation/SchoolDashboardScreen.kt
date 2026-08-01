@@ -11,6 +11,8 @@ import tech.sumato.avn.mp.designsystem.LocalFormFactor
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.screen_variants.SchoolDashboardScreenCompact
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.screen_variants.SchoolDashboardScreenExpanded
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.screen_variants.SchoolDashboardScreenMedium
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.event.SchoolDashboardEvent
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.state.SchoolDashboardState
 
 @Composable
 fun SchoolDashboardScreen(

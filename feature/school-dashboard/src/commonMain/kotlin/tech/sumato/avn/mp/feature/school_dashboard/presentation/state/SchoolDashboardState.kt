@@ -1,4 +1,4 @@
-package tech.sumato.avn.mp.feature.school_dashboard.presentation
+package tech.sumato.avn.mp.feature.school_dashboard.presentation.state
 
 sealed interface SchoolDashboardState {
     data object Loading : SchoolDashboardState

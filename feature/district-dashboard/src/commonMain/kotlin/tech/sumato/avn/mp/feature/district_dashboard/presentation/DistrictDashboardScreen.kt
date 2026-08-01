@@ -23,10 +23,11 @@ import tech.sumato.avn.mp.designsystem.LocalFormFactor
 import tech.sumato.avn.mp.designsystem.components.AppCard
 import tech.sumato.avn.mp.designsystem.components.ScreenHeader
 import tech.sumato.avn.mp.designsystem.components.StatCard
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.event.DistrictDashboardEvent
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.screen_variants.DistrictDashboardCompact
-import tech.sumato.avn.mp.feature.district_dashboard.presentation.screen_variants.DistrictDashboardExpanded
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.screen_variants.DistrictDashboardMedium
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.screen_variants.DistrictDashboardScreenExpandedNew
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.state.DistrictDashboardState
 
 @Composable
 fun DistrictDashboardScreen(
@@ -39,7 +40,6 @@ fun DistrictDashboardScreen(
         FormFactor.Compact -> DistrictDashboardCompact()
         FormFactor.Medium -> DistrictDashboardMedium()
         FormFactor.Expanded -> DistrictDashboardScreenExpandedNew(state, onEvent)
-//        FormFactor.Expanded -> DistrictDashboardExpanded()
     }
 }
 

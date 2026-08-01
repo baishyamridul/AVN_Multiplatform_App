@@ -31,19 +31,19 @@ import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.District
 fun DistrictDashboardHeader(
     modifier: Modifier,
     districts: List<DistrictUiModel> = emptyList(),
+    selectedDistrictId: Int = -1,
     onDistrictSelected: (district: DistrictUiModel) -> Unit = {},
     onUserClicked: () -> Unit = {},
 ) {
+
+    LaunchedEffect(selectedDistrictId) {
+        println("mridx: $selectedDistrictId")
+    }
 
     val options = buildList {
         add(DistrictUiModel(-1, "All District"))
         addAll(districts)
     }
-
-    LaunchedEffect(Unit) {
-        println(options.forEach { it.toString() })
-    }
-
 
     AppHeaderCustom(modifier = modifier, leading = {}) {
 
@@ -66,7 +66,7 @@ fun DistrictDashboardHeader(
                 onSelected = { it ->
                     onDistrictSelected(it)
                 },
-                selected = options.first(),
+                selected = options.firstOrNull { it.id == selectedDistrictId } ?: options.first(),
             ) { currentOption ->
 
                 Row(

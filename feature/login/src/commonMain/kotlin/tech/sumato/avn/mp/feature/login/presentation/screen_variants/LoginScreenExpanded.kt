@@ -30,8 +30,8 @@ import org.jetbrains.compose.resources.painterResource
 import tech.sumato.avn.mp.designsystem.components.AppTextField
 import tech.sumato.avn.mp.feature.login.presentation.LoginButton
 import tech.sumato.avn.mp.feature.login.presentation.LoginError
-import tech.sumato.avn.mp.feature.login.presentation.LoginEvent
-import tech.sumato.avn.mp.feature.login.presentation.LoginState
+import tech.sumato.avn.mp.feature.login.presentation.event.LoginEvent
+import tech.sumato.avn.mp.feature.login.presentation.state.LoginState
 
 
 @Composable
