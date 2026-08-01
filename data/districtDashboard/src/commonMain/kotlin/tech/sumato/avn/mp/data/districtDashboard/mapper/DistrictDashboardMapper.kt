@@ -1,7 +1,9 @@
 package tech.sumato.avn.mp.data.districtDashboard.mapper
 
 import tech.sumato.avn.mp.core.network.model.DateDto
+import tech.sumato.avn.mp.data.districtDashboard.dto.DashboardProjectCategoryDto
 import tech.sumato.avn.mp.data.districtDashboard.dto.DashboardProjectDto
+import tech.sumato.avn.mp.data.districtDashboard.dto.DashboardProjectStatsDto
 import tech.sumato.avn.mp.data.districtDashboard.dto.DashboardStatDto
 import tech.sumato.avn.mp.data.districtDashboard.dto.DistrictDashboardDataDto
 import tech.sumato.avn.mp.data.districtDashboard.dto.DistrictDto
@@ -9,9 +11,11 @@ import tech.sumato.avn.mp.data.districtDashboard.dto.OngoingProjectDto
 import tech.sumato.avn.mp.data.districtDashboard.dto.SchoolCategoryDto
 import tech.sumato.avn.mp.domain.common.model.DateModel
 import tech.sumato.avn.mp.domain.common.model.DistrictModel
+import tech.sumato.avn.mp.domain.districtDashboard.model.DashboardProjectCategoryData
 import tech.sumato.avn.mp.domain.districtDashboard.model.DashboardProjectModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.DashboardStatModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.DistrictDashboardData
+import tech.sumato.avn.mp.domain.districtDashboard.model.DistrictDashboardProjectStatsData
 import tech.sumato.avn.mp.domain.districtDashboard.model.OngoingProjectModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.SchoolCategoryModel
 
@@ -24,6 +28,7 @@ class DistrictDashboardMapper {
             schoolCategoryList = dto.schoolCategoryList.map { it.toDomain() },
 //            ongoingProjects = dto.ongoingProjects.toDomain(),
             ongoingProjects = OngoingProjectModel(emptyList(), 0),
+            projectStats = dto.dashboardProjectStats.toDomain(),
         )
     }
 
@@ -59,4 +64,23 @@ class DistrictDashboardMapper {
         date = date,
         formatted = formatted,
     )
+
+    private fun DashboardProjectStatsDto.toDomain(): DistrictDashboardProjectStatsData {
+        return DistrictDashboardProjectStatsData(
+            projects = projects.map { it.toDomain() },
+            totalProjects = total_projects,
+        )
+    }
+
+    private fun DashboardProjectCategoryDto.toDomain(): DashboardProjectCategoryData {
+        return DashboardProjectCategoryData(
+            id = id,
+            categoryName = categoryName,
+            completedPercent = completedPercent,
+            total = total,
+            totalCompleted = totalCompleted,
+            totalOngoing = totalOngoing,
+        )
+    }
+
 }

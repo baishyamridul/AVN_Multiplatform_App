@@ -7,4 +7,5 @@ data class DistrictDashboardData(
     val stats: List<DashboardStatModel>,
     val schoolCategoryList: List<SchoolCategoryModel>,
     val ongoingProjects: OngoingProjectModel,
+    val projectStats: DistrictDashboardProjectStatsData,
 )

@@ -33,6 +33,7 @@ import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.Dis
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.DistrictDashboardSchoolCategoriesAnalytics
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.HorizontalStatsBar
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.OngoingProjects
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.ProjectsStats
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.components.UpcomingEvents
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.event.DistrictDashboardEvent
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.DashboardStatsUiModel
@@ -40,6 +41,7 @@ import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.District
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.toDistrictUiModel
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.toOngoingProjectStatsUiModel
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.toSchoolCategoryUiModel
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.toUiModel
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.state.DistrictDashboardState
 
 @Composable
@@ -143,7 +145,7 @@ private fun ExpandedDashboardContent(
         HorizontalStatsBar(
             modifier = Modifier,
             stats = data.stats.map { it.toStatsUiModel() },
-            onStatsClicked = {  },
+            onStatsClicked = { },
         )
 
         Spacer(Modifier.height(8.dp))
@@ -164,6 +166,13 @@ private fun ExpandedDashboardContent(
 
         Spacer(Modifier.height(8.dp))
 
+        ProjectsStats(
+            modifier = Modifier.fillMaxWidth(),
+            projectStats = data.projectStats.projects.map { it.toUiModel() },
+            totalProjects = data.projectStats.totalProjects
+        )
+
+
         Row(
             modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -173,6 +182,7 @@ private fun ExpandedDashboardContent(
                 projects = data.ongoingProjects.projects.map { it.toOngoingProjectStatsUiModel() },
                 totalProjects = data.ongoingProjects.totalProjects
             )
+
             UpcomingEvents(modifier = Modifier.weight(1f).fillMaxWidth().fillMaxHeight())
         }
     }

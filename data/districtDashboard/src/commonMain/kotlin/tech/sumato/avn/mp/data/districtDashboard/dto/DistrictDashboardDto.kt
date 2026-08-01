@@ -12,6 +12,8 @@ data class DistrictDashboardDataDto(
     val schoolCategoryList: List<SchoolCategoryDto>,
 //    @SerialName("ongoing_projects")
 //    val ongoingProjects: OngoingProjectDto,
+    @SerialName("project_stats")
+    val dashboardProjectStats: DashboardProjectStatsDto,
 )
 
 @Serializable
@@ -55,4 +57,26 @@ data class DashboardProjectDto(
     val districtName: String,
     @SerialName("updated_at")
     val updatedAt: DateDto,
+)
+
+
+@Serializable
+data class DashboardProjectStatsDto(
+    val projects: List<DashboardProjectCategoryDto>,
+    val total_projects: Int
+)
+
+
+@Serializable
+data class DashboardProjectCategoryDto(
+    val id: String,
+    @SerialName("category_name")
+    val categoryName: String,
+    @SerialName("completed_percent")
+    val completedPercent: Float,
+    val total: Int,
+    @SerialName("total_completed")
+    val totalCompleted: Int,
+    @SerialName("total_ongoing")
+    val totalOngoing: Int,
 )
