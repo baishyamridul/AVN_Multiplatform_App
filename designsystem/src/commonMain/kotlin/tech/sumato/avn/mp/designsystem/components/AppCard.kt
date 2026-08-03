@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.BrushPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -53,6 +54,7 @@ fun AppCardBordered(
     border: BorderStroke = CardDefaults.outlinedCardBorder(),
     paddingLess: Boolean = false,
     padding: Dp = 16.dp,
+    containerColor: Color = MaterialTheme.colorScheme.surface,
     content: @Composable () -> Unit,
 ) {
     val shape = RoundedCornerShape(12.dp)
@@ -62,7 +64,7 @@ fun AppCardBordered(
         shape = shape,
         border = border,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = containerColor,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
