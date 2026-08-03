@@ -30,6 +30,8 @@ kotlinx-date-time = "0.8.0"
 
 saralapps-webview = "0.1.4"
 
+datastore = "1.2.1"
+
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
@@ -45,7 +47,7 @@ androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle
 androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "composeMultiplatform" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "composeMultiplatform" }
-compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref="material3" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "composeMultiplatform" }
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
 compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
@@ -73,11 +75,14 @@ androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
 material-icons = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "material-icons" }
 material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material-icons" }
 
-kotlinx-date-time = {module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-date-time"}
+kotlinx-date-time = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-date-time" }
 
 # webview
-saralapps-webview = {module = "com.saralapps:composemultiplatformwebview", version.ref = "saralapps-webview"}
+saralapps-webview = { module = "com.saralapps:composemultiplatformwebview", version.ref = "saralapps-webview" }
 datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version = "1.2.1" }
+#datastore-preferences-core = { module = "androidx.datastore:datastore-core", version = "1.2.1" }
+datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 
 [plugins]

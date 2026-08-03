@@ -30,7 +30,9 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.koin.core)
-            implementation(libs.datastore.preferences.core)
+//            implementation(libs.datastore.preferences.core)
+            implementation(libs.datastore)
+            implementation(libs.datastore.preferences)
         }
         androidMain.dependencies {
         }
