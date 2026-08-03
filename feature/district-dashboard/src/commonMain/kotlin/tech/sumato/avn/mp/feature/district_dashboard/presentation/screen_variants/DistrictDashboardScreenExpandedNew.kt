@@ -24,7 +24,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import tech.sumato.avn.mp.component.map.DistrictSvgMap
 import tech.sumato.avn.mp.core.navigation.Route
+import tech.sumato.avn.mp.designsystem.components.AppCardBordered
 import tech.sumato.avn.mp.domain.common.model.DistrictModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.DashboardStatModel
 import tech.sumato.avn.mp.domain.districtDashboard.model.DistrictDashboardData
@@ -154,7 +156,18 @@ private fun ExpandedDashboardContent(
             modifier = Modifier.fillMaxWidth().height(420.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            DistrictDashboardMap(modifier = Modifier.weight(4f).fillMaxSize())
+//            DistrictDashboardMap(modifier = Modifier.weight(4f).fillMaxSize())
+
+            AppCardBordered(modifier = Modifier.weight(4f).fillMaxSize()) {
+                DistrictSvgMap(
+                    modifier = Modifier.weight(4f).fillMaxSize(),
+                    onDistrictClick = { svgShape ->
+
+                    })
+            }
+
+
+
             DistrictDashboardSchoolCategoriesAnalytics(
                 modifier = Modifier.weight(2f).fillMaxSize(),
                 categories = data.schoolCategoryList.map { it.toSchoolCategoryUiModel() }.toList(),

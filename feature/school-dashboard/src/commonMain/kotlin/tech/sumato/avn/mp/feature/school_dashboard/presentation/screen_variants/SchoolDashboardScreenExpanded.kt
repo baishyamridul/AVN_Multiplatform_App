@@ -79,22 +79,19 @@ fun SchoolDashboardScreenExpanded(viewModel: SchoolDashboardViewModel = koinView
 
 //                PanoImageViewer("https://mridx.github.io/360img/config.json")
 
-                DistrictSvgMap(modifier = Modifier.fillMaxSize(),)
 
-//                ImgViewer()
-
-//                if (loadMap)
-//                    MapView(
-//                        modifier = Modifier
-//                            .fillMaxSize()
-//                            .clip(RoundedCornerShape(12.dp)),
-//                        styleUrl = "",
-//                    )
-//                else
-//                    Box(
-//                        modifier = Modifier.fillMaxSize()
-//                            .background(MaterialTheme.colorScheme.surface)
-//                    )
+                if (loadMap)
+                    MapView(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(12.dp)),
+                        styleUrl = "",
+                    )
+                else
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surface)
+                    )
             }
 
             AppCardBordered(

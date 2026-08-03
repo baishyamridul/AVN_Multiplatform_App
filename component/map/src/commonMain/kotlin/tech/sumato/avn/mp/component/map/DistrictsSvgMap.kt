@@ -1,17 +1,23 @@
 package tech.sumato.avn.mp.component.map
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathIterator
+import androidx.compose.ui.graphics.PathSegment
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.vector.PathParser
+import androidx.compose.ui.input.pointer.pointerInput
 import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
@@ -214,8 +220,90 @@ fun cropColor(id: String): Color {
     )
 }
 
+private data class MapFit(
+    val scale: Float,
+    val offsetLeft: Float,
+    val offsetTop: Float,
+)
+
+private fun fitTransform(width: Float, height: Float, bounds: Rect): MapFit {
+    val scale = if (bounds.width <= 0f || bounds.height <= 0f) {
+        1f
+    } else {
+        min(width / bounds.width, height / bounds.height) * 0.95f
+    }
+    return MapFit(
+        scale = scale,
+        offsetLeft = (width - bounds.width * scale) / 2f - bounds.left * scale,
+        offsetTop = (height - bounds.height * scale) / 2f - bounds.top * scale,
+    )
+}
+
+private fun Path.toPolygon(): List<Offset> {
+    val vertices = mutableListOf<Offset>()
+    var contourStart = Offset.Zero
+    var current = Offset.Zero
+    val iterator = PathIterator(this)
+    while (iterator.hasNext()) {
+        val segment = iterator.next()
+        when (segment.type) {
+            PathSegment.Type.Move -> {
+                current = Offset(segment.points[0], segment.points[1])
+                contourStart = current
+            }
+
+            PathSegment.Type.Line -> {
+                vertices += current
+                current = Offset(segment.points[2], segment.points[3])
+            }
+
+            PathSegment.Type.Close -> {
+                vertices += current
+                vertices += contourStart
+                current = contourStart
+            }
+
+            PathSegment.Type.Quadratic,
+            PathSegment.Type.Conic,
+            PathSegment.Type.Cubic -> {
+                vertices += current
+                current = Offset(
+                    segment.points[segment.points.size - 2],
+                    segment.points[segment.points.size - 1],
+                )
+            }
+
+            PathSegment.Type.Done -> break
+        }
+    }
+    return vertices
+}
+
+private fun List<Offset>.containsPoint(point: Offset): Boolean {
+    if (size < 3) return false
+    var inside = false
+    var j = size - 1
+    for (i in indices) {
+        val xi = this[i].x
+        val yi = this[i].y
+        val xj = this[j].x
+        val yj = this[j].y
+        if ((yi > point.y) != (yj > point.y) &&
+            point.x < (xj - xi) * (point.y - yi) / (yj - yi) + xi
+        ) {
+            inside = !inside
+        }
+        j = i
+    }
+    return inside
+}
+
 @Composable
-fun DistrictSvgMap(modifier: Modifier, svgShapes: DistrictsSvgShape = DistrictsSvgShape()) {
+fun DistrictSvgMap(
+    modifier: Modifier,
+    svgShapes: DistrictsSvgShape = DistrictsSvgShape(),
+    onDistrictClick: ((DistrictSvgShape) -> Unit)? = null,
+) {
 
     val bounds = remember(svgShapes) {
         var minX = Float.MAX_VALUE
@@ -232,32 +320,56 @@ fun DistrictSvgMap(modifier: Modifier, svgShapes: DistrictsSvgShape = DistrictsS
         Rect(minX, minY, maxX, maxY)
     }
 
-    Canvas(modifier = modifier) {
+    val hitPolys = remember(svgShapes) {
+        svgShapes.shapes.map { it.path.toPolygon() }
+    }
 
-        val scale = if (bounds.width <= 0f || bounds.height <= 0f) {
-            1f
-        } else {
-            min(size.width / bounds.width, size.height / bounds.height) * 0.95f
+    var selectedSvg by remember { mutableStateOf<DistrictSvgShape?>(null) }
+
+
+    Canvas(
+        modifier = modifier.pointerInput(svgShapes) {
+            detectTapGestures { tap ->
+                if (onDistrictClick != null) {
+                    val fit = fitTransform(size.width.toFloat(), size.height.toFloat(), bounds)
+                    val svgPoint = Offset(
+                        x = (tap.x - fit.offsetLeft) / fit.scale,
+                        y = (tap.y - fit.offsetTop) / fit.scale,
+                    )
+                    for (index in svgShapes.shapes.indices) {
+                        if (hitPolys[index].containsPoint(svgPoint)) {
+                            onDistrictClick(svgShapes.shapes[index])
+                            selectedSvg = svgShapes.shapes[index]
+                            break
+                        }
+                    }
+                }
+            }
         }
+    ) {
+
+        val fit = fitTransform(size.width, size.height, bounds)
 
         withTransform({
             translate(
-                left = (size.width - bounds.width * scale) / 2f - bounds.left * scale,
-                top = (size.height - bounds.height * scale) / 2f - bounds.top * scale,
+                left = fit.offsetLeft,
+                top = fit.offsetTop,
             )
-            scale(scale, scale, pivot = Offset.Zero)
+            scale(fit.scale, fit.scale, pivot = Offset.Zero)
         }) {
-            svgShapes.shapes.forEach {
+            svgShapes.shapes.forEach { svgShape ->
+
+                val color = if (selectedSvg?.id == svgShape.id) Color.Blue else Color(0xff52525b)
 
                 drawPath(
-                    path = it.path,
-                    color = Color(0xff52525b),
+                    path = svgShape.path,
+                    color = color,
                 )
 
                 drawPath(
-                    path = it.path,
+                    path = svgShape.path,
 //                    color = Color(0xffd4d4d8),
-                    color = cropColor(it.id),
+                    color = cropColor(svgShape.id),
                     style = Stroke(
                         width = 1.0f
                     )
