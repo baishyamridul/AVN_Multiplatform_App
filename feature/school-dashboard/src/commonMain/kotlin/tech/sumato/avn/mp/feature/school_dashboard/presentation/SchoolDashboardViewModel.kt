@@ -1,31 +1,65 @@
 package tech.sumato.avn.mp.feature.school_dashboard.presentation
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import tech.sumato.avn.mp.core.navigation.MviViewModel
+import tech.sumato.avn.mp.domain.common.model.exception.ResponseExceptionModel
+import tech.sumato.avn.mp.domain.school.usecase.GetSchoolsUseCase
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.effect.SchoolDashboardEffect
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.event.SchoolDashboardEvent
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.state.SchoolDashboardState
 
-class SchoolDashboardViewModel : ViewModel(), MviViewModel<SchoolDashboardState, SchoolDashboardEffect> {
+class SchoolDashboardViewModel(
+    private val getSchoolsUseCase: GetSchoolsUseCase,
+) : ViewModel(), MviViewModel<SchoolDashboardState, SchoolDashboardEffect> {
 
-    private val _state = MutableStateFlow<SchoolDashboardState>(SchoolDashboardState.Loading)
+    private val _state = MutableStateFlow(SchoolDashboardState())
     override val state: StateFlow<SchoolDashboardState> = _state.asStateFlow()
 
     private val _effects = Channel<SchoolDashboardEffect>(Channel.BUFFERED)
     override val effects: Flow<SchoolDashboardEffect> = _effects.receiveAsFlow()
+
+    init {
+        fetchSchools()
+    }
+
 
     fun onEvent(event: SchoolDashboardEvent) {
         when (event) {
             is SchoolDashboardEvent.Back -> {
                 _effects.trySend(SchoolDashboardEffect.NavigateBack)
             }
+
             else -> {}
         }
     }
+
+
+    private fun fetchSchools(districtId: Int = -1) {
+        viewModelScope.launch {
+            try {
+                val response = getSchoolsUseCase.invoke(districtId = districtId)
+                _state.update { state ->
+                    state.copy(
+                        schoolsState = state.schoolsState.copy(
+                            isLoading = false,
+                            schools = response
+                        )
+                    )
+                }
+            } catch (e: ResponseExceptionModel) {
+                //
+            }
+        }
+    }
+
+
 }

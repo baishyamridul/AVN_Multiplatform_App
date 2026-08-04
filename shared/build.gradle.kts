@@ -80,6 +80,8 @@ kotlin {
 
             implementation(libs.kotlinx.date.time)
 
+            implementation(projects.data.school)
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

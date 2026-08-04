@@ -9,17 +9,18 @@ import androidx.compose.ui.Modifier
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.CameraState
 import org.maplibre.compose.map.MaplibreMap
-import org.maplibre.compose.style.BaseStyle
+import org.maplibre.compose.util.MaplibreComposable
 import org.maplibre.spatialk.geojson.Position
 
 @Composable
 actual fun MapView(
     modifier: Modifier,
     styleUrl: String,
+    layers: @Composable @MaplibreComposable () -> Unit
 ) {
     MaplibreMap(
         modifier = modifier,
-        baseStyle = BaseStyle.Demo,
+        baseStyle = mapBaseStyle,
         cameraState = CameraState(
             firstPosition = CameraPosition(
                 target = Position(longitude = 93.7520957, latitude = 25.55711865),

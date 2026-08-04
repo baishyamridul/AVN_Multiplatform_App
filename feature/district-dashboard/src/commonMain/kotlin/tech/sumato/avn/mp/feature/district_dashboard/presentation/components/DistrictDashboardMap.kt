@@ -42,7 +42,9 @@ fun DistrictDashboardMap(modifier: Modifier) {
                     .fillMaxSize()
                     .clip(RoundedCornerShape(12.dp)),
                 styleUrl = "",
-            )
+            ) {
+
+            }
         else
             Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface))
     }

@@ -15,19 +15,21 @@ import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.map.MapOptions
 import org.maplibre.compose.map.MaplibreMap
 import org.maplibre.compose.map.RenderOptions
-import org.maplibre.compose.style.BaseStyle
+import org.maplibre.compose.style.rememberStyleState
+import org.maplibre.compose.util.MaplibreComposable
 import org.maplibre.spatialk.geojson.Position
 
 @Composable
 actual fun MapView(
     modifier: Modifier,
     styleUrl: String,
+    layers: @Composable @MaplibreComposable () -> Unit
 ) {
 
 
     val cameraState = rememberCameraState(
         firstPosition = CameraPosition(
-            target = Position(longitude = 93.7520957, latitude = 25.55711865),
+            target = Position(longitude = 93.609159, latitude = 27.085558),
             zoom = 8.0,
             bearing = 0.0,
             tilt = 0.0,
@@ -37,11 +39,14 @@ actual fun MapView(
 
     MaplibreMap(
         modifier = modifier.padding(16.dp).clip(RoundedCornerShape(8.dp)),
-        baseStyle = BaseStyle.Demo,
+        baseStyle = mapBaseStyle,
         cameraState = cameraState,
+        styleState = rememberStyleState(),
         options = MapOptions(
         )
-    )
+    ) {
+        layers()
+    }
 
 
 }

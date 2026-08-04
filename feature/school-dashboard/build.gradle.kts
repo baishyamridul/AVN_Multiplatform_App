@@ -37,6 +37,10 @@ kotlin {
             implementation(projects.core.common)
             implementation(projects.core.navigation)
             implementation(projects.designsystem)
+
+            implementation(projects.domain.common)
+            implementation(projects.domain.school)
+
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
@@ -62,6 +66,18 @@ kotlin {
 
             implementation(libs.kotlinx.date.time)
 
+            implementation(libs.maplibre.compose)
+
         }
+
+        androidMain.dependencies {
+            implementation(libs.maplibre.compose)
+        }
+        iosMain.dependencies {
+        }
+        jvmMain.dependencies {
+            implementation(libs.maplibre.compose)
+        }
+
     }
 }

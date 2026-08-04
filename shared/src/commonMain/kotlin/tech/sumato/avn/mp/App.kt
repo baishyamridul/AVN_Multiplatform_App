@@ -23,6 +23,7 @@ import tech.sumato.avn.mp.core.navigation.Route
 import tech.sumato.avn.mp.core.network.di.NetworkModule
 import tech.sumato.avn.mp.data.dashboard.di.DashboardDataModule
 import tech.sumato.avn.mp.data.districtDashboard.di.DistrictDashboardDataModule
+import tech.sumato.avn.mp.data.school.di.SchoolDataModule
 import tech.sumato.avn.mp.data.user.di.UserDataModule
 import tech.sumato.avn.mp.designsystem.theme.AVNTheme
 import tech.sumato.avn.mp.feature.dashboard.di.DashboardFeatureModule
@@ -52,7 +53,8 @@ fun App(
             LoginFeatureModule,
             MapAnalyticsFeatureModule,
             DistrictDashboardFeatureModule,
-            SchoolDashboardFeatureModule
+            SchoolDashboardFeatureModule,
+            SchoolDataModule,
         )
     }, content = {
         AVNTheme {

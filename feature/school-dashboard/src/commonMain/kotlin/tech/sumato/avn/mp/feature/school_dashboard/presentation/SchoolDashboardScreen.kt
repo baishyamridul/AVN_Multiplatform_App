@@ -26,7 +26,7 @@ fun SchoolDashboardScreen(
     when (formFactor) {
         FormFactor.Compact -> SchoolDashboardScreenCompact()
         FormFactor.Medium -> SchoolDashboardScreenMedium()
-        FormFactor.Expanded -> SchoolDashboardScreenExpanded()
+        FormFactor.Expanded -> SchoolDashboardScreenExpanded(state = state, onEvent = onEvent)
     }
 
 }

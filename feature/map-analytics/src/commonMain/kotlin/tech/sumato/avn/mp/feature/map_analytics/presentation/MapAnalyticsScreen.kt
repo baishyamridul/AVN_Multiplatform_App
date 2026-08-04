@@ -73,7 +73,9 @@ private fun MapCompact(styleUrl: String) {
         MapView(
             modifier = Modifier.fillMaxSize(),
             styleUrl = styleUrl,
-        )
+        ) {
+
+        }
 
         Column(
             modifier = Modifier
@@ -94,7 +96,9 @@ private fun MapWide(styleUrl: String) {
             MapView(
                 modifier = Modifier.fillMaxSize(),
                 styleUrl = styleUrl,
-            )
+            ) {
+
+            }
 
             Column(
                 modifier = Modifier
