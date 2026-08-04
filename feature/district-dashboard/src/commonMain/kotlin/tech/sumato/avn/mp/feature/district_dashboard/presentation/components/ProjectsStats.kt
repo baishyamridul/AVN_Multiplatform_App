@@ -85,7 +85,7 @@ fun ProjectsStats(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        BoxWithConstraints(modifier = Modifier) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             val spacing = 16.dp
 
             val columns = when (LocalFormFactor.current) {
