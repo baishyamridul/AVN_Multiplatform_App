@@ -172,7 +172,8 @@ private fun ExpandedDashboardContent(
                 modifier = Modifier.weight(2f).fillMaxSize(),
                 categories = data.schoolCategoryList.map { it.toSchoolCategoryUiModel() }.toList(),
                 onViewAllClicked = {
-                    onEvent(DistrictDashboardEvent.Navigate(Route.SCHOOL_DASHBOARD))
+                    val districtId = userDistricts.firstOrNull { it.id == selectedDistrictId }?.id
+                    onEvent(DistrictDashboardEvent.Navigate(Route.schoolDashboard(districtId)))
                 }
             )
         }

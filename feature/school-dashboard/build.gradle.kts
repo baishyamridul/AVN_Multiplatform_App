@@ -40,6 +40,7 @@ kotlin {
 
             implementation(projects.domain.common)
             implementation(projects.domain.school)
+            implementation(projects.domain.user)
 
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)

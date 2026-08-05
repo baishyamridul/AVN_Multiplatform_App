@@ -12,7 +12,9 @@ sealed interface SchoolDashboardEvent {
 
     data class UpdateSearchQuery(val query: String) : SchoolDashboardEvent
 
-    data class SelectDistrict(val district: String?) : SchoolDashboardEvent
+    data class SelectDistrict(val districtId: Int?) : SchoolDashboardEvent
+
+    data class SelectCategory(val category: String?) : SchoolDashboardEvent
 
     data class SelectSortOption(val option: SchoolSortOption) : SchoolDashboardEvent
 

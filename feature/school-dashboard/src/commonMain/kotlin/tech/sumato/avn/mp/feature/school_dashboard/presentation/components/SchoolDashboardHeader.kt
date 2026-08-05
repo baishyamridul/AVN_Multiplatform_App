@@ -23,13 +23,14 @@ import androidx.compose.ui.unit.dp
 import tech.sumato.avn.mp.designsystem.components.app.AppDateTime
 import tech.sumato.avn.mp.designsystem.components.app.AppHeaderCustom
 import tech.sumato.avn.mp.designsystem.components.app.fields.AppDropDownBasic
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.DistrictUiModel
 
 @Composable
 fun SchoolDashboardHeader(
     modifier: Modifier,
-    districts: List<String>,
-    selectedDistrict: String?,
-    onDistrictSelected: (String?) -> Unit,
+    districts: List<DistrictUiModel>,
+    selectedDistrictId: Int?,
+    onDistrictSelected: (Int?) -> Unit,
     onBack: () -> Unit,
 ) {
 
@@ -46,7 +47,7 @@ fun SchoolDashboardHeader(
             horizontalArrangement = Arrangement.End
         ) {
 
-            val options = listOf(ALL_DISTRICT_LABEL) + districts
+            val options = listOf(ALL_DISTRICT) + districts
 
             AppDropDownBasic(
                 modifier = Modifier
@@ -57,13 +58,13 @@ fun SchoolDashboardHeader(
                         RoundedCornerShape(8.dp)
                     ),
                 options = options,
-                labelTransformer = { it },
+                labelTransformer = { it.name },
                 onSelected = { option ->
                     onDistrictSelected(
-                        if (option == ALL_DISTRICT_LABEL) null else option
+                        if (option.id == ALL_DISTRICT_ID) null else option.id
                     )
                 },
-                selected = selectedDistrict ?: ALL_DISTRICT_LABEL,
+                selected = districts.firstOrNull { it.id == selectedDistrictId } ?: ALL_DISTRICT,
             ) { currentOption ->
                 Row(
                     modifier = Modifier
@@ -73,7 +74,7 @@ fun SchoolDashboardHeader(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        currentOption ?: ALL_DISTRICT_LABEL,
+                        currentOption?.name ?: ALL_DISTRICT.name,
                         style = MaterialTheme.typography.bodySmall
                     )
                     Icon(Icons.Default.ArrowDropDown, contentDescription = "Show options")
@@ -89,4 +90,5 @@ fun SchoolDashboardHeader(
 
 }
 
-private const val ALL_DISTRICT_LABEL = "All Districts"
+private const val ALL_DISTRICT_ID = -1
+private val ALL_DISTRICT = DistrictUiModel(id = ALL_DISTRICT_ID, name = "All Districts")

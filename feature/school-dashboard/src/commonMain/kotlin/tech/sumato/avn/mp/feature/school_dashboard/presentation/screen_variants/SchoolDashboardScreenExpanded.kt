@@ -10,40 +10,27 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Sort
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Filter
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.LocationOff
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Category
-import androidx.compose.material.icons.outlined.LocationOff
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Place
-import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -67,6 +55,7 @@ import tech.sumato.avn.mp.designsystem.components.app.fields.AppDropDownBasic
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.SchoolDashboardHeader
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.SchoolsMapLayers
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.event.SchoolDashboardEvent
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.DistrictUiModel
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.SchoolUiModel
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.toUiModel
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.state.SchoolDashboardState
@@ -98,10 +87,10 @@ fun SchoolDashboardScreenExpanded(
 
         SchoolDashboardHeader(
             modifier = Modifier.fillMaxWidth(),
-            districts = state.schoolsState.schools.map { it.district.name }.distinct().sorted(),
-            selectedDistrict = state.schoolsState.selectedDistrict,
-            onDistrictSelected = { district ->
-                onEvent(SchoolDashboardEvent.SelectDistrict(district))
+            districts = state.schoolsState.districts.map { it.toUiModel() },
+            selectedDistrictId = state.schoolsState.selectedDistrictId,
+            onDistrictSelected = { districtId ->
+                onEvent(SchoolDashboardEvent.SelectDistrict(districtId))
             },
             onBack = {
                 onEvent(SchoolDashboardEvent.Back)
@@ -127,10 +116,10 @@ fun SchoolDashboardScreenExpanded(
                             .clip(RoundedCornerShape(12.dp)),
                         styleUrl = "",
                     ) {
-//                        SchoolsMapLayers(
-//                            schools = state.schoolsState.schools.map { it.toUiModel() },
-//                            selectedSchoolId = state.schoolsState.selectedSchoolId
-//                        )
+                        SchoolsMapLayers(
+                            schools = state.schoolsState.schools.map { it.toUiModel() },
+                            selectedSchoolId = state.schoolsState.selectedSchoolId
+                        )
                     }
                 else
                     Box(
@@ -153,12 +142,20 @@ fun SchoolDashboardScreenExpanded(
 
                 SchoolListContent(
                     schools = state.schoolsState.schools.map { it.toUiModel() },
+                    districts = state.schoolsState.districts.map { it.toUiModel() },
                     selectedSchoolId = state.schoolsState.selectedSchoolId,
                     searchQuery = state.schoolsState.searchQuery,
-                    selectedDistrict = state.schoolsState.selectedDistrict,
+                    selectedDistrictId = state.schoolsState.selectedDistrictId,
+                    selectedCategory = state.schoolsState.selectedCategory,
                     sortOption = state.schoolsState.sortOption,
                     onSearchQueryChange = { query ->
                         onEvent(SchoolDashboardEvent.UpdateSearchQuery(query))
+                    },
+                    onDistrictSelected = { districtId ->
+                        onEvent(SchoolDashboardEvent.SelectDistrict(districtId))
+                    },
+                    onCategorySelected = { category ->
+                        onEvent(SchoolDashboardEvent.SelectCategory(category))
                     },
                     onSortOptionChange = { option ->
                         onEvent(SchoolDashboardEvent.SelectSortOption(option))
@@ -188,98 +185,66 @@ fun SchoolDashboardScreenExpanded(
 @Composable
 private fun SchoolListContent(
     schools: List<SchoolUiModel>,
+    districts: List<DistrictUiModel>,
     selectedSchoolId: String?,
     searchQuery: String,
-    selectedDistrict: String?,
+    selectedDistrictId: Int?,
+    selectedCategory: String?,
     sortOption: SchoolSortOption,
     onSearchQueryChange: (String) -> Unit,
+    onDistrictSelected: (Int?) -> Unit,
+    onCategorySelected: (String?) -> Unit,
     onSortOptionChange: (SchoolSortOption) -> Unit,
     onSelectSchool: (String) -> Unit,
 ) {
-    val filteredSchools = schools
-        .filter { school ->
-            val matchesQuery = searchQuery.isBlank() ||
-                    school.name.contains(searchQuery, ignoreCase = true)
-            val matchesDistrict = selectedDistrict == null ||
-                    school.districtModel.name == selectedDistrict
-            matchesQuery && matchesDistrict
-        }
+//    val filteredSchools = schools
+//        .filter { school ->
+//            val matchesQuery = searchQuery.isBlank() ||
+//                    school.name.contains(searchQuery, ignoreCase = true)
+//            val matchesDistrict = selectedDistrictId == null ||
+//                    school.districtModel.id == selectedDistrictId
+//            matchesQuery && matchesDistrict
+//        }
 
     Column(modifier = Modifier.fillMaxSize()) {
+
+        val categories = schools.mapNotNull { it.category?.name }.distinct().sorted()
 
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            AppChip(modifier = Modifier.wrapContentWidth()) {
-                Row(
-                    modifier = Modifier.wrapContentWidth()
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(Icons.Default.FilterList, "", modifier = Modifier.size(16.dp))
-                    Text(
-                        "Sort",
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Medium,
-                        color = LocalContentColor.current.copy(alpha = 0.85f),
-                    )
-                }
-            }
+            FilterChipMenu(
+                icon = Icons.Default.FilterList,
+                defaultLabel = sortOption.label,
+                options = SchoolSortOption.entries,
+                selected = sortOption,
+                labelTransformer = { "Sort By: ${it.label}" },
+                onSelected = onSortOptionChange,
+            )
 
-            AppChip(modifier = Modifier.wrapContentWidth()) {
-                Row(
-                    modifier = Modifier.wrapContentWidth()
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(Icons.Outlined.Category, "", modifier = Modifier.size(16.dp))
-                    Text(
-                        "Categories",
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Medium,
-                        color = LocalContentColor.current.copy(alpha = 0.85f),
-                    )
-                }
-            }
+            FilterChipMenu(
+                icon = Icons.Outlined.Category,
+                defaultLabel = "All Categories",
+                options = listOf("All Categories") + categories,
+                selected = selectedCategory,
+                labelTransformer = { it },
+                onSelected = { category ->
+                    onCategorySelected(if (category == "All Categories") null else category)
+                },
+            )
 
-            AppChip(modifier = Modifier.wrapContentWidth()) {
-                Row(
-                    modifier = Modifier.wrapContentWidth()
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(Icons.Outlined.Place, "", modifier = Modifier.size(16.dp))
-                    Text(
-                        "District",
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Medium,
-                        color = LocalContentColor.current.copy(alpha = 0.85f),
-                    )
-                }
-            }
-
-
-//            AppChip(modifier = Modifier.wrapContentWidth()) {
-//                Row(
-//                    modifier = Modifier.wrapContentWidth()
-//                        .padding(horizontal = 8.dp, vertical = 4.dp),
-//                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-//                    verticalAlignment = Alignment.CenterVertically,
-//                ) {
-//                    Icon(Icons.Outlined.Search, "", modifier = Modifier.size(16.dp))
-//                    Text(
-//                        "Search School",
-//                        style = MaterialTheme.typography.labelMedium,
-//                        fontWeight = FontWeight.Medium,
-//                        color = LocalContentColor.current.copy(alpha = 0.85f),
-//                    )
-//                }
-//            }
+            FilterChipMenu(
+                icon = Icons.Outlined.Place,
+                defaultLabel = "All Districts",
+                options = listOf(ALL_DISTRICT) + districts,
+                selected = districts.firstOrNull { it.id == selectedDistrictId } ?: ALL_DISTRICT,
+                labelTransformer = { it.name },
+                onSelected = { district ->
+                    onDistrictSelected(if (district.id == ALL_DISTRICT.id) null else district.id)
+                },
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -312,6 +277,17 @@ private fun SchoolListContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        val filteredSchools = schools
+            .filter { school ->
+                val matchesQuery = searchQuery.isBlank() ||
+                        school.name.contains(searchQuery, ignoreCase = true)
+                val matchesDistrict = selectedDistrictId == null || selectedDistrictId == -1 ||
+                        school.districtModel.id == selectedDistrictId
+                val matchesCategory = selectedCategory == null ||
+                        school.category?.name == selectedCategory
+                matchesQuery && matchesDistrict && matchesCategory
+            }
+
         if (filteredSchools.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -328,28 +304,114 @@ private fun SchoolListContent(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                if (sortOption == SchoolSortOption.DistrictName) {
-                    val groupedSchools = filteredSchools
-                        .sortedBy { it.name }
-                        .groupBy { it.districtModel.name }
-                        .toList()
-                        .sortedBy { it.first }
+                stickyHeader {
+                    Text(
+                        text = "Total Schools ${filteredSchools.size}",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surface)
+                            .padding(vertical = 8.dp)
+                    )
 
-                    groupedSchools.forEach { (district, districtSchools) ->
-                        stickyHeader(key = district) {
-                            Text(
-                                text = district,
-                                style = MaterialTheme.typography.labelLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.surface)
-                                    .padding(vertical = 8.dp)
-                            )
+                }
+                when (sortOption) {
+                    SchoolSortOption.DistrictName -> {
+                        val groupedSchools = filteredSchools
+                            .sortedBy { it.name }
+                            .groupBy { it.districtModel.name }
+                            .toList()
+                            .sortedBy { it.first }
+
+                        groupedSchools.forEach { (group, groupSchools) ->
+                            stickyHeader(key = group) {
+                                Row(modifier = Modifier.fillMaxWidth()) {
+                                    Text(
+                                        text = group,
+                                        style = MaterialTheme.typography.labelLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .fillMaxWidth()
+                                            .background(MaterialTheme.colorScheme.surface)
+                                            .padding(vertical = 8.dp)
+                                    )
+
+                                    Text(
+                                        text = "${groupSchools.size} Schools",
+                                        style = MaterialTheme.typography.labelLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier
+                                            .wrapContentWidth()
+                                            .background(MaterialTheme.colorScheme.surface)
+                                            .padding(vertical = 8.dp)
+                                    )
+                                }
+
+                            }
+
+                            items(groupSchools, key = { it.id }) { school ->
+                                SchoolListItem(
+                                    school = school,
+                                    isSelected = school.id == selectedSchoolId,
+                                    onClick = { onSelectSchool(school.id) }
+                                )
+                            }
                         }
+                    }
 
-                        items(districtSchools, key = { it.id }) { school ->
+                    SchoolSortOption.SchoolCategory -> {
+                        val groupedSchools = filteredSchools
+                            .sortedBy { it.name }
+                            .groupBy { it.category?.name ?: "Uncategorized" }
+                            .toList()
+                            .sortedBy { it.first }
+
+                        groupedSchools.forEach { (group, groupSchools) ->
+                            stickyHeader(key = group) {
+                                Row(modifier = Modifier.fillMaxWidth()) {
+                                    Text(
+                                        text = group,
+                                        style = MaterialTheme.typography.labelLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .fillMaxWidth()
+                                            .background(MaterialTheme.colorScheme.surface)
+                                            .padding(vertical = 8.dp)
+                                    )
+
+                                    Text(
+                                        text = "${groupSchools.size} Schools",
+                                        style = MaterialTheme.typography.labelLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier
+                                            .wrapContentWidth()
+                                            .background(MaterialTheme.colorScheme.surface)
+                                            .padding(vertical = 8.dp)
+                                    )
+                                }
+                            }
+
+                            items(groupSchools, key = { it.id }) { school ->
+                                SchoolListItem(
+                                    school = school,
+                                    isSelected = school.id == selectedSchoolId,
+                                    onClick = { onSelectSchool(school.id) }
+                                )
+                            }
+                        }
+                    }
+
+                    SchoolSortOption.SchoolName -> {
+                        items(filteredSchools.sortedBy { it.name }, key = { it.id }) { school ->
                             SchoolListItem(
                                 school = school,
                                 isSelected = school.id == selectedSchoolId,
@@ -357,15 +419,43 @@ private fun SchoolListContent(
                             )
                         }
                     }
-                } else {
-                    items(filteredSchools.sortedBy { it.name }, key = { it.id }) { school ->
-                        SchoolListItem(
-                            school = school,
-                            isSelected = school.id == selectedSchoolId,
-                            onClick = { onSelectSchool(school.id) }
-                        )
-                    }
                 }
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun <T> FilterChipMenu(
+    icon: ImageVector,
+    defaultLabel: String,
+    options: List<T>,
+    selected: T?,
+    labelTransformer: (T) -> String,
+    onSelected: (T) -> Unit,
+) {
+    AppDropDownBasic(
+        modifier = Modifier.wrapContentWidth().clip(RoundedCornerShape(50)),
+        options = options,
+        labelTransformer = labelTransformer,
+        onSelected = onSelected,
+        selected = selected,
+    ) { currentOption ->
+        AppChip(modifier = Modifier.wrapContentWidth()) {
+            Row(
+                modifier = Modifier.wrapContentWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(icon, "", modifier = Modifier.size(16.dp))
+                Text(
+                    currentOption?.let(labelTransformer) ?: defaultLabel,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = LocalContentColor.current.copy(alpha = 0.85f),
+                )
             }
         }
     }
@@ -428,3 +518,5 @@ private fun SchoolListItem(
         }
     }
 }
+
+private val ALL_DISTRICT = DistrictUiModel(id = -1, name = "All Districts")

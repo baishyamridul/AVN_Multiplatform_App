@@ -13,12 +13,14 @@ import kotlinx.coroutines.launch
 import tech.sumato.avn.mp.core.navigation.MviViewModel
 import tech.sumato.avn.mp.domain.common.model.exception.ResponseExceptionModel
 import tech.sumato.avn.mp.domain.school.usecase.GetSchoolsUseCase
+import tech.sumato.avn.mp.domain.user.usecase.GetStoredUserDetailsUseCase
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.effect.SchoolDashboardEffect
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.event.SchoolDashboardEvent
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.state.SchoolDashboardState
 
 class SchoolDashboardViewModel(
     private val getSchoolsUseCase: GetSchoolsUseCase,
+    private val getStoredUserDetailsUseCase: GetStoredUserDetailsUseCase,
 ) : ViewModel(), MviViewModel<SchoolDashboardState, SchoolDashboardEffect> {
 
     private val _state = MutableStateFlow(SchoolDashboardState())
@@ -29,6 +31,7 @@ class SchoolDashboardViewModel(
 
     init {
         fetchSchools()
+        loadDistricts()
     }
 
 
@@ -72,7 +75,17 @@ class SchoolDashboardViewModel(
                 _state.update { state ->
                     state.copy(
                         schoolsState = state.schoolsState.copy(
-                            selectedDistrict = event.district
+                            selectedDistrictId = event.districtId
+                        )
+                    )
+                }
+            }
+
+            is SchoolDashboardEvent.SelectCategory -> {
+                _state.update { state ->
+                    state.copy(
+                        schoolsState = state.schoolsState.copy(
+                            selectedCategory = event.category
                         )
                     )
                 }
@@ -86,6 +99,35 @@ class SchoolDashboardViewModel(
                         )
                     )
                 }
+            }
+        }
+    }
+
+
+    fun preselectDistrict(districtId: Int) {
+        _state.update { state ->
+            state.copy(
+                schoolsState = state.schoolsState.copy(
+                    selectedDistrictId = districtId
+                )
+            )
+        }
+    }
+
+
+    private fun loadDistricts() {
+        viewModelScope.launch {
+            try {
+                val storedDetails = getStoredUserDetailsUseCase()
+                _state.update { state ->
+                    state.copy(
+                        schoolsState = state.schoolsState.copy(
+                            districts = storedDetails?.districts.orEmpty()
+                        )
+                    )
+                }
+            } catch (e: ResponseExceptionModel) {
+                //
             }
         }
     }

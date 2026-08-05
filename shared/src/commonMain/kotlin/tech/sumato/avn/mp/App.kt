@@ -8,9 +8,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.savedstate.read
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import org.jetbrains.compose.resources.painterResource
@@ -112,10 +115,22 @@ fun AppNavGraph(navController: NavHostController) {
             )
         }
 
-        composable(Route.SCHOOL_DASHBOARD) {
-            SchoolDashboardRoute(onNavigateBack = {
-                navController.popBackStack()
-            })
+        composable(
+            route = Route.SCHOOL_DASHBOARD,
+            arguments = listOf(
+                navArgument("districtId") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
+        ) { backStackEntry ->
+            val initialDistrictId = backStackEntry.arguments?.read { getIntOrNull("districtId") }
+            SchoolDashboardRoute(
+                initialDistrictId = initialDistrictId,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
         }
 
     }

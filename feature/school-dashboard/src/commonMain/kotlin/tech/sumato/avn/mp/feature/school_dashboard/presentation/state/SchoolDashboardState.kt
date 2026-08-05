@@ -1,5 +1,6 @@
 package tech.sumato.avn.mp.feature.school_dashboard.presentation.state
 
+import tech.sumato.avn.mp.domain.common.model.DistrictModel
 import tech.sumato.avn.mp.domain.school.model.SchoolModel
 
 //sealed interface SchoolDashboardState {
@@ -19,9 +20,11 @@ data class SchoolDashboardState(
 data class SchoolsState(
     val isLoading: Boolean = false,
     val schools: List<SchoolModel> = emptyList(),
+    val districts: List<DistrictModel> = emptyList(),
     val selectedSchoolId: String? = null,
     val searchQuery: String = "",
-    val selectedDistrict: String? = null,
+    val selectedDistrictId: Int? = null,
+    val selectedCategory: String? = null,
     val sortOption: SchoolSortOption = SchoolSortOption.SchoolName,
 )
 
