@@ -19,4 +19,16 @@ data class SchoolDashboardState(
 data class SchoolsState(
     val isLoading: Boolean = false,
     val schools: List<SchoolModel> = emptyList(),
+    val selectedSchoolId: String? = null,
+    val searchQuery: String = "",
+    val selectedDistrict: String? = null,
+    val sortOption: SchoolSortOption = SchoolSortOption.SchoolName,
 )
+
+enum class SchoolSortOption(val label: String) {
+    SchoolName("School Name"),
+
+    DistrictName("District"),
+
+    SchoolCategory("School Category"),
+}

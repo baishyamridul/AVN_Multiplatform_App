@@ -38,7 +38,55 @@ class SchoolDashboardViewModel(
                 _effects.trySend(SchoolDashboardEffect.NavigateBack)
             }
 
-            else -> {}
+            is SchoolDashboardEvent.SelectSchool -> {
+                _state.update { state ->
+                    state.copy(
+                        schoolsState = state.schoolsState.copy(
+                            selectedSchoolId = event.schoolId
+                        )
+                    )
+                }
+            }
+
+            is SchoolDashboardEvent.ClearSchoolSelection -> {
+                _state.update { state ->
+                    state.copy(
+                        schoolsState = state.schoolsState.copy(
+                            selectedSchoolId = null
+                        )
+                    )
+                }
+            }
+
+            is SchoolDashboardEvent.UpdateSearchQuery -> {
+                _state.update { state ->
+                    state.copy(
+                        schoolsState = state.schoolsState.copy(
+                            searchQuery = event.query
+                        )
+                    )
+                }
+            }
+
+            is SchoolDashboardEvent.SelectDistrict -> {
+                _state.update { state ->
+                    state.copy(
+                        schoolsState = state.schoolsState.copy(
+                            selectedDistrict = event.district
+                        )
+                    )
+                }
+            }
+
+            is SchoolDashboardEvent.SelectSortOption -> {
+                _state.update { state ->
+                    state.copy(
+                        schoolsState = state.schoolsState.copy(
+                            sortOption = event.option
+                        )
+                    )
+                }
+            }
         }
     }
 

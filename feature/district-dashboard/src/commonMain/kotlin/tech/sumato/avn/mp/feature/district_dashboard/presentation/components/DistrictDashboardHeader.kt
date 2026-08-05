@@ -77,7 +77,7 @@ fun DistrictDashboardHeader(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        (currentOption as? DistrictUiModel)?.name ?: "All District",
+                        currentOption?.name ?: "All District",
                         style = MaterialTheme.typography.bodySmall
                     )
                     Icon(Icons.Default.ArrowDropDown, contentDescription = "Show options")

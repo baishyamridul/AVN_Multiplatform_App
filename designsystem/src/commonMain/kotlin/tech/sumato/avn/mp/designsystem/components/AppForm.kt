@@ -30,19 +30,28 @@ fun AppTextField(
     error: String? = null,
 ) {
     Column(modifier = modifier) {
-        Text(
-            label,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        Spacer(Modifier.height(6.dp))
+//        Text(
+//            label,
+//            style = MaterialTheme.typography.labelMedium,
+//            color = MaterialTheme.colorScheme.onSurface,
+//        )
+//        Spacer(Modifier.height(6.dp))
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             isError = error != null,
             placeholder = if (placeholder.isNotEmpty()) {
-                { Text(placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                {
+                    Text(
+                        placeholder,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                            alpha = 0.75f
+                        ),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
             } else null,
+            textStyle = MaterialTheme.typography.bodyMedium,
             enabled = enabled,
             readOnly = readOnly,
             singleLine = singleLine,
@@ -59,7 +68,7 @@ fun AppTextField(
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = if (isSecured) PasswordVisualTransformation() else VisualTransformation.None,
 
-        )
+            )
         if (error != null) {
             Spacer(Modifier.height(4.dp))
             Text(

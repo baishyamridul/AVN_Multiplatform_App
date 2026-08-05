@@ -25,7 +25,13 @@ import tech.sumato.avn.mp.designsystem.components.app.AppHeaderCustom
 import tech.sumato.avn.mp.designsystem.components.app.fields.AppDropDownBasic
 
 @Composable
-fun SchoolDashboardHeader(modifier: Modifier, onBack: () -> Unit) {
+fun SchoolDashboardHeader(
+    modifier: Modifier,
+    districts: List<String>,
+    selectedDistrict: String?,
+    onDistrictSelected: (String?) -> Unit,
+    onBack: () -> Unit,
+) {
 
     AppHeaderCustom(modifier = modifier, leading = {
         IconButton(onClick = onBack) {
@@ -40,7 +46,7 @@ fun SchoolDashboardHeader(modifier: Modifier, onBack: () -> Unit) {
             horizontalArrangement = Arrangement.End
         ) {
 
-            val options = listOf("All District", "Kamrup", "Kamrup Metro", "Palashbari")
+            val options = listOf(ALL_DISTRICT_LABEL) + districts
 
             AppDropDownBasic(
                 modifier = Modifier
@@ -51,8 +57,13 @@ fun SchoolDashboardHeader(modifier: Modifier, onBack: () -> Unit) {
                         RoundedCornerShape(8.dp)
                     ),
                 options = options,
-                onSelected = { it -> },
-                selected = options.first(),
+                labelTransformer = { it },
+                onSelected = { option ->
+                    onDistrictSelected(
+                        if (option == ALL_DISTRICT_LABEL) null else option
+                    )
+                },
+                selected = selectedDistrict ?: ALL_DISTRICT_LABEL,
             ) { currentOption ->
                 Row(
                     modifier = Modifier
@@ -62,7 +73,7 @@ fun SchoolDashboardHeader(modifier: Modifier, onBack: () -> Unit) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        currentOption ?: "All District",
+                        currentOption ?: ALL_DISTRICT_LABEL,
                         style = MaterialTheme.typography.bodySmall
                     )
                     Icon(Icons.Default.ArrowDropDown, contentDescription = "Show options")
@@ -77,3 +88,5 @@ fun SchoolDashboardHeader(modifier: Modifier, onBack: () -> Unit) {
     }
 
 }
+
+private const val ALL_DISTRICT_LABEL = "All Districts"
