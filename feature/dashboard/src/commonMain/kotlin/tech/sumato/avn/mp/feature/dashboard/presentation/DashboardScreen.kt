@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,6 +26,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import tech.sumato.avn.mp.designsystem.FormFactor
+import tech.sumato.avn.mp.designsystem.LocalFormFactor
 import tech.sumato.avn.mp.designsystem.components.AppCard
 import tech.sumato.avn.mp.designsystem.components.AppTextField
 import tech.sumato.avn.mp.designsystem.components.ScreenHeader
@@ -34,12 +37,16 @@ import tech.sumato.avn.mp.designsystem.theme.MainColor
 import tech.sumato.avn.mp.domain.dashboard.model.DashboardData
 import tech.sumato.avn.mp.domain.dashboard.model.RevenueItem
 import tech.sumato.avn.mp.domain.dashboard.model.Transaction
+import tech.sumato.avn.mp.feature.dashboard.presentation.event.DashboardEvent
+import tech.sumato.avn.mp.feature.dashboard.presentation.state.DashboardState
 
 @Composable
 fun DashboardScreen(
     state: DashboardState,
     onEvent: (DashboardEvent) -> Unit,
 ) {
+    val formFactor = LocalFormFactor.current
+
     when (state) {
         is DashboardState.Loading -> {
             Box(
@@ -51,7 +58,11 @@ fun DashboardScreen(
         }
 
         is DashboardState.Success -> {
-            DashboardContent(state.data)
+            when (formFactor) {
+                FormFactor.Compact -> DashboardCompact(state.data)
+                FormFactor.Medium -> DashboardMedium(state.data)
+                FormFactor.Expanded -> DashboardExpanded(state.data)
+            }
         }
 
         is DashboardState.Error -> {
@@ -69,7 +80,7 @@ fun DashboardScreen(
 }
 
 @Composable
-private fun DashboardContent(data: DashboardData) {
+private fun DashboardCompact(data: DashboardData) {
     val scrollState = rememberScrollState()
 
     Column(
@@ -84,7 +95,7 @@ private fun DashboardContent(data: DashboardData) {
             subtitle = "Welcome back, here's your overview.",
         )
         Spacer(Modifier.height(20.dp))
-        StatsGrid(data)
+        StatsGrid(data, columns = 2)
         Spacer(Modifier.height(20.dp))
         MonthlyRevenue(data)
         Spacer(Modifier.height(20.dp))
@@ -96,53 +107,99 @@ private fun DashboardContent(data: DashboardData) {
 }
 
 @Composable
-private fun StatsGrid(data: DashboardData) {
-    val stats = data.stats
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+private fun DashboardMedium(data: DashboardData) {
+    val scrollState = rememberScrollState()
+
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(24.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(scrollState)
+                .padding(end = 12.dp),
         ) {
-            if (stats.size > 0) {
-                StatCard(
-                    label = stats[0].label,
-                    value = stats[0].value,
-                    change = stats[0].change,
-                    isPositive = stats[0].isPositive,
-                    modifier = Modifier.weight(1f),
-                )
+            ScreenHeader(
+                title = "Dashboard",
+                subtitle = "Welcome back, here's your overview.",
+            )
+            Spacer(Modifier.height(20.dp))
+            StatsGrid(data, columns = 2)
+            Spacer(Modifier.height(20.dp))
+            MonthlyRevenue(data)
+        }
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(scrollState)
+                .padding(start = 12.dp),
+        ) {
+            RecentTransactions(data)
+            Spacer(Modifier.height(20.dp))
+            SampleForm()
+        }
+    }
+}
+
+@Composable
+private fun DashboardExpanded(data: DashboardData) {
+    val scrollState = rememberScrollState()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(scrollState)
+            .padding(32.dp),
+    ) {
+        ScreenHeader(
+            title = "Dashboard",
+            subtitle = "Welcome back, here's your overview.",
+        )
+        Spacer(Modifier.height(24.dp))
+        StatsGrid(data, columns = 4)
+        Spacer(Modifier.height(24.dp))
+
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.weight(1f)) {
+                MonthlyRevenue(data)
             }
-            if (stats.size > 1) {
-                StatCard(
-                    label = stats[1].label,
-                    value = stats[1].value,
-                    change = stats[1].change,
-                    isPositive = stats[1].isPositive,
-                    modifier = Modifier.weight(1f),
-                )
+            Spacer(Modifier.width(24.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                RecentTransactions(data)
             }
         }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            if (stats.size > 2) {
-                StatCard(
-                    label = stats[2].label,
-                    value = stats[2].value,
-                    change = stats[2].change,
-                    isPositive = stats[2].isPositive,
-                    modifier = Modifier.weight(1f),
-                )
-            }
-            if (stats.size > 3) {
-                StatCard(
-                    label = stats[3].label,
-                    value = stats[3].value,
-                    change = stats[3].change,
-                    isPositive = stats[3].isPositive,
-                    modifier = Modifier.weight(1f),
-                )
+
+        Spacer(Modifier.height(24.dp))
+        SampleForm()
+        Spacer(Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun StatsGrid(data: DashboardData, columns: Int) {
+    val stats = data.stats
+    val rows = stats.chunked(columns)
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        rows.forEach { row ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                row.forEach { stat ->
+                    StatCard(
+                        label = stat.label,
+                        value = stat.value,
+                        change = stat.change,
+                        isPositive = stat.isPositive,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
         }
     }
@@ -183,7 +240,7 @@ private fun RevenueBar(item: RevenueItem) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth(item.fraction)
-                    .fillMaxSize()
+                    .fillMaxHeight()
                     .clip(RoundedCornerShape(4.dp))
                     .background(MainColor.copy(alpha = 0.3f)),
             )
@@ -229,7 +286,7 @@ private fun TransactionItem(transaction: Transaction) {
         ) {
             Text(
                 if (transaction.isInflow) "\u2191" else "\u2193",
-                color = if (transaction.isInflow) MainColor else MainColor,
+                color = MainColor,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
             )

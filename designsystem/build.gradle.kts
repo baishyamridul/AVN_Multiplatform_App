@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.invoke
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -7,6 +8,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
 }
+
 
 kotlin {
     listOf(
@@ -20,10 +22,10 @@ kotlin {
     }
 
     jvm()
-    js { browser() }
-
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs { browser() }
+//    js { browser() }
+//
+//    @OptIn(ExperimentalWasmDsl::class)
+//    wasmJs { browser() }
 
     androidLibrary {
         namespace = "tech.sumato.avn.mp.designsystem"
@@ -41,9 +43,20 @@ kotlin {
             implementation(libs.compose.material3)
             implementation(libs.compose.ui)
             implementation(libs.compose.components.resources)
-        }
-        androidMain.dependencies {
+            implementation(libs.material.icons.extended)
+
+
             implementation(libs.compose.uiToolingPreview)
+
+            implementation(libs.kotlinx.date.time)
+
         }
+
     }
+}
+
+compose.resources {
+
+    publicResClass = true
+
 }

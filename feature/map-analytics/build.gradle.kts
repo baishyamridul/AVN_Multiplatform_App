@@ -20,10 +20,10 @@ kotlin {
     }
 
     jvm()
-    js { browser() }
-
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs { browser() }
+//    js { browser() }
+//
+//    @OptIn(ExperimentalWasmDsl::class)
+//    wasmJs { browser() }
 
     androidLibrary {
         namespace = "tech.sumato.avn.mp.feature.map_analytics"
@@ -34,6 +34,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.component.map)
             implementation(projects.core.common)
             implementation(projects.core.navigation)
             implementation(projects.designsystem)
@@ -47,19 +48,19 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.material.icons.extended)
         }
         androidMain.dependencies {
             implementation(libs.maplibre.compose)
         }
         iosMain.dependencies {
-            implementation(libs.maplibre.compose)
         }
         jvmMain.dependencies {
             implementation(libs.maplibre.compose)
         }
-        jsMain.dependencies {
-        }
-        wasmJsMain.dependencies {
-        }
+//        jsMain.dependencies {
+//        }
+//        wasmJsMain.dependencies {
+//        }
     }
 }

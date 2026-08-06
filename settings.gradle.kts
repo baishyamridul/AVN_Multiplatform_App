@@ -25,6 +25,7 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
+        maven("https://jogamp.org/deployment/maven")
     }
 }
 
@@ -35,19 +36,32 @@ plugins {
 include(":androidApp")
 include(":desktopApp")
 include(":shared")
-include(":webApp")
+//include(":webApp")
 
 include(":core:common")
 include(":core:network")
 include(":core:navigation")
+include(":core:datastore")
+include(":domain:common")
 include(":domain:user")
 include(":data:user")
+include(":domain:districtDashboard")
 include(":feature:login")
 include(":designsystem")
 include(":domain:dashboard")
+include(":domain:school")
 include(":data:dashboard")
+include(":data:districtDashboard")
+include(":data:school")
 include(":feature:dashboard")
+include(":feature:district-dashboard")
 
 
 
+include(":component:map")
 include(":feature:map-analytics")
+
+
+include(":feature:school-dashboard")
+include(":component:image360")
+

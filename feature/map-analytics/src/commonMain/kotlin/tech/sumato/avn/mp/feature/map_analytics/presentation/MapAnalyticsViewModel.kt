@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import tech.sumato.avn.mp.core.navigation.MviViewModel
+import tech.sumato.avn.mp.feature.map_analytics.presentation.effect.MapAnalyticsEffect
+import tech.sumato.avn.mp.feature.map_analytics.presentation.event.MapAnalyticsEvent
+import tech.sumato.avn.mp.feature.map_analytics.presentation.state.MapAnalyticsState
 
 class MapAnalyticsViewModel : ViewModel(), MviViewModel<MapAnalyticsState, MapAnalyticsEffect> {
 

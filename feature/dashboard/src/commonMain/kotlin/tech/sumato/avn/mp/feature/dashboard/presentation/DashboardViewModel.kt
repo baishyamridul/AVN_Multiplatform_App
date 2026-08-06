@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import tech.sumato.avn.mp.core.navigation.MviViewModel
 import tech.sumato.avn.mp.domain.dashboard.usecase.GetDashboardDataUseCase
+import tech.sumato.avn.mp.feature.dashboard.presentation.effect.DashboardEffect
+import tech.sumato.avn.mp.feature.dashboard.presentation.event.DashboardEvent
+import tech.sumato.avn.mp.feature.dashboard.presentation.state.DashboardState
 
 class DashboardViewModel(
     private val getDashboardDataUseCase: GetDashboardDataUseCase,

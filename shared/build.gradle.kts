@@ -20,24 +20,11 @@ kotlin {
         }
     }
 
-//    cocoapods {
-//        summary = "KMPMaplibre"
-//        homepage = "https://github.com/tech.sumato/kmpmaplibre"
-//        version = "1.0"
-//        ios.deploymentTarget = "15.0"
-//        podfile = project.file("../iosApp/Podfile")
-//        framework {
-//            baseName = "Shared"
-//            isStatic = true
-//        }
-//        pod("MapLibre")
-//    }
-
     jvm()
-    js { browser() }
+//    js { browser() }
 
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs { browser() }
+//    @OptIn(ExperimentalWasmDsl::class)
+//    wasmJs { browser() }
 
     androidLibrary {
        namespace = "tech.sumato.avn.mp.shared"
@@ -67,6 +54,11 @@ kotlin {
             implementation(projects.designsystem)
             implementation(projects.core.common)
             implementation(projects.core.navigation)
+            implementation(projects.core.datastore)
+
+            implementation(projects.feature.districtDashboard)
+            implementation(projects.feature.schoolDashboard)
+            implementation(projects.data.districtDashboard)
 
             implementation(libs.androidx.navigation.compose)
 
@@ -82,6 +74,14 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
+
+            implementation(libs.material.icons)
+            implementation(libs.material.icons.extended)
+
+            implementation(libs.kotlinx.date.time)
+
+            implementation(projects.data.school)
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -89,9 +89,9 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
         }
-        jsMain.dependencies {
-            implementation(libs.wrappers.browser)
-        }
+//        jsMain.dependencies {
+//            implementation(libs.wrappers.browser)
+//        }
     }
 }
 

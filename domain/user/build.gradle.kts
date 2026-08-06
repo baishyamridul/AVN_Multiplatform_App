@@ -18,10 +18,10 @@ kotlin {
     }
 
     jvm()
-    js { browser() }
-
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs { browser() }
+//    js { browser() }
+//
+//    @OptIn(ExperimentalWasmDsl::class)
+//    wasmJs { browser() }
 
     androidLibrary {
         namespace = "tech.sumato.avn.mp.domain.user"
@@ -32,6 +32,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.domain.common)
             implementation(projects.core.common)
             implementation(libs.kotlinx.coroutines.core)
         }

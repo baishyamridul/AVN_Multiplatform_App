@@ -20,9 +20,17 @@ kotlinx-coroutines = "1.11.0"
 kotlinx-serialization = "1.7.3"
 material3 = "1.11.0-alpha07"
 kotlinStdlib = "2.4.0"
-maplibre = "0.13.0"
+maplibre = "0.13.1"
 runner = "1.7.0"
 core = "1.7.0"
+
+material-icons = "1.7.3"
+
+kotlinx-date-time = "0.8.0"
+
+saralapps-webview = "0.1.4"
+
+datastore = "1.2.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -63,6 +71,19 @@ maplibre-compose = { module = "org.maplibre.compose:maplibre-compose", version.r
 maplibre-jni = { module = "org.maplibre.compose:maplibre-native-bindings-jni", version.ref = "maplibre" }
 androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
 androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
+
+material-icons = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "material-icons" }
+material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material-icons" }
+
+kotlinx-date-time = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-date-time" }
+
+# webview
+saralapps-webview = { module = "com.saralapps:composemultiplatformwebview", version.ref = "saralapps-webview" }
+datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version = "1.2.1" }
+#datastore-preferences-core = { module = "androidx.datastore:datastore-core", version = "1.2.1" }
+datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

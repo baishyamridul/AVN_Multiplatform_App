@@ -19,10 +19,10 @@ kotlin {
     }
 
     jvm()
-    js { browser() }
-
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs { browser() }
+//    js { browser() }
+//
+//    @OptIn(ExperimentalWasmDsl::class)
+//    wasmJs { browser() }
 
     androidLibrary {
         namespace = "tech.sumato.avn.mp.core.network"
@@ -34,6 +34,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.core.datastore)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.koin.core)
@@ -49,13 +50,14 @@ kotlin {
             implementation(libs.ktor.client.darwin)
         }
         jvmMain.dependencies {
-            implementation(libs.ktor.client.java)
+//            implementation(libs.ktor.client.java)
+            implementation(libs.ktor.client.okhttp)
         }
-        jsMain.dependencies {
-            implementation(libs.ktor.client.js)
-        }
-        wasmJsMain.dependencies {
-            implementation(libs.ktor.client.js)
-        }
+//        jsMain.dependencies {
+//            implementation(libs.ktor.client.js)
+//        }
+//        wasmJsMain.dependencies {
+//            implementation(libs.ktor.client.js)
+//        }
     }
 }

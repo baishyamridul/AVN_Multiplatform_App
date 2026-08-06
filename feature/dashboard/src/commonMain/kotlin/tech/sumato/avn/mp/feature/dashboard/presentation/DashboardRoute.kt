@@ -2,6 +2,8 @@ package tech.sumato.avn.mp.feature.dashboard.presentation
 
 import androidx.compose.runtime.Composable
 import tech.sumato.avn.mp.core.navigation.BaseRoute
+import tech.sumato.avn.mp.feature.dashboard.presentation.effect.DashboardEffect
+import tech.sumato.avn.mp.feature.dashboard.presentation.state.DashboardState
 
 @Composable
 fun DashboardRoute(
