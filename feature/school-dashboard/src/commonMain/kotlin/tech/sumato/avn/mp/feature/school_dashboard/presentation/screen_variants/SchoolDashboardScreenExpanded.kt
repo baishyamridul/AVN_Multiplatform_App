@@ -53,6 +53,7 @@ import tech.sumato.avn.mp.designsystem.components.AppTextField
 import tech.sumato.avn.mp.designsystem.components.app.AppChip
 import tech.sumato.avn.mp.designsystem.components.app.fields.AppDropDownBasic
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.SchoolDashboardHeader
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.SchoolDetails
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.SchoolsMapLayers
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.event.SchoolDashboardEvent
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.DistrictUiModel
@@ -130,6 +131,16 @@ fun SchoolDashboardScreenExpanded(
 
             AppCardBordered(
                 modifier = Modifier.weight(1.8f).fillMaxSize(),
+                paddingLess = false,
+            ) {
+
+                SchoolDetails()
+
+            }
+
+
+            AppCardBordered(
+                modifier = Modifier.weight(0.1f).fillMaxSize(),
                 paddingLess = false,
             ) {
                 Text(

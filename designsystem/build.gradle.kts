@@ -50,6 +50,25 @@ kotlin {
 
             implementation(libs.kotlinx.date.time)
 
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor)
+
+        }
+
+        androidMain {
+            dependencies {
+                implementation(libs.ktor.client.android)
+            }
+        }
+        iosMain {
+            dependencies {
+                implementation(libs.ktor.client.darwin)
+            }
+        }
+        jvmMain {
+            dependencies {
+                implementation(libs.ktor.client.java)
+            }
         }
 
     }

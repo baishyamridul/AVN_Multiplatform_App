@@ -69,6 +69,13 @@ kotlin {
 
             implementation(libs.maplibre.compose)
 
+//            implementation(libs.qrcode.kotlin)
+
+            implementation(libs.qr.kit)
+
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor)
+
         }
 
         androidMain.dependencies {
