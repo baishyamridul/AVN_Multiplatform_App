@@ -10,6 +10,10 @@ sealed interface SchoolDashboardEvent {
 
     data object ClearSchoolSelection : SchoolDashboardEvent
 
+    data class LoadSchoolDetails(val schoolId: String) : SchoolDashboardEvent
+
+    data object ClearSchoolDetails : SchoolDashboardEvent
+
     data class UpdateSearchQuery(val query: String) : SchoolDashboardEvent
 
     data class SelectDistrict(val districtId: Int?) : SchoolDashboardEvent

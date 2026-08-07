@@ -2,6 +2,7 @@ package tech.sumato.avn.mp.feature.school_dashboard.presentation.state
 
 import tech.sumato.avn.mp.domain.common.model.DistrictModel
 import tech.sumato.avn.mp.domain.school.model.SchoolModel
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.SchoolDetailsUiModel
 
 //sealed interface SchoolDashboardState {
 //    data object Loading : SchoolDashboardState
@@ -26,6 +27,8 @@ data class SchoolsState(
     val selectedDistrictId: Int? = null,
     val selectedCategory: String? = null,
     val sortOption: SchoolSortOption = SchoolSortOption.SchoolName,
+    val schoolDetails: SchoolDetailsUiModel? = null,
+    val isSchoolDetailsLoading: Boolean = false,
 )
 
 enum class SchoolSortOption(val label: String) {

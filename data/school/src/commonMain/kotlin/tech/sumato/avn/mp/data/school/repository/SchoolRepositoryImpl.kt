@@ -8,6 +8,7 @@ import tech.sumato.avn.mp.data.school.mapper.SchoolMapper
 import tech.sumato.avn.mp.data.school.remote.SchoolApi
 import tech.sumato.avn.mp.domain.common.model.exception.ResponseDataModel
 import tech.sumato.avn.mp.domain.common.model.exception.ResponseExceptionModel
+import tech.sumato.avn.mp.domain.school.model.SchoolDetailsModel
 import tech.sumato.avn.mp.domain.school.model.SchoolModel
 import tech.sumato.avn.mp.domain.school.repository.SchoolRepository
 
@@ -37,4 +38,26 @@ class SchoolRepositoryImpl(
         return result?.map { schoolDto -> mapper.toDomain(schoolDto) } ?: emptyList()
 
     }
+
+    override suspend fun getSchoolDetails(schoolId: String): SchoolDetailsModel {
+
+        val result = try {
+            val response = api.getSchoolDetails(schoolId = schoolId)
+            response.data
+        } catch (e: ClientRequestException) {
+            val errorBody = try {
+                json.decodeFromString<ErrorResponseWrapper>(e.response.bodyAsText())
+            } catch (_: Exception) {
+                ErrorResponseWrapper(status = e.response.status.value, message = e.message)
+            }
+            throw ResponseExceptionModel(
+                message = errorBody.message,
+                fieldErrors = errorBody.errors,
+            )
+        }
+
+        return result?.let { mapper.toDomain(it) } ?: error("school details empty")
+
+    }
+
 }

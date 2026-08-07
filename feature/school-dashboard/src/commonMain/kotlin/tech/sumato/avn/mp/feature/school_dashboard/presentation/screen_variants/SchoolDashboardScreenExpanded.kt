@@ -20,12 +20,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.LocationOff
 import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,6 +59,7 @@ import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.Schoo
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.SchoolsMapLayers
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.event.SchoolDashboardEvent
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.DistrictUiModel
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.SchoolDetailsUiModel
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.SchoolUiModel
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.toUiModel
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.state.SchoolDashboardState
@@ -134,53 +137,48 @@ fun SchoolDashboardScreenExpanded(
                 paddingLess = false,
             ) {
 
-                SchoolDetails()
+                val selectedSchoolId = state.schoolsState.selectedSchoolId
 
-            }
+                if (selectedSchoolId != null) {
 
-
-            AppCardBordered(
-                modifier = Modifier.weight(0.1f).fillMaxSize(),
-                paddingLess = false,
-            ) {
-                Text(
-                    "\uD83C\uDFEB Schools",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                SchoolListContent(
-                    schools = state.schoolsState.schools.map { it.toUiModel() },
-                    districts = state.schoolsState.districts.map { it.toUiModel() },
-                    selectedSchoolId = state.schoolsState.selectedSchoolId,
-                    searchQuery = state.schoolsState.searchQuery,
-                    selectedDistrictId = state.schoolsState.selectedDistrictId,
-                    selectedCategory = state.schoolsState.selectedCategory,
-                    sortOption = state.schoolsState.sortOption,
-                    onSearchQueryChange = { query ->
-                        onEvent(SchoolDashboardEvent.UpdateSearchQuery(query))
-                    },
-                    onDistrictSelected = { districtId ->
-                        onEvent(SchoolDashboardEvent.SelectDistrict(districtId))
-                    },
-                    onCategorySelected = { category ->
-                        onEvent(SchoolDashboardEvent.SelectCategory(category))
-                    },
-                    onSortOptionChange = { option ->
-                        onEvent(SchoolDashboardEvent.SelectSortOption(option))
-                    },
-                    onSelectSchool = { schoolId ->
-                        val isSelected = schoolId == state.schoolsState.selectedSchoolId
-                        if (isSelected) {
+                    SchoolDetailsPanel(
+                        isSchoolDetailsLoading = state.schoolsState.isSchoolDetailsLoading,
+                        schoolDetails = state.schoolsState.schoolDetails,
+                        onBack = {
                             onEvent(SchoolDashboardEvent.ClearSchoolSelection)
-                        } else {
-                            onEvent(SchoolDashboardEvent.SelectSchool(schoolId))
+                            onEvent(SchoolDashboardEvent.ClearSchoolDetails)
                         }
-                    }
-                )
+                    )
 
+                } else {
+
+                    SchoolListContent(
+                        schools = state.schoolsState.schools.map { it.toUiModel() },
+                        districts = state.schoolsState.districts.map { it.toUiModel() },
+                        selectedSchoolId = state.schoolsState.selectedSchoolId,
+                        searchQuery = state.schoolsState.searchQuery,
+                        selectedDistrictId = state.schoolsState.selectedDistrictId,
+                        selectedCategory = state.schoolsState.selectedCategory,
+                        sortOption = state.schoolsState.sortOption,
+                        onSearchQueryChange = { query ->
+                            onEvent(SchoolDashboardEvent.UpdateSearchQuery(query))
+                        },
+                        onDistrictSelected = { districtId ->
+                            onEvent(SchoolDashboardEvent.SelectDistrict(districtId))
+                        },
+                        onCategorySelected = { category ->
+                            onEvent(SchoolDashboardEvent.SelectCategory(category))
+                        },
+                        onSortOptionChange = { option ->
+                            onEvent(SchoolDashboardEvent.SelectSortOption(option))
+                        },
+                        onSelectSchool = { schoolId ->
+                            onEvent(SchoolDashboardEvent.SelectSchool(schoolId))
+                            onEvent(SchoolDashboardEvent.LoadSchoolDetails(schoolId))
+                        }
+                    )
+
+                }
 
             }
 
@@ -189,6 +187,58 @@ fun SchoolDashboardScreenExpanded(
 
     }
 
+}
+
+
+@Composable
+private fun SchoolDetailsPanel(
+    isSchoolDetailsLoading: Boolean,
+    schoolDetails: SchoolDetailsUiModel?,
+    onBack: () -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+
+        IconButton(
+            onClick = onBack,
+            modifier = Modifier.size(32.dp),
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Back to schools",
+                modifier = Modifier.size(20.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        when {
+            isSchoolDetailsLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            schoolDetails != null -> {
+                SchoolDetails(details = schoolDetails)
+            }
+
+            else -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        "Unable to load school details",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+    }
 }
 
 

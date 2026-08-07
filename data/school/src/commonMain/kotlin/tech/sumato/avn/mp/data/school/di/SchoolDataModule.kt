@@ -7,6 +7,7 @@ import tech.sumato.avn.mp.data.school.mapper.SchoolMapper
 import tech.sumato.avn.mp.data.school.remote.SchoolApi
 import tech.sumato.avn.mp.data.school.repository.SchoolRepositoryImpl
 import tech.sumato.avn.mp.domain.school.repository.SchoolRepository
+import tech.sumato.avn.mp.domain.school.usecase.GetSchoolDetailsUseCase
 import tech.sumato.avn.mp.domain.school.usecase.GetSchoolsUseCase
 
 val SchoolDataModule = module {
@@ -14,4 +15,5 @@ val SchoolDataModule = module {
     singleOf(::SchoolMapper)
     singleOf(::SchoolRepositoryImpl) { bind<SchoolRepository>() }
     singleOf(::GetSchoolsUseCase)
+    singleOf(::GetSchoolDetailsUseCase)
 }

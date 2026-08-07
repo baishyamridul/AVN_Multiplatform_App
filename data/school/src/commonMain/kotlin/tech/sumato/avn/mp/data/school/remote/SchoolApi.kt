@@ -5,6 +5,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import tech.sumato.avn.mp.core.network.model.SuccessResponseWrapper
+import tech.sumato.avn.mp.data.school.dto.SchoolDetailsDto
 import tech.sumato.avn.mp.data.school.dto.SchoolDto
 
 class SchoolApi(
@@ -16,6 +17,10 @@ class SchoolApi(
             if (districtId != -1)
                 parameter("districtId", districtId)
         }.body()
+    }
+
+    suspend fun getSchoolDetails(schoolId: String): SuccessResponseWrapper<SchoolDetailsDto> {
+        return httpClient.get("school-info/$schoolId").body()
     }
 
 }
