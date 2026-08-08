@@ -23,13 +23,14 @@ import kotlin.math.absoluteValue
 
 @Composable
 fun AppCarousel(modifier: Modifier, images: List<String>) {
-    val pagerState = rememberPagerState(pageCount = { images.size })
+    val pagerState =
+        rememberPagerState(pageCount = { images.size }, initialPage = if (images.size > 1) 1 else 0)
 
     HorizontalPager(
         state = pagerState,
         contentPadding = PaddingValues(horizontal = 48.dp), // Leaves a peak of adjacent items
         pageSpacing = 16.dp,
-        modifier = Modifier.height(200.dp)
+        modifier = modifier
     ) { pageIndex ->
         Box(
             modifier = Modifier
@@ -62,12 +63,6 @@ fun AppCarousel(modifier: Modifier, images: List<String>) {
                 modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp))
             )
 
-//            Image(
-//                painter = painterResource(images[pageIndex]),
-//                contentDescription = null,
-//                contentScale = ContentScale.Crop,
-//                modifier = Modifier.fillMaxSize()
-//            )
         }
     }
 }
