@@ -82,6 +82,24 @@ fun SchoolDashboardScreenExpanded(
 
     }
 
+    val allSchools = remember(state.schoolsState.schools) {
+        state.schoolsState.schools.map { it.toUiModel() }
+    }
+
+    val filteredSchools = remember(
+        allSchools,
+        state.schoolsState.searchQuery,
+        state.schoolsState.selectedDistrictId,
+        state.schoolsState.selectedCategory,
+    ) {
+        filterSchools(
+            schools = allSchools,
+            searchQuery = state.schoolsState.searchQuery,
+            selectedDistrictId = state.schoolsState.selectedDistrictId,
+            selectedCategory = state.schoolsState.selectedCategory,
+        )
+    }
+
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -121,7 +139,7 @@ fun SchoolDashboardScreenExpanded(
                         styleUrl = "",
                     ) {
                         SchoolsMapLayers(
-                            schools = state.schoolsState.schools.map { it.toUiModel() },
+                            schools = filteredSchools,
                             selectedSchoolId = state.schoolsState.selectedSchoolId
                         )
                     }
@@ -153,7 +171,11 @@ fun SchoolDashboardScreenExpanded(
                 } else {
 
                     SchoolListContent(
-                        schools = state.schoolsState.schools.map { it.toUiModel() },
+                        schools = filteredSchools,
+                        allCategories = allSchools
+                            .mapNotNull { it.category?.name }
+                            .distinct()
+                            .sorted(),
                         districts = state.schoolsState.districts.map { it.toUiModel() },
                         selectedSchoolId = state.schoolsState.selectedSchoolId,
                         searchQuery = state.schoolsState.searchQuery,
@@ -246,6 +268,7 @@ private fun SchoolDetailsPanel(
 @Composable
 private fun SchoolListContent(
     schools: List<SchoolUiModel>,
+    allCategories: List<String>,
     districts: List<DistrictUiModel>,
     selectedSchoolId: String?,
     searchQuery: String,
@@ -269,12 +292,13 @@ private fun SchoolListContent(
 
     Column(modifier = Modifier.fillMaxSize()) {
 
-        val categories = schools.mapNotNull { it.category?.name }.distinct().sorted()
+        val categories = allCategories
 
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
+
         ) {
             FilterChipMenu(
                 icon = Icons.Default.FilterList,
@@ -339,15 +363,6 @@ private fun SchoolListContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         val filteredSchools = schools
-            .filter { school ->
-                val matchesQuery = searchQuery.isBlank() ||
-                        school.name.contains(searchQuery, ignoreCase = true)
-                val matchesDistrict = selectedDistrictId == null || selectedDistrictId == -1 ||
-                        school.districtModel.id == selectedDistrictId
-                val matchesCategory = selectedCategory == null ||
-                        school.category?.name == selectedCategory
-                matchesQuery && matchesDistrict && matchesCategory
-            }
 
         if (filteredSchools.isEmpty()) {
             Box(
@@ -581,3 +596,18 @@ private fun SchoolListItem(
 }
 
 private val ALL_DISTRICT = DistrictUiModel(id = -1, name = "All Districts")
+
+private fun filterSchools(
+    schools: List<SchoolUiModel>,
+    searchQuery: String,
+    selectedDistrictId: Int?,
+    selectedCategory: String?,
+): List<SchoolUiModel> = schools.filter { school ->
+    val matchesQuery = searchQuery.isBlank() ||
+            school.name.contains(searchQuery, ignoreCase = true)
+    val matchesDistrict = selectedDistrictId == null || selectedDistrictId == -1 ||
+            school.districtModel.id == selectedDistrictId
+    val matchesCategory = selectedCategory == null ||
+            school.category?.name == selectedCategory
+    matchesQuery && matchesDistrict && matchesCategory
+}

@@ -24,6 +24,7 @@ import org.maplibre.spatialk.geojson.Feature
 import org.maplibre.spatialk.geojson.FeatureCollection
 import org.maplibre.spatialk.geojson.Point
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.SchoolUiModel
+import kotlin.time.Duration.Companion.milliseconds
 
 private const val POINTS_CHUNK_SIZE = 50
 private const val POINTS_CHUNK_DELAY_MS = 16L
@@ -43,7 +44,7 @@ fun SchoolsMapLayers(
     LaunchedEffect(located) {
         loadedCount = 0
         while (loadedCount < located.size) {
-            delay(POINTS_CHUNK_DELAY_MS)
+            delay(POINTS_CHUNK_DELAY_MS.milliseconds)
             loadedCount = (loadedCount + POINTS_CHUNK_SIZE).coerceAtMost(located.size)
         }
     }
