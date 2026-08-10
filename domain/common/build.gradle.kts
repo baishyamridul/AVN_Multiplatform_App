@@ -17,7 +17,12 @@ kotlin {
         }
     }
 
-    jvm()
+    jvm {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_25
+        }
+    }
+
 //    js { browser() }
 //
 //    @OptIn(ExperimentalWasmDsl::class)

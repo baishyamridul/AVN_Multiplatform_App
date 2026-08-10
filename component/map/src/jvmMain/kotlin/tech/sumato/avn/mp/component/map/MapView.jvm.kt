@@ -36,7 +36,6 @@ actual fun MapView(
         ),
     )
 
-
     MaplibreMap(
         modifier = modifier.padding(16.dp).clip(RoundedCornerShape(8.dp)),
         baseStyle = mapBaseStyle,
@@ -45,8 +44,7 @@ actual fun MapView(
         options = MapOptions(
         )
     ) {
-//        layers()
+        layers()
     }
-
 
 }

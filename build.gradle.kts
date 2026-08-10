@@ -10,3 +10,5 @@ plugins {
     alias(libs.plugins.androidLint) apply false
 //    alias(libs.plugins.kotlinCocoapods) apply false
 }
+
+

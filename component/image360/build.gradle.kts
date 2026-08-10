@@ -18,7 +18,12 @@ kotlin {
         }
     }
 
-    jvm()
+    jvm {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_25
+        }
+    }
+
 
     android {
         namespace = "tech.sumato.avn.mp.component.image360"

@@ -10,6 +10,7 @@ kotlin {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_11
     }
+    jvmToolchain(25)
 }
 dependencies {
     implementation(projects.shared)

@@ -20,7 +20,7 @@ kotlinx-coroutines = "1.11.0"
 kotlinx-serialization = "1.7.3"
 material3 = "1.11.0-alpha07"
 kotlinStdlib = "2.4.0"
-maplibre = "0.13.1"
+maplibre = "0.14.0"
 runner = "1.7.0"
 core = "1.7.0"
 
@@ -74,7 +74,6 @@ ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "k
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlinStdlib" }
 maplibre-compose = { module = "org.maplibre.compose:maplibre-compose", version.ref = "maplibre" }
-maplibre-jni = { module = "org.maplibre.compose:maplibre-native-bindings-jni", version.ref = "maplibre" }
 androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
 androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
 

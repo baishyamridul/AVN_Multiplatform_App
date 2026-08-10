@@ -18,7 +18,12 @@ kotlin {
         }
     }
 
-    jvm()
+    jvm {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_25
+        }
+    }
+
 
     androidLibrary {
         namespace = "tech.sumato.avn.mp.data.districtDashboard"
