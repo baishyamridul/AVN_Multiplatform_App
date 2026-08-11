@@ -17,12 +17,14 @@ import org.maplibre.compose.map.MaplibreMap
 import org.maplibre.compose.map.RenderOptions
 import org.maplibre.compose.style.rememberStyleState
 import org.maplibre.compose.util.MaplibreComposable
+import org.maplibre.spatialk.geojson.BoundingBox
 import org.maplibre.spatialk.geojson.Position
 
 @Composable
 actual fun MapView(
     modifier: Modifier,
     styleUrl: String,
+    boundingBox: BoundingBox?,
     layers: @Composable @MaplibreComposable () -> Unit
 ) {
 

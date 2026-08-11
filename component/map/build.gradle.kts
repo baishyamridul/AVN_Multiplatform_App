@@ -44,6 +44,7 @@ kotlin {
             implementation(libs.compose.material3)
             implementation(libs.compose.ui)
             implementation(libs.maplibre.compose)
+            implementation(libs.compose.components.resources)
         }
         androidMain.dependencies {
 //            implementation(libs.maplibre.compose)

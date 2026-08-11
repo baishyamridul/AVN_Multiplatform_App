@@ -180,7 +180,8 @@ fun SchoolDetails(
 
             AppCarousel(
                 modifier = Modifier.fillMaxWidth().height(200.dp),
-                images = details.schoolImages.map { it.large }
+                images = details.schoolImages.map { it.large },
+                caption = { index -> details.schoolImages[index].caption ?: "" }
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -458,7 +459,6 @@ private data class FacilityIcon(
 )
 
 private fun facilityIcon(key: String, label: String): FacilityIcon {
-    val text = "$key $label".lowercase()
     return when (key) {
         "electricity_source" ->
             FacilityIcon(Icons.Outlined.Bolt, Color(0xfff59e0b))

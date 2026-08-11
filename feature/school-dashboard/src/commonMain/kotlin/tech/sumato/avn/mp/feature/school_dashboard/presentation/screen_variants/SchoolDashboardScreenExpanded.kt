@@ -38,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,6 +50,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import org.maplibre.compose.expressions.dsl.const
+import org.maplibre.compose.layers.LineLayer
+import org.maplibre.compose.sources.GeoJsonData
+import org.maplibre.compose.sources.rememberGeoJsonSource
+import tech.sumato.avn.mp.component.map.GeoJsonLoader
+import tech.sumato.avn.mp.component.map.MapHolder
+import tech.sumato.avn.mp.component.map.MapHolderBoundingBox
+import tech.sumato.avn.mp.component.map.MapHolderCameraState
+import tech.sumato.avn.mp.component.map.MapHolderState
 import tech.sumato.avn.mp.component.map.MapView
 import tech.sumato.avn.mp.designsystem.components.AppCardBordered
 import tech.sumato.avn.mp.designsystem.components.AppTextField
@@ -71,6 +81,15 @@ fun SchoolDashboardScreenExpanded(
     state: SchoolDashboardState,
     onEvent: (SchoolDashboardEvent) -> Unit
 ) {
+
+
+//    val arunachalBoundary by produceState<String?>(initialValue = null) {
+//        value = GeoJsonLoader.loadArunachalBoundary()
+//    }
+//
+//    val arunachalBoundarySource = rememberGeoJsonSource(
+//        data = GeoJsonData.JsonString(arunachalBoundary ?: "not read")
+//    )
 
 
     var loadMap by remember { mutableStateOf(false) }
@@ -131,19 +150,34 @@ fun SchoolDashboardScreenExpanded(
                 paddingLess = true,
             ) {
 
-                if (loadMap)
-                    MapView(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(12.dp)),
-                        styleUrl = "",
+                if (loadMap) {
+//                    MapView(
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .clip(RoundedCornerShape(12.dp)),
+//                        styleUrl = "",
+//                    ) {
+//                        SchoolsMapLayers(
+//                            schools = filteredSchools,
+//                            selectedSchoolId = state.schoolsState.selectedSchoolId
+//                        )
+//                    }
+                    MapHolder(
+                        modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)),
+                        mapHolderState = MapHolderState(
+                            cameraState = MapHolderCameraState(
+                                boundingBox = MapHolderBoundingBox()
+                            )
+                        ),
                     ) {
+//                        LineLayer("db1", source = arunachalBoundarySource, color = const(Color.Red), width = const(1.dp))
+
                         SchoolsMapLayers(
                             schools = filteredSchools,
                             selectedSchoolId = state.schoolsState.selectedSchoolId
                         )
                     }
-                else
+                } else
                     Box(
                         modifier = Modifier.fillMaxSize()
                             .background(MaterialTheme.colorScheme.surface)

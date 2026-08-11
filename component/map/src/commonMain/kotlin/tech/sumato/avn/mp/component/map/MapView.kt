@@ -7,8 +7,10 @@ import kotlinx.serialization.json.addJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
+import org.maplibre.compose.camera.CameraState
 import org.maplibre.compose.style.BaseStyle
 import org.maplibre.compose.util.MaplibreComposable
+import org.maplibre.spatialk.geojson.BoundingBox
 
 
 val mapBaseStyle =
@@ -66,5 +68,6 @@ val mapBaseStyle =
 expect fun MapView(
     modifier: Modifier,
     styleUrl: String,
+    boundingBox: BoundingBox? = null,
     layers: @Composable @MaplibreComposable () -> Unit
 )

@@ -2,6 +2,7 @@ package tech.sumato.avn.mp.component.map
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -327,6 +328,8 @@ fun DistrictSvgMap(
     var selectedSvg by remember { mutableStateOf<DistrictSvgShape?>(null) }
 
 
+    val surfaceColor = MaterialTheme.colorScheme.surface
+
     Canvas(
         modifier = modifier.pointerInput(svgShapes) {
             detectTapGestures { tap ->
@@ -359,7 +362,7 @@ fun DistrictSvgMap(
         }) {
             svgShapes.shapes.forEach { svgShape ->
 
-                val color = if (selectedSvg?.id == svgShape.id) Color.Blue else Color(0xff52525b)
+                val color = if (selectedSvg?.id == svgShape.id) Color.Blue else surfaceColor
 
                 drawPath(
                     path = svgShape.path,
@@ -370,6 +373,7 @@ fun DistrictSvgMap(
                     path = svgShape.path,
 //                    color = Color(0xffd4d4d8),
                     color = cropColor(svgShape.id),
+//                    color = surfaceColor,
                     style = Stroke(
                         width = 1.0f
                     )
