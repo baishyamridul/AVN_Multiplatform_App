@@ -64,6 +64,8 @@ import qrgenerator.qrkitpainter.getSelectedQrBall
 import qrgenerator.qrkitpainter.rememberQrKitPainter
 import tech.sumato.avn.mp.designsystem.components.app.AppCarousel
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.material.icons.filled.Vrpano
 import androidx.compose.material.icons.outlined.CameraOutdoor
 import androidx.compose.material.icons.outlined.HourglassEmpty
 import androidx.compose.material.icons.outlined.HourglassTop
@@ -71,12 +73,26 @@ import androidx.compose.material.icons.outlined.Kitchen
 import androidx.compose.material.icons.outlined.LocalDrink
 import androidx.compose.material.icons.outlined.PermCameraMic
 import androidx.compose.material.icons.outlined.WineBar
+import androidx.compose.material.icons.outlined.Apartment
+import androidx.compose.material.icons.outlined.Construction
+import androidx.compose.material.icons.outlined.MeetingRoom
+import androidx.compose.material.icons.outlined.School
+import androidx.compose.material.icons.outlined.Science
+import androidx.compose.material.icons.outlined.Vrpano
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import tech.sumato.avn.mp.designsystem.components.app.AppChip
 import tech.sumato.avn.mp.domain.school.model.SchoolImage360Model
 import tech.sumato.avn.mp.domain.school.model.SchoolRoomConditionModel
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.SchoolDetailsUiModel
 import coil3.compose.AsyncImage
+import tech.sumato.avn.mp.designsystem.components.AppCard
+import tech.sumato.avn.mp.designsystem.components.AppCardBordered
+import tech.sumato.avn.mp.domain.school.model.SchoolProjectModel
+import tech.sumato.avn.mp.domain.school.model.SchoolStaffsModel
+import tech.sumato.avn.mp.domain.school.model.SchoolStudentsModel
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.StudentsCountRow
 
 
 @Composable
@@ -209,7 +225,7 @@ fun SchoolDetails(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Icon(Icons.Default.PanoramaPhotosphere, "", modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Vrpano, "", modifier = Modifier.size(16.dp))
                         Text("Virtual Tour", style = MaterialTheme.typography.bodySmall)
                     }
                 }
@@ -218,10 +234,9 @@ fun SchoolDetails(
             if (details.schoolImages360.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    "\uD83D\uDD0E Virtual Tour",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
+                SectionHeading(
+                    icon = Icons.Outlined.Vrpano,
+                    title = "Virtual Tour"
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -247,6 +262,22 @@ fun SchoolDetails(
             SchoolLiveAttendance(attendance = attendance)
         }
 
+        details.students?.let { schoolStudentsModel ->
+            Spacer(Modifier.height(8.dp))
+            HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp)
+            Spacer(Modifier.height(8.dp))
+
+            SchoolStudentsSection(students = schoolStudentsModel)
+
+        }
+
+        details.staffs?.let { schoolStaffsModel ->
+            Spacer(Modifier.height(8.dp))
+            HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp)
+            Spacer(Modifier.height(8.dp))
+            SchoolStaffSection(schoolStaffsModel = schoolStaffsModel)
+        }
+
         details.classroom?.let { roomCondition ->
             Spacer(Modifier.height(8.dp))
 
@@ -255,7 +286,8 @@ fun SchoolDetails(
             Spacer(Modifier.height(8.dp))
 
             RoomConditionSection(
-                title = "\uD83D\uDDD2\uFE0F Classroom Condition",
+                icon = Icons.Outlined.MeetingRoom,
+                title = "Classroom Condition",
                 condition = roomCondition
             )
         }
@@ -268,7 +300,8 @@ fun SchoolDetails(
             Spacer(Modifier.height(8.dp))
 
             RoomConditionSection(
-                title = "\uD83E\uDDEA Lab Condition",
+                icon = Icons.Outlined.Science,
+                title = "Lab Condition",
                 condition = labCondition
             )
         }
@@ -292,7 +325,7 @@ fun SchoolDetails(
 
             Spacer(Modifier.height(8.dp))
 
-            ProjectsSection(details = details)
+            ProjectsSection(projects = details.projects)
         }
 
         Spacer(Modifier.height(8.dp))
@@ -302,12 +335,97 @@ fun SchoolDetails(
 }
 
 @Composable
+fun SectionHeading(
+    icon: ImageVector,
+    title: String,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = MaterialTheme.colorScheme.primary,
+        )
+        Text(
+            title,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold,
+        )
+    }
+}
+
+@Composable
+fun SchoolStaffSection(schoolStaffsModel: SchoolStaffsModel) {
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+//        Text(
+//            "\uD83C\uDF93 School Staff",
+//            style = MaterialTheme.typography.titleSmall,
+//            fontWeight = FontWeight.SemiBold
+//        )
+
+        StudentsCountRow(label = "Total Staff", count = schoolStaffsModel.total, percent = null)
+
+    }
+}
+
+@Composable
+fun SchoolStudentsSection(students: SchoolStudentsModel) {
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        SectionHeading(
+            icon = Icons.Outlined.School,
+            title = "Students"
+        )
+
+        StudentsCountRow(
+            label = "Boys",
+            count = students.boys,
+            percent = students.getBoysPercent()
+        )
+
+        StudentsCountRow(
+            label = "Girls",
+            count = students.girls,
+            percent = students.getGirlsPercent()
+        )
+
+        StudentsCountRow(label = "Total", count = students.total, percent = null)
+
+    }
+}
+
+@Composable
+private fun StudentsCountRow(
+    label: String,
+    count: Int,
+    percent: Double?,
+) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(label, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Normal)
+        Text(
+            buildString {
+                append(count)
+                if (percent != null) {
+                    append(" (").append(percent).append("%)")
+                }
+            },
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
+        )
+    }
+}
+
+@Composable
 private fun RoomConditionSection(
+    icon: ImageVector,
     title: String,
     condition: SchoolRoomConditionModel,
 ) {
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+        SectionHeading(icon = icon, title = title)
 
         condition.veryGood?.let {
             RoomCountRow(label = "Very Good", count = it.count, percent = it.percent)
@@ -340,10 +458,9 @@ private fun RoomCountRow(
 @Composable
 private fun FacilitiesSection(details: SchoolDetailsUiModel) {
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(
-            "\uD83D\uDDEE\uFE0F Facilities",
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.SemiBold,
+        SectionHeading(
+            icon = Icons.Outlined.Apartment,
+            title = "Facilities"
         )
 
         if (details.coreFacilities.isNotEmpty()) {
@@ -372,11 +489,11 @@ private fun FacilitiesSection(details: SchoolDetailsUiModel) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                details.extraFacilities.take(6).forEach { facility ->
-                    val facilityIcon = facilityIcon(facility.key, facility.label)
+                details.extraFacilities.forEach { facility ->
+                    val facilityIcon = facilityIcon("extra", facility.label)
                     FacilityIconChip(
                         label = facility.label,
-                        icon = facilityIcon.icon,
+//                        icon = facilityIcon.icon,
                         color = facilityIcon.color,
                     )
                 }
@@ -429,7 +546,7 @@ private fun FacilityRow(
 @Composable
 private fun FacilityIconChip(
     label: String,
-    icon: ImageVector,
+    icon: ImageVector? = null,
     color: Color,
 ) {
     Row(
@@ -440,12 +557,14 @@ private fun FacilityIconChip(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            modifier = Modifier.size(16.dp),
-            tint = color,
-        )
+        if (icon != null) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                modifier = Modifier.size(16.dp),
+                tint = color,
+            )
+        }
         Text(
             label,
             style = MaterialTheme.typography.bodySmall,
@@ -456,6 +575,15 @@ private fun FacilityIconChip(
 private data class FacilityIcon(
     val icon: ImageVector,
     val color: Color,
+)
+
+val colors = listOf(
+    Color(0xfff59e0b),
+    Color(0xff06b6d4),
+    Color(0xff06b6d4),
+    Color(0xff2563eb),
+    Color(0xffeab308),
+    Color(0xff57534e)
 )
 
 private fun facilityIcon(key: String, label: String): FacilityIcon {
@@ -478,6 +606,10 @@ private fun facilityIcon(key: String, label: String): FacilityIcon {
 
         "surveillance" -> {
             FacilityIcon(Icons.Outlined.CameraOutdoor, Color(0xff57534e))
+        }
+
+        "extra" -> {
+            FacilityIcon(Icons.Outlined.Category, colors.random())
         }
 
 
@@ -511,48 +643,54 @@ private fun facilityIcon(key: String, label: String): FacilityIcon {
 }
 
 @Composable
-private fun ProjectsSection(details: SchoolDetailsUiModel) {
+private fun ProjectsSection(projects: List<SchoolProjectModel>) {
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(
-            "\uD83C\uDF10 Projects",
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.SemiBold,
+        SectionHeading(
+            icon = Icons.Outlined.Construction,
+            title = "Projects"
         )
 
-        details.projects.forEach { project ->
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                Text(
-                    project.name,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+        projects.forEach { project ->
+            AppCardBordered {
+                Column(
+                    modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    project.status?.let {
-                        Text(
-                            it,
-                            style = MaterialTheme.typography.bodySmall,
-                            fontWeight = FontWeight.Normal,
-                        )
+                    Text(
+                        project.name,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 2,
+                        minLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        project.status?.let {
+                            Text(
+                                it,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Normal,
+                            )
+                        }
+                        project.allocatedAmount?.let {
+                            Text(
+                                "\u20B9 $it",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
                     }
-                    project.allocatedAmount?.let {
-                        Text(
-                            "\u20B9 $it",
-                            style = MaterialTheme.typography.bodySmall,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth().height(6.dp),
+                        progress = { (project.percent.coerceIn(0, 100) / 100f) },
+                        color = Color.Green,
+                    )
                 }
-                androidx.compose.material3.LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth().height(6.dp),
-                    progress = { (project.percent.coerceIn(0, 100) / 100f) },
-                    color = Color.Green,
-                )
             }
         }
     }
@@ -567,7 +705,8 @@ private fun VirtualTourThumbnail(image: SchoolImage360Model) {
         AsyncImage(
             model = image.thumbnail,
             contentDescription = image.caption,
-            modifier = Modifier.fillMaxWidth().height(72.dp),
+            modifier = Modifier.fillMaxWidth().height(72.dp).clip(RoundedCornerShape(8.dp)),
+            contentScale = ContentScale.FillBounds
         )
         image.caption?.let {
             Text(

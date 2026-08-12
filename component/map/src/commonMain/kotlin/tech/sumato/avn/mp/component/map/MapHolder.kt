@@ -22,6 +22,7 @@ import org.maplibre.compose.style.BaseStyle
 import org.maplibre.compose.style.rememberStyleState
 import org.maplibre.compose.util.MaplibreComposable
 import org.maplibre.spatialk.geojson.Position
+import kotlin.time.Duration.Companion.milliseconds
 
 
 @Composable
@@ -45,15 +46,34 @@ fun MapHolder(
 
 
 
-    LaunchedEffect(mapHolderState.cameraState.boundingBox) {
-        val boundingBox = mapHolderState.cameraState.boundingBox
-        if (boundingBox != null) {
+    LaunchedEffect(
+        mapHolderState.cameraState.boundingBox,
+        mapHolderState.cameraState.focusPosition,
+    ) {
+        val focusPosition = mapHolderState.cameraState.focusPosition
+        if (focusPosition != null) {
             cameraState.animateTo(
-                boundingBox = boundingBox.toBoundingBox(),
-                padding = PaddingValues(16.dp),
-                tilt = 0.0,
-                bearing = 0.0
+                finalPosition = CameraPosition(
+                    target = Position(
+                        longitude = focusPosition.longitude,
+                        latitude = focusPosition.latitude,
+                    ),
+                    zoom = 14.0,
+                    bearing = 0.0,
+                    tilt = 0.0,
+                ),
+                duration = 800.milliseconds,
             )
+        } else {
+            val boundingBox = mapHolderState.cameraState.boundingBox
+            if (boundingBox != null) {
+                cameraState.animateTo(
+                    boundingBox = boundingBox.toBoundingBox(),
+                    padding = PaddingValues(16.dp),
+                    tilt = 0.0,
+                    bearing = 0.0
+                )
+            }
         }
     }
 

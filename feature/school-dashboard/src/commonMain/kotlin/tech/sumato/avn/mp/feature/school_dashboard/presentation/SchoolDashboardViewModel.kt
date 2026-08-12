@@ -146,6 +146,14 @@ class SchoolDashboardViewModel(
 
     private fun fetchSchools(districtId: Int = -1) {
         viewModelScope.launch {
+            _state.update { state ->
+                state.copy(
+                    schoolsState = state.schoolsState.copy(
+                        isLoading = true
+                    )
+                )
+            }
+
             try {
                 val response = getSchoolsUseCase.invoke(districtId = districtId)
                 _state.update { state ->
@@ -157,7 +165,13 @@ class SchoolDashboardViewModel(
                     )
                 }
             } catch (e: ResponseExceptionModel) {
-                //
+                _state.update { state ->
+                    state.copy(
+                        schoolsState = state.schoolsState.copy(
+                            isLoading = false
+                        )
+                    )
+                }
             }
         }
     }

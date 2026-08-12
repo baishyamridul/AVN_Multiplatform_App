@@ -1,6 +1,8 @@
 package tech.sumato.avn.mp.domain.school.model
 
 import tech.sumato.avn.mp.domain.common.model.DistrictModel
+import kotlin.math.absoluteValue
+import kotlin.math.round
 
 data class SchoolDetailsModel(
     val id: String,
@@ -26,7 +28,17 @@ data class SchoolStudentsModel(
     val boys: Int,
     val girls: Int,
     val total: Int,
-)
+) {
+    fun getBoysPercent(): Double {
+        val p = (boys.toDouble() / total.toDouble()) * 100
+        return round(p.absoluteValue * 100) / 100
+    }
+
+    fun getGirlsPercent(): Double {
+        val p = (girls.toDouble() / total.toDouble()) * 100
+        return round(p.absoluteValue * 100) / 100
+    }
+}
 
 data class SchoolStaffsModel(
     val total: Int,

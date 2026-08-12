@@ -27,7 +27,6 @@ import androidx.compose.material.icons.filled.LocationOff
 import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Place
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -58,14 +57,18 @@ import tech.sumato.avn.mp.component.map.GeoJsonLoader
 import tech.sumato.avn.mp.component.map.MapHolder
 import tech.sumato.avn.mp.component.map.MapHolderBoundingBox
 import tech.sumato.avn.mp.component.map.MapHolderCameraState
+import tech.sumato.avn.mp.component.map.MapHolderPosition
 import tech.sumato.avn.mp.component.map.MapHolderState
 import tech.sumato.avn.mp.component.map.MapView
 import tech.sumato.avn.mp.designsystem.components.AppCardBordered
 import tech.sumato.avn.mp.designsystem.components.AppTextField
 import tech.sumato.avn.mp.designsystem.components.app.AppChip
 import tech.sumato.avn.mp.designsystem.components.app.fields.AppDropDownBasic
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.MapPanelShimmer
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.SchoolDashboardHeader
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.SchoolDetails
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.SchoolDetailsShimmer
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.SchoolListShimmer
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.SchoolsMapLayers
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.event.SchoolDashboardEvent
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.DistrictUiModel
@@ -119,6 +122,10 @@ fun SchoolDashboardScreenExpanded(
         )
     }
 
+    val selectedSchool = remember(allSchools, state.schoolsState.selectedSchoolId) {
+        allSchools.firstOrNull { it.id == state.schoolsState.selectedSchoolId }
+    }
+
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -150,7 +157,9 @@ fun SchoolDashboardScreenExpanded(
                 paddingLess = true,
             ) {
 
-                if (loadMap) {
+                if (state.schoolsState.isLoading) {
+                    MapPanelShimmer()
+                } else if (loadMap) {
 //                    MapView(
 //                        modifier = Modifier
 //                            .fillMaxSize()
@@ -166,7 +175,10 @@ fun SchoolDashboardScreenExpanded(
                         modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)),
                         mapHolderState = MapHolderState(
                             cameraState = MapHolderCameraState(
-                                boundingBox = MapHolderBoundingBox()
+                                boundingBox = MapHolderBoundingBox(),
+                                focusPosition = selectedSchool
+                                    ?.takeIf { it.hasLocation() }
+                                    ?.let { MapHolderPosition(it.latitude!!, it.longitude!!) },
                             )
                         ),
                     ) {
@@ -202,6 +214,10 @@ fun SchoolDashboardScreenExpanded(
                         }
                     )
 
+                } else if (state.schoolsState.isLoading) {
+
+                    SchoolListShimmer()
+
                 } else {
 
                     SchoolListContent(
@@ -216,6 +232,7 @@ fun SchoolDashboardScreenExpanded(
                         selectedDistrictId = state.schoolsState.selectedDistrictId,
                         selectedCategory = state.schoolsState.selectedCategory,
                         sortOption = state.schoolsState.sortOption,
+                        isLoading = state.schoolsState.isLoading,
                         onSearchQueryChange = { query ->
                             onEvent(SchoolDashboardEvent.UpdateSearchQuery(query))
                         },
@@ -269,12 +286,7 @@ private fun SchoolDetailsPanel(
 
         when {
             isSchoolDetailsLoading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator()
-                }
+                SchoolDetailsShimmer()
             }
 
             schoolDetails != null -> {
@@ -309,6 +321,7 @@ private fun SchoolListContent(
     selectedDistrictId: Int?,
     selectedCategory: String?,
     sortOption: SchoolSortOption,
+    isLoading: Boolean,
     onSearchQueryChange: (String) -> Unit,
     onDistrictSelected: (Int?) -> Unit,
     onCategorySelected: (String?) -> Unit,
@@ -398,7 +411,7 @@ private fun SchoolListContent(
 
         val filteredSchools = schools
 
-        if (filteredSchools.isEmpty()) {
+        if (filteredSchools.isEmpty() && !isLoading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,

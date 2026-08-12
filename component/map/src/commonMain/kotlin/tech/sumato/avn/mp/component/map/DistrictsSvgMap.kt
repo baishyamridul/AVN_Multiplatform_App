@@ -328,7 +328,7 @@ fun DistrictSvgMap(
     var selectedSvg by remember { mutableStateOf<DistrictSvgShape?>(null) }
 
 
-    val surfaceColor = MaterialTheme.colorScheme.surface
+    val surfaceColor = MaterialTheme.colorScheme.surfaceDim.copy(alpha = 0.25f)
 
     Canvas(
         modifier = modifier.pointerInput(svgShapes) {
