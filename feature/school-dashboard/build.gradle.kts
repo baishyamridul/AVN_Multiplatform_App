@@ -71,6 +71,8 @@ kotlin {
 
             implementation(projects.component.image360)
 
+            implementation(projects.component.imageViewer)
+
             implementation(libs.kotlinx.date.time)
 
             implementation(libs.maplibre.compose)

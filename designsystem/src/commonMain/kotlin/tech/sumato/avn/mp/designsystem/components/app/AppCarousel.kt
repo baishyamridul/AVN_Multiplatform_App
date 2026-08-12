@@ -2,8 +2,10 @@ package tech.sumato.avn.mp.designsystem.components.app
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,7 +35,8 @@ import kotlin.math.absoluteValue
 fun AppCarousel(
     modifier: Modifier,
     images: List<String>,
-    caption: (index: Int) -> String = { "" }
+    caption: (index: Int) -> String = { "" },
+    onImageClick: ((index: Int) -> Unit)? = null,
 ) {
     val pagerState =
         rememberPagerState(pageCount = { images.size }, initialPage = if (images.size > 1) 1 else 0)
@@ -71,7 +74,14 @@ fun AppCarousel(
                     model = images[pageIndex],
                     "",
                     contentScale = ContentScale.FillBounds,
-                    modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp))
+                    modifier = Modifier.fillMaxWidth()
+//                        .aspectRatio(16f / 9f)
+                        .clip(RoundedCornerShape(16.dp))
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable(onClick = { onImageClick?.invoke(pageIndex) })
                 )
                 Box(
                     modifier = Modifier.fillMaxWidth()
@@ -83,7 +93,8 @@ fun AppCarousel(
                     Text(
                         caption(pageIndex),
                         style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(horizontal = 8.dp, vertical = 8.dp),
                         textAlign = TextAlign.Center
                     )
                 }

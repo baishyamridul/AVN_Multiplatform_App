@@ -1,6 +1,8 @@
 package tech.sumato.avn.mp.feature.school_dashboard.presentation.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +42,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -65,6 +71,7 @@ import qrgenerator.qrkitpainter.rememberQrKitPainter
 import tech.sumato.avn.mp.designsystem.components.app.AppCarousel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.material.icons.filled.Vrpano
 import androidx.compose.material.icons.outlined.CameraOutdoor
 import androidx.compose.material.icons.outlined.HourglassEmpty
@@ -86,7 +93,10 @@ import tech.sumato.avn.mp.designsystem.components.app.AppChip
 import tech.sumato.avn.mp.domain.school.model.SchoolImage360Model
 import tech.sumato.avn.mp.domain.school.model.SchoolRoomConditionModel
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.SchoolDetailsUiModel
+import tech.sumato.avn.mp.component.image_viewer.ImageModal
+import tech.sumato.avn.mp.component.image_viewer.ImageSource
 import coil3.compose.AsyncImage
+import tech.sumato.avn.mp.component.image_viewer.ImageViewer
 import tech.sumato.avn.mp.designsystem.components.AppCard
 import tech.sumato.avn.mp.designsystem.components.AppCardBordered
 import tech.sumato.avn.mp.domain.school.model.SchoolProjectModel
@@ -99,6 +109,8 @@ import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.Stude
 fun SchoolDetails(
     details: SchoolDetailsUiModel,
 ) {
+
+    var modalSource by remember { mutableStateOf<ImageSource?>(null) }
 
     Column(
         modifier = Modifier.fillMaxWidth().verticalScroll(state = rememberScrollState()),
@@ -195,9 +207,16 @@ fun SchoolDetails(
             Spacer(modifier = Modifier.height(8.dp))
 
             AppCarousel(
-                modifier = Modifier.fillMaxWidth().height(200.dp),
-                images = details.schoolImages.map { it.large },
-                caption = { index -> details.schoolImages[index].caption ?: "" }
+                modifier = Modifier.fillMaxWidth().aspectRatio(19f / 9f),
+                images = details.schoolImages.map { it.thumbnail },
+                caption = { index -> details.schoolImages[index].caption ?: "" },
+                onImageClick = { index ->
+                    val image = details.schoolImages[index]
+                    modalSource = ImageSource.Photo(
+                        url = image.large,
+                        caption = image.caption,
+                    )
+                }
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -246,7 +265,15 @@ fun SchoolDetails(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(details.schoolImages360, key = { it.link }) { image ->
-                        VirtualTourThumbnail(image = image)
+                        VirtualTourThumbnail(
+                            image = image,
+                            onClick = {
+                                modalSource = ImageSource.Pano(
+                                    configUrl = image.link,
+                                    caption = image.caption,
+                                )
+                            },
+                        )
                     }
                 }
             }
@@ -331,6 +358,13 @@ fun SchoolDetails(
         Spacer(Modifier.height(8.dp))
 
     }
+
+//    ImageModal(
+//        source = modalSource,
+//        onDismissRequest = { modalSource = null },
+//    )
+
+    ImageViewer(source = modalSource, onDismissRequest = { modalSource = null })
 
 }
 
@@ -697,9 +731,16 @@ private fun ProjectsSection(projects: List<SchoolProjectModel>) {
 }
 
 @Composable
-private fun VirtualTourThumbnail(image: SchoolImage360Model) {
+private fun VirtualTourThumbnail(
+    image: SchoolImage360Model,
+    onClick: () -> Unit,
+) {
     Column(
-        modifier = Modifier.fillMaxWidth().size(width = 120.dp, height = 96.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(width = 120.dp, height = 96.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         AsyncImage(

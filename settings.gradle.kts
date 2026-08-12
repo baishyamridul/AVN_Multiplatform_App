@@ -64,4 +64,5 @@ include(":feature:map-analytics")
 
 include(":feature:school-dashboard")
 include(":component:image360")
+include(":component:image-viewer")
 
