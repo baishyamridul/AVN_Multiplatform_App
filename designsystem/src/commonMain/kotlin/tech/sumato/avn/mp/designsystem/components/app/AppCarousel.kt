@@ -69,7 +69,11 @@ fun AppCarousel(
                     )
                 }
         ) {
-            Box(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp))) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+                    .clip(RoundedCornerShape(16.dp))
+                    .clickable(onClick = { onImageClick?.invoke(pageIndex) })
+            ) {
                 AsyncImage(
                     model = images[pageIndex],
                     "",
@@ -78,11 +82,11 @@ fun AppCarousel(
 //                        .aspectRatio(16f / 9f)
                         .clip(RoundedCornerShape(16.dp))
                 )
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clickable(onClick = { onImageClick?.invoke(pageIndex) })
-                )
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxSize()
+////                        .clickable(onClick = { onImageClick?.invoke(pageIndex) })
+//                )
                 Box(
                     modifier = Modifier.fillMaxWidth()
                         .background(MaterialTheme.colorScheme.surfaceDim.copy(alpha = 0.75f))

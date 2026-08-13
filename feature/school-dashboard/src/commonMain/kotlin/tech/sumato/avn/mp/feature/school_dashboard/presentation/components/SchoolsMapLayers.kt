@@ -13,8 +13,10 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.maplibre.compose.expressions.dsl.asBoolean
+import org.maplibre.compose.expressions.dsl.asString
 import org.maplibre.compose.expressions.dsl.condition
 import org.maplibre.compose.expressions.dsl.const
+import org.maplibre.compose.expressions.dsl.contains
 import org.maplibre.compose.expressions.dsl.feature
 import org.maplibre.compose.expressions.dsl.switch
 import org.maplibre.compose.layers.CircleLayer
@@ -30,6 +32,12 @@ private const val POINTS_CHUNK_SIZE = 50
 private const val POINTS_CHUNK_DELAY_MS = 16L
 
 private const val PROPERTY_SELECTED = "selected"
+
+private const val CATEGORY = "category"
+
+fun String.isPrimarySchool(): Boolean {
+    return this.lowercase() == "primary school"
+}
 
 @Composable
 fun SchoolsMapLayers(
@@ -60,6 +68,7 @@ fun SchoolsMapLayers(
                 ),
                 properties = buildJsonObject {
                     put(PROPERTY_SELECTED, school.id == selectedSchoolId)
+                    put(CATEGORY, school.category?.key)
                 },
                 id = JsonPrimitive(school.id),
             )

@@ -160,17 +160,6 @@ fun SchoolDashboardScreenExpanded(
                 if (state.schoolsState.isLoading) {
                     MapPanelShimmer()
                 } else if (loadMap) {
-//                    MapView(
-//                        modifier = Modifier
-//                            .fillMaxSize()
-//                            .clip(RoundedCornerShape(12.dp)),
-//                        styleUrl = "",
-//                    ) {
-//                        SchoolsMapLayers(
-//                            schools = filteredSchools,
-//                            selectedSchoolId = state.schoolsState.selectedSchoolId
-//                        )
-//                    }
                     MapHolder(
                         modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)),
                         mapHolderState = MapHolderState(
@@ -182,7 +171,6 @@ fun SchoolDashboardScreenExpanded(
                             )
                         ),
                     ) {
-//                        LineLayer("db1", source = arunachalBoundarySource, color = const(Color.Red), width = const(1.dp))
 
                         SchoolsMapLayers(
                             schools = filteredSchools,
