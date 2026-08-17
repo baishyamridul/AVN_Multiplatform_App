@@ -219,7 +219,7 @@ fun SchoolDetails(
                 }
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            /*Spacer(modifier = Modifier.height(8.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -248,7 +248,7 @@ fun SchoolDetails(
                         Text("Virtual Tour", style = MaterialTheme.typography.bodySmall)
                     }
                 }
-            }
+            }*/
 
             if (details.schoolImages360.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))

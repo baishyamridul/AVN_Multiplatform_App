@@ -14,6 +14,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.maplibre.compose.expressions.dsl.asBoolean
 import org.maplibre.compose.expressions.dsl.asString
+import org.maplibre.compose.expressions.dsl.case
 import org.maplibre.compose.expressions.dsl.condition
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.expressions.dsl.contains
@@ -25,6 +26,7 @@ import org.maplibre.compose.sources.rememberGeoJsonSource
 import org.maplibre.spatialk.geojson.Feature
 import org.maplibre.spatialk.geojson.FeatureCollection
 import org.maplibre.spatialk.geojson.Point
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.SchoolCategoryUiModel
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.SchoolUiModel
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -35,6 +37,19 @@ private const val PROPERTY_SELECTED = "selected"
 
 private const val CATEGORY = "category"
 
+private val CATEGORY_PALETTE = listOf(
+    Color(0xffe53935),
+    Color(0xff1e88e5),
+    Color(0xff43a047),
+    Color(0xfffdd835),
+    Color(0xff8e24aa),
+    Color(0xff00acc1),
+    Color(0xfffb8c00),
+    Color(0xffd81b60),
+    Color(0xff3949ab),
+    Color(0xff6d4c41),
+)
+
 fun String.isPrimarySchool(): Boolean {
     return this.lowercase() == "primary school"
 }
@@ -42,6 +57,7 @@ fun String.isPrimarySchool(): Boolean {
 @Composable
 fun SchoolsMapLayers(
     schools: List<SchoolUiModel>,
+    categories: List<SchoolCategoryUiModel> = emptyList(),
     selectedSchoolId: String? = null,
 ) {
 
@@ -79,6 +95,30 @@ fun SchoolsMapLayers(
         data = GeoJsonData.Features(FeatureCollection(features)),
     )
 
+    val categoryColorByKey = remember(categories) {
+        mapOf(
+            "primarySchool_1_to_5" to Color(0xff00E5FF),
+            "upperPrimarySchool_1_to_8" to Color(0xffFFD600),
+            "upperPrimarySchool_6_to_8" to Color(0xffFFD600),
+            "secondarySchool_1_to_10" to Color(0xff00E676),
+            "secondarySchool_6_to_10" to Color(0xff00E676),
+            "secondarySchool_9_to_10" to Color(0xff00E676),
+            "higherSecondarySchool_6_to_12" to Color(0xffD500F9),
+            "higherSecondarySchool_9_to_12" to Color(0xffD500F9),
+            "higherSecondarySchool_1_to_12" to Color(0xffD500F9),
+        )
+//        categories
+//            .sortedBy { it.key }
+//            .mapIndexed { index, category ->
+//                category.key to CATEGORY_PALETTE[index % CATEGORY_PALETTE.size]
+//            }
+//            .toMap()
+    }
+
+    val categoryCases = categoryColorByKey.map { (key, color) ->
+        case(label = key, output = const(color))
+    }
+
     CircleLayer(
         id = "schoolsLayer",
         source = source,
@@ -87,7 +127,11 @@ fun SchoolsMapLayers(
                 test = feature[PROPERTY_SELECTED].asBoolean(),
                 output = const(Color.Blue),
             ),
-            fallback = const(Color.Red),
+            fallback = switch(
+                input = feature[CATEGORY].asString(),
+                *categoryCases.toTypedArray(),
+                fallback = const(Color.Red),
+            ),
         ),
         radius = switch(
             condition(

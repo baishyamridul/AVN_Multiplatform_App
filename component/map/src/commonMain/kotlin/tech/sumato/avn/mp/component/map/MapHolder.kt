@@ -14,8 +14,11 @@ import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.layers.LineLayer
+import org.maplibre.compose.map.GestureOptions
 import org.maplibre.compose.map.MapOptions
 import org.maplibre.compose.map.MaplibreMap
+import org.maplibre.compose.map.OrnamentOptions
+import org.maplibre.compose.map.RenderOptions
 import org.maplibre.compose.sources.GeoJsonData
 import org.maplibre.compose.sources.rememberGeoJsonSource
 import org.maplibre.compose.style.BaseStyle
@@ -29,6 +32,7 @@ import kotlin.time.Duration.Companion.milliseconds
 fun MapHolder(
     modifier: Modifier,
     mapHolderState: MapHolderState = MapHolderState(),
+    disable: Boolean = false,
     layers: @Composable @MaplibreComposable () -> Unit
 ) {
 
@@ -96,6 +100,13 @@ fun MapHolder(
 
         styleState = rememberStyleState(),
         options = MapOptions(
+            gestureOptions = if (disable) GestureOptions.AllDisabled else GestureOptions.Standard,
+            ornamentOptions = OrnamentOptions(
+                isLogoEnabled = false,
+                isCompassEnabled = false,
+                isScaleBarEnabled = false
+            ),
+            renderOptions = RenderOptions.Standard
         )
     ) {
         val arunachalBoundarySource = rememberGeoJsonSource(

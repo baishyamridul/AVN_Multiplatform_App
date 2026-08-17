@@ -109,6 +109,13 @@ fun SchoolDashboardScreenExpanded(
         state.schoolsState.schools.map { it.toUiModel() }
     }
 
+    val allCategories = remember(allSchools) {
+        allSchools
+            .mapNotNull { it.category }
+            .distinctBy { it.key }
+            .sortedBy { it.label }
+    }
+
     val filteredSchools = remember(
         allSchools,
         state.schoolsState.searchQuery,
@@ -171,10 +178,12 @@ fun SchoolDashboardScreenExpanded(
                                     ?.let { MapHolderPosition(it.latitude!!, it.longitude!!) },
                             )
                         ),
+                        disable = true
                     ) {
 
                         SchoolsMapLayers(
                             schools = filteredSchools,
+                            categories = allCategories,
                             selectedSchoolId = state.schoolsState.selectedSchoolId
                         )
                     }
@@ -211,10 +220,7 @@ fun SchoolDashboardScreenExpanded(
 
                     SchoolListContent(
                         schools = filteredSchools,
-                        allCategories = allSchools
-                            .mapNotNull { it.category }
-                            .distinctBy { it.key }
-                            .sortedBy { it.label },
+                        allCategories = allCategories,
                         districts = state.schoolsState.districts.map { it.toUiModel() },
                         selectedSchoolId = state.schoolsState.selectedSchoolId,
                         searchQuery = state.schoolsState.searchQuery,
