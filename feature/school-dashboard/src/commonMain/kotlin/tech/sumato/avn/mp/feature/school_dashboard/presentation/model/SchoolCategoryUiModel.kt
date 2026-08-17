@@ -6,7 +6,10 @@ data class SchoolCategoryUiModel(
     val key: String,
     val name: String,
     val classRange: String
-)
+) {
+    val label: String
+        get() = if (classRange.isNotBlank()) "$name \u2022 $classRange" else name
+}
 
 fun SchoolCategoryModel.toUiModel() : SchoolCategoryUiModel {
     return SchoolCategoryUiModel(

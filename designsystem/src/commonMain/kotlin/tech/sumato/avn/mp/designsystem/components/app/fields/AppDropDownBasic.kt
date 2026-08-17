@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -66,7 +67,8 @@ fun <T> AppDropDownBasic(
         ) {
             options.forEach {
                 DropdownMenuItem(
-                    text = { Text(labelTransformer(it)) },
+                    text = { Text(labelTransformer(it), style = MaterialTheme.typography.bodyMedium) },
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
                     onClick = {
                         selectedItem = it
                         onSelected(it)

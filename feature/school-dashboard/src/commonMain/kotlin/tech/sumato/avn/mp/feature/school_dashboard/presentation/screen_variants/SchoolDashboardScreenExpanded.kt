@@ -72,6 +72,7 @@ import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.Schoo
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.SchoolsMapLayers
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.event.SchoolDashboardEvent
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.DistrictUiModel
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.SchoolCategoryUiModel
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.SchoolDetailsUiModel
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.SchoolUiModel
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.toUiModel
@@ -211,9 +212,9 @@ fun SchoolDashboardScreenExpanded(
                     SchoolListContent(
                         schools = filteredSchools,
                         allCategories = allSchools
-                            .mapNotNull { it.category?.name }
-                            .distinct()
-                            .sorted(),
+                            .mapNotNull { it.category }
+                            .distinctBy { it.key }
+                            .sortedBy { it.label },
                         districts = state.schoolsState.districts.map { it.toUiModel() },
                         selectedSchoolId = state.schoolsState.selectedSchoolId,
                         searchQuery = state.schoolsState.searchQuery,
@@ -302,7 +303,7 @@ private fun SchoolDetailsPanel(
 @Composable
 private fun SchoolListContent(
     schools: List<SchoolUiModel>,
-    allCategories: List<String>,
+    allCategories: List<SchoolCategoryUiModel>,
     districts: List<DistrictUiModel>,
     selectedSchoolId: String?,
     searchQuery: String,
@@ -347,11 +348,11 @@ private fun SchoolListContent(
             FilterChipMenu(
                 icon = Icons.Outlined.Category,
                 defaultLabel = "All Categories",
-                options = listOf("All Categories") + categories,
-                selected = selectedCategory,
-                labelTransformer = { it },
+                options = listOf(ALL_CATEGORY) + categories,
+                selected = categories.firstOrNull { it.key == selectedCategory } ?: ALL_CATEGORY,
+                labelTransformer = { it.label },
                 onSelected = { category ->
-                    onCategorySelected(if (category == "All Categories") null else category)
+                    onCategorySelected(if (category.key.isEmpty()) null else category.key)
                 },
             )
 
@@ -442,7 +443,7 @@ private fun SchoolListContent(
                                 Row(modifier = Modifier.fillMaxWidth()) {
                                     Text(
                                         text = group,
-                                        style = MaterialTheme.typography.labelLarge,
+                                        style = MaterialTheme.typography.labelMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier
@@ -454,7 +455,7 @@ private fun SchoolListContent(
 
                                     Text(
                                         text = "${groupSchools.size} Schools",
-                                        style = MaterialTheme.typography.labelLarge,
+                                        style = MaterialTheme.typography.labelMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier
@@ -477,9 +478,10 @@ private fun SchoolListContent(
                     }
 
                     SchoolSortOption.SchoolCategory -> {
+                        val categoryLabelByKey = allCategories.associate { it.key to it.label }
                         val groupedSchools = filteredSchools
                             .sortedBy { it.name }
-                            .groupBy { it.category?.name ?: "Uncategorized" }
+                            .groupBy { it.category?.key ?: "Uncategorized" }
                             .toList()
                             .sortedBy { it.first }
 
@@ -487,8 +489,8 @@ private fun SchoolListContent(
                             stickyHeader(key = group) {
                                 Row(modifier = Modifier.fillMaxWidth()) {
                                     Text(
-                                        text = group,
-                                        style = MaterialTheme.typography.labelLarge,
+                                        text = categoryLabelByKey[group] ?: group,
+                                        style = MaterialTheme.typography.labelMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier
@@ -500,7 +502,7 @@ private fun SchoolListContent(
 
                                     Text(
                                         text = "${groupSchools.size} Schools",
-                                        style = MaterialTheme.typography.labelLarge,
+                                        style = MaterialTheme.typography.labelMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier
@@ -632,6 +634,8 @@ private fun SchoolListItem(
 
 private val ALL_DISTRICT = DistrictUiModel(id = -1, name = "All Districts")
 
+private val ALL_CATEGORY = SchoolCategoryUiModel(key = "", name = "All Categories", classRange = "")
+
 private fun filterSchools(
     schools: List<SchoolUiModel>,
     searchQuery: String,
@@ -643,6 +647,6 @@ private fun filterSchools(
     val matchesDistrict = selectedDistrictId == null || selectedDistrictId == -1 ||
             school.districtModel.id == selectedDistrictId
     val matchesCategory = selectedCategory == null ||
-            school.category?.name == selectedCategory
+            school.category?.key == selectedCategory
     matchesQuery && matchesDistrict && matchesCategory
 }

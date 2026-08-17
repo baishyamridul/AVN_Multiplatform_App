@@ -15,7 +15,7 @@ data class SchoolCategoryUiModel(
 
 fun SchoolCategoryModel.toSchoolCategoryUiModel(): SchoolCategoryUiModel {
     return SchoolCategoryUiModel(
-        id = "",
+        id = key,
         label = schoolCategory,
         classRange = className,
         schoolCount = totalSchools

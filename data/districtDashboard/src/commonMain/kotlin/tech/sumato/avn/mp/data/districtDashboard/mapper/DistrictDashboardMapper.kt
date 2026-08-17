@@ -41,6 +41,7 @@ class DistrictDashboardMapper {
     )
 
     private fun SchoolCategoryDto.toDomain() = SchoolCategoryModel(
+        key = key,
         schoolCategory = schoolCategory,
         className = className,
         totalSchools = totalSchools,

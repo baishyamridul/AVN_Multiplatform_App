@@ -130,7 +130,7 @@ fun SchoolDetails(
                 details.category?.let { category ->
                     AppChip(modifier = Modifier.wrapContentWidth()) {
                         Text(
-                            category.name,
+                            category.label,
                             style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
