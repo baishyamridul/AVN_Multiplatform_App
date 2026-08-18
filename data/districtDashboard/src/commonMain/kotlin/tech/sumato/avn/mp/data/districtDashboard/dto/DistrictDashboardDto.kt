@@ -31,7 +31,7 @@ data class DashboardStatDto(
 
 @Serializable
 data class SchoolCategoryDto(
-    val key: String = "",
+    val key: String,
     @SerialName("school_category")
     val schoolCategory: String,
     @SerialName("class")

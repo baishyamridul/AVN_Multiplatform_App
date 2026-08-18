@@ -1,5 +1,6 @@
 package tech.sumato.avn.mp.feature.school_dashboard.presentation.screen_variants
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,12 +19,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.LocationOff
+import androidx.compose.material.icons.filled.LockReset
 import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Place
@@ -32,10 +35,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -43,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -78,12 +84,12 @@ import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.SchoolUiMo
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.toUiModel
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.state.SchoolDashboardState
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.state.SchoolSortOption
+import kotlin.time.Duration.Companion.milliseconds
 
 
 @Composable
 fun SchoolDashboardScreenExpanded(
-    state: SchoolDashboardState,
-    onEvent: (SchoolDashboardEvent) -> Unit
+    state: SchoolDashboardState, onEvent: (SchoolDashboardEvent) -> Unit
 ) {
 
 
@@ -99,7 +105,7 @@ fun SchoolDashboardScreenExpanded(
     var loadMap by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        delay(2000)
+        delay(2000.milliseconds)
 
         loadMap = true
 
@@ -110,10 +116,7 @@ fun SchoolDashboardScreenExpanded(
     }
 
     val allCategories = remember(allSchools) {
-        allSchools
-            .mapNotNull { it.category }
-            .distinctBy { it.key }
-            .sortedBy { it.label }
+        allSchools.mapNotNull { it.category }.distinctBy { it.key }.sortedBy { it.label }
     }
 
     val filteredSchools = remember(
@@ -134,10 +137,11 @@ fun SchoolDashboardScreenExpanded(
         allSchools.firstOrNull { it.id == state.schoolsState.selectedSchoolId }
     }
 
+    var mapResetVersion by remember { mutableIntStateOf(0) }
+
 
     Column(
-        modifier = Modifier.fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
 
@@ -150,8 +154,7 @@ fun SchoolDashboardScreenExpanded(
             },
             onBack = {
                 onEvent(SchoolDashboardEvent.Back)
-            }
-        )
+            })
 
 
         HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = Dp.Hairline)
@@ -168,30 +171,53 @@ fun SchoolDashboardScreenExpanded(
                 if (state.schoolsState.isLoading) {
                     MapPanelShimmer()
                 } else if (loadMap) {
-                    MapHolder(
-                        modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)),
-                        mapHolderState = MapHolderState(
-                            cameraState = MapHolderCameraState(
-                                boundingBox = MapHolderBoundingBox(),
-                                focusPosition = selectedSchool
-                                    ?.takeIf { it.hasLocation() }
-                                    ?.let { MapHolderPosition(it.latitude!!, it.longitude!!) },
-                            )
-                        ),
-                        disable = true
-                    ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        MapHolder(
+                            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)),
+                            mapHolderState = MapHolderState(
+                                cameraState = MapHolderCameraState(
+                                    boundingBox = MapHolderBoundingBox(),
+                                    focusPosition = selectedSchool?.takeIf { it.hasLocation() }
+                                        ?.let { MapHolderPosition(it.latitude!!, it.longitude!!) },
+                                    resetVersion = mapResetVersion,
+                                )
+                            ),
+                            disable = false
+                        ) {
 
-                        SchoolsMapLayers(
-                            schools = filteredSchools,
-                            categories = allCategories,
-                            selectedSchoolId = state.schoolsState.selectedSchoolId
-                        )
+                            SchoolsMapLayers(
+                                schools = filteredSchools,
+                                categories = allCategories,
+                                selectedSchoolId = state.schoolsState.selectedSchoolId
+                            )
+                        }
+
+                        Surface(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(8.dp)
+                                .size(40.dp)
+                                .shadow(elevation = 4.dp, shape = CircleShape),
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.surface,
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                        ) {
+                            IconButton(
+                                onClick = {
+//                                    onEvent(SchoolDashboardEvent.ClearSchoolSelection)
+                                    mapResetVersion++
+                                },
+                                modifier = Modifier.fillMaxSize(),
+                            ) {
+                                Icon(Icons.Default.LockReset, "Reset Map")
+                            }
+                        }
+
                     }
-                } else
-                    Box(
-                        modifier = Modifier.fillMaxSize()
-                            .background(MaterialTheme.colorScheme.surface)
-                    )
+
+                } else Box(
+                    modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)
+                )
             }
 
             AppCardBordered(
@@ -209,8 +235,7 @@ fun SchoolDashboardScreenExpanded(
                         onBack = {
                             onEvent(SchoolDashboardEvent.ClearSchoolSelection)
                             onEvent(SchoolDashboardEvent.ClearSchoolDetails)
-                        }
-                    )
+                        })
 
                 } else if (state.schoolsState.isLoading) {
 
@@ -243,8 +268,7 @@ fun SchoolDashboardScreenExpanded(
                         onSelectSchool = { schoolId ->
                             onEvent(SchoolDashboardEvent.SelectSchool(schoolId))
                             onEvent(SchoolDashboardEvent.LoadSchoolDetails(schoolId))
-                        }
-                    )
+                        })
 
                 }
 
@@ -385,8 +409,7 @@ private fun SchoolListContent(
             trailing = {
                 if (searchQuery.isNotEmpty()) {
                     IconButton(
-                        onClick = { onSearchQueryChange("") },
-                        modifier = Modifier.size(24.dp)
+                        onClick = { onSearchQueryChange("") }, modifier = Modifier.size(24.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
@@ -428,21 +451,16 @@ private fun SchoolListContent(
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.surface)
-                            .padding(vertical = 8.dp)
+                        modifier = Modifier.weight(1f).fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surface).padding(vertical = 8.dp)
                     )
 
                 }
                 when (sortOption) {
                     SchoolSortOption.DistrictName -> {
-                        val groupedSchools = filteredSchools
-                            .sortedBy { it.name }
-                            .groupBy { it.districtModel.name }
-                            .toList()
-                            .sortedBy { it.first }
+                        val groupedSchools =
+                            filteredSchools.sortedBy { it.name }.groupBy { it.districtModel.name }
+                                .toList().sortedBy { it.first }
 
                         groupedSchools.forEach { (group, groupSchools) ->
                             stickyHeader(key = group) {
@@ -452,9 +470,7 @@ private fun SchoolListContent(
                                         style = MaterialTheme.typography.labelMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .fillMaxWidth()
+                                        modifier = Modifier.weight(1f).fillMaxWidth()
                                             .background(MaterialTheme.colorScheme.surface)
                                             .padding(vertical = 8.dp)
                                     )
@@ -464,8 +480,7 @@ private fun SchoolListContent(
                                         style = MaterialTheme.typography.labelMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier
-                                            .wrapContentWidth()
+                                        modifier = Modifier.wrapContentWidth()
                                             .background(MaterialTheme.colorScheme.surface)
                                             .padding(vertical = 8.dp)
                                     )
@@ -477,18 +492,15 @@ private fun SchoolListContent(
                                 SchoolListItem(
                                     school = school,
                                     isSelected = school.id == selectedSchoolId,
-                                    onClick = { onSelectSchool(school.id) }
-                                )
+                                    onClick = { onSelectSchool(school.id) })
                             }
                         }
                     }
 
                     SchoolSortOption.SchoolCategory -> {
                         val categoryLabelByKey = allCategories.associate { it.key to it.label }
-                        val groupedSchools = filteredSchools
-                            .sortedBy { it.name }
-                            .groupBy { it.category?.key ?: "Uncategorized" }
-                            .toList()
+                        val groupedSchools = filteredSchools.sortedBy { it.name }
+                            .groupBy { it.category?.key ?: "Uncategorized" }.toList()
                             .sortedBy { it.first }
 
                         groupedSchools.forEach { (group, groupSchools) ->
@@ -499,9 +511,7 @@ private fun SchoolListContent(
                                         style = MaterialTheme.typography.labelMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .fillMaxWidth()
+                                        modifier = Modifier.weight(1f).fillMaxWidth()
                                             .background(MaterialTheme.colorScheme.surface)
                                             .padding(vertical = 8.dp)
                                     )
@@ -511,8 +521,7 @@ private fun SchoolListContent(
                                         style = MaterialTheme.typography.labelMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier
-                                            .wrapContentWidth()
+                                        modifier = Modifier.wrapContentWidth()
                                             .background(MaterialTheme.colorScheme.surface)
                                             .padding(vertical = 8.dp)
                                     )
@@ -523,8 +532,7 @@ private fun SchoolListContent(
                                 SchoolListItem(
                                     school = school,
                                     isSelected = school.id == selectedSchoolId,
-                                    onClick = { onSelectSchool(school.id) }
-                                )
+                                    onClick = { onSelectSchool(school.id) })
                             }
                         }
                     }
@@ -534,8 +542,7 @@ private fun SchoolListContent(
                             SchoolListItem(
                                 school = school,
                                 isSelected = school.id == selectedSchoolId,
-                                onClick = { onSelectSchool(school.id) }
-                            )
+                                onClick = { onSelectSchool(school.id) })
                         }
                     }
                 }
@@ -563,8 +570,7 @@ private fun <T> FilterChipMenu(
     ) { currentOption ->
         AppChip(modifier = Modifier.wrapContentWidth()) {
             Row(
-                modifier = Modifier.wrapContentWidth()
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                modifier = Modifier.wrapContentWidth().padding(horizontal = 8.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -605,18 +611,14 @@ private fun SchoolListItem(
                     buildString {
                         append(school.name)
                         append(" \u2022 ").append(school.districtModel.name)
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold
+                    }, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     buildString {
                         school.category?.name?.let { append(it) }
                         school.category?.classRange?.let { append(" \u2022 ").append(it) }
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.SemiBold
+                    }, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold
                 )
             }
 
@@ -648,11 +650,9 @@ private fun filterSchools(
     selectedDistrictId: Int?,
     selectedCategory: String?,
 ): List<SchoolUiModel> = schools.filter { school ->
-    val matchesQuery = searchQuery.isBlank() ||
-            school.name.contains(searchQuery, ignoreCase = true)
-    val matchesDistrict = selectedDistrictId == null || selectedDistrictId == -1 ||
-            school.districtModel.id == selectedDistrictId
-    val matchesCategory = selectedCategory == null ||
-            school.category?.key == selectedCategory
+    val matchesQuery = searchQuery.isBlank() || school.name.contains(searchQuery, ignoreCase = true)
+    val matchesDistrict =
+        selectedDistrictId == null || selectedDistrictId == -1 || school.districtModel.id == selectedDistrictId
+    val matchesCategory = selectedCategory.isNullOrBlank() || school.category?.key == selectedCategory
     matchesQuery && matchesDistrict && matchesCategory
 }

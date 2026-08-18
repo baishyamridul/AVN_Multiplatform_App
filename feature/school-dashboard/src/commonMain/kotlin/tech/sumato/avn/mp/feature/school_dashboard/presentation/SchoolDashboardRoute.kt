@@ -9,6 +9,7 @@ import tech.sumato.avn.mp.feature.school_dashboard.presentation.state.SchoolDash
 @Composable
 fun SchoolDashboardRoute(
     initialDistrictId: Int? = null,
+    initialCategory: String? = null,
     onShowSnackbar: (String) -> Unit = {},
     onNavigateBack: () -> Unit = {}
 ) {
@@ -22,6 +23,9 @@ fun SchoolDashboardRoute(
         content = { state ->
             LaunchedEffect(initialDistrictId) {
                 initialDistrictId?.let { preselectDistrict(it) }
+            }
+            LaunchedEffect(initialCategory) {
+                initialCategory?.takeIf { it.isNotBlank() }?.let { preselectCategory(it) }
             }
             SchoolDashboardScreen(
                 state = state,

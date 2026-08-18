@@ -25,6 +25,7 @@ fun AppSchoolCategoryCard(
 
     AppCardBordered(
         modifier = modifier,
+        onClick = onClick,
     ) {
 
 

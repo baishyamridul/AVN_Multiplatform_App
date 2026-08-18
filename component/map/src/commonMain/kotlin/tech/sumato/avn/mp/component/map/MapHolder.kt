@@ -5,7 +5,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -50,12 +53,29 @@ fun MapHolder(
 
 
 
+    var lastResetVersion by remember { mutableIntStateOf(mapHolderState.cameraState.resetVersion) }
+
     LaunchedEffect(
         mapHolderState.cameraState.boundingBox,
         mapHolderState.cameraState.focusPosition,
+        mapHolderState.cameraState.resetVersion,
     ) {
+        val resetVersion = mapHolderState.cameraState.resetVersion
+        val isResetRequested = resetVersion != lastResetVersion
+        lastResetVersion = resetVersion
+
+        val boundingBox = mapHolderState.cameraState.boundingBox
         val focusPosition = mapHolderState.cameraState.focusPosition
-        if (focusPosition != null) {
+        if (isResetRequested) {
+            if (boundingBox != null) {
+                cameraState.animateTo(
+                    boundingBox = boundingBox.toBoundingBox(),
+                    padding = PaddingValues(16.dp),
+                    tilt = 0.0,
+                    bearing = 0.0
+                )
+            }
+        } else if (focusPosition != null) {
             cameraState.animateTo(
                 finalPosition = CameraPosition(
                     target = Position(
@@ -68,16 +88,13 @@ fun MapHolder(
                 ),
                 duration = 800.milliseconds,
             )
-        } else {
-            val boundingBox = mapHolderState.cameraState.boundingBox
-            if (boundingBox != null) {
-                cameraState.animateTo(
-                    boundingBox = boundingBox.toBoundingBox(),
-                    padding = PaddingValues(16.dp),
-                    tilt = 0.0,
-                    bearing = 0.0
-                )
-            }
+        } else if (boundingBox != null) {
+            cameraState.animateTo(
+                boundingBox = boundingBox.toBoundingBox(),
+                padding = PaddingValues(16.dp),
+                tilt = 0.0,
+                bearing = 0.0
+            )
         }
     }
 
@@ -104,7 +121,8 @@ fun MapHolder(
             ornamentOptions = OrnamentOptions(
                 isLogoEnabled = false,
                 isCompassEnabled = false,
-                isScaleBarEnabled = false
+                isScaleBarEnabled = false,
+                isAttributionEnabled = false
             ),
             renderOptions = RenderOptions.Standard
         )

@@ -12,6 +12,7 @@ data class MapHolderCameraState(
     val zoom: Double = 8.0,
     val bearing: Double = 0.0,
     val tilt: Double = 0.0,
+    val resetVersion: Int = 0,
 )
 
 data class MapHolderPosition(

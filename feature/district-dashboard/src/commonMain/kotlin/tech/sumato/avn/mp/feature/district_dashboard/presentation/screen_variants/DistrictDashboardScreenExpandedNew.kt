@@ -174,6 +174,10 @@ private fun ExpandedDashboardContent(
                 onViewAllClicked = {
                     val districtId = userDistricts.firstOrNull { it.id == selectedDistrictId }?.id
                     onEvent(DistrictDashboardEvent.Navigate(Route.schoolDashboard(districtId)))
+                },
+                onCategoryClicked = { categoryId ->
+                    val districtId = userDistricts.firstOrNull { it.id == selectedDistrictId }?.id
+                    onEvent(DistrictDashboardEvent.Navigate(Route.schoolDashboard(districtId, categoryId)))
                 }
             )
         }

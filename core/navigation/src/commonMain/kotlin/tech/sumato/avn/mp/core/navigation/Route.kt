@@ -12,9 +12,9 @@ object Route {
 
     const val DISTRICT_DASHBOARD = "district-dashboard"
 
-    const val SCHOOL_DASHBOARD = "school_dashboard?districtId={districtId}"
+    const val SCHOOL_DASHBOARD = "school_dashboard?districtId={districtId}&category={category}"
 
-    fun schoolDashboard(districtId: Int?) =
-        "school_dashboard?districtId=${districtId ?: -1}"
+    fun schoolDashboard(districtId: Int?, category: String? = null) =
+        "school_dashboard?districtId=${districtId ?: -1}&category=${category ?: ""}"
 
 }

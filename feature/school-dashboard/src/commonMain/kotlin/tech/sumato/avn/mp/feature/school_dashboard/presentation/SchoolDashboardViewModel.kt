@@ -125,6 +125,16 @@ class SchoolDashboardViewModel(
         }
     }
 
+    fun preselectCategory(category: String) {
+        _state.update { state ->
+            state.copy(
+                schoolsState = state.schoolsState.copy(
+                    selectedCategory = category
+                )
+            )
+        }
+    }
+
 
     private fun loadDistricts() {
         viewModelScope.launch {

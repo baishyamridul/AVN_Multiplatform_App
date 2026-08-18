@@ -27,7 +27,8 @@ import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.SchoolCa
 fun DistrictDashboardSchoolCategoriesAnalytics(
     modifier: Modifier,
     categories: List<SchoolCategoryUiModel> = emptyList(),
-    onViewAllClicked: () -> Unit = {}
+    onViewAllClicked: () -> Unit = {},
+    onCategoryClicked: (String) -> Unit = {},
 ) {
 
     AppCardBordered(
@@ -69,6 +70,7 @@ fun DistrictDashboardSchoolCategoriesAnalytics(
                     name = category.label,
                     schoolCount = category.schoolCount.toString(),
                     classRange = category.classRange,
+                    onClick = { onCategoryClicked(category.id) },
                 )
             }
 

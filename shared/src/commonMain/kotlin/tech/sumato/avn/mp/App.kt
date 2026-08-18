@@ -121,12 +121,18 @@ fun AppNavGraph(navController: NavHostController) {
                 navArgument("districtId") {
                     type = NavType.IntType
                     defaultValue = -1
+                },
+                navArgument("category") {
+                    type = NavType.StringType
+                    defaultValue = ""
                 }
             )
         ) { backStackEntry ->
             val initialDistrictId = backStackEntry.arguments?.read { getIntOrNull("districtId") }
+            val initialCategory = backStackEntry.arguments?.read { getStringOrNull("category") }
             SchoolDashboardRoute(
                 initialDistrictId = initialDistrictId,
+                initialCategory = initialCategory,
                 onNavigateBack = {
                     navController.popBackStack()
                 }
