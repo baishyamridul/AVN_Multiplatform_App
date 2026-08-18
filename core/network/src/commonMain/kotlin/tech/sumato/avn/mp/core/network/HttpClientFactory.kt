@@ -68,7 +68,7 @@ object HttpClientFactory {
             }
 
             defaultRequest {
-                url(config.baseUrl)
+                url(config.apiBaseUrl)
                 contentType(ContentType.Application.Json)
                 config.headers.forEach { (key, value) ->
                     headers.append(key, value)

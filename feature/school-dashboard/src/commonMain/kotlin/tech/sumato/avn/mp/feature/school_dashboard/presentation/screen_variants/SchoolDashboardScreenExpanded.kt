@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.maplibre.compose.expressions.dsl.const
+import org.maplibre.compose.expressions.dsl.contains
 import org.maplibre.compose.layers.LineLayer
 import org.maplibre.compose.sources.GeoJsonData
 import org.maplibre.compose.sources.rememberGeoJsonSource
@@ -76,6 +77,7 @@ import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.Schoo
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.SchoolDetailsShimmer
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.SchoolListShimmer
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.SchoolsMapLayers
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.components.categoryColors
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.event.SchoolDashboardEvent
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.DistrictUiModel
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.SchoolCategoryUiModel
@@ -188,7 +190,8 @@ fun SchoolDashboardScreenExpanded(
                             SchoolsMapLayers(
                                 schools = filteredSchools,
                                 categories = allCategories,
-                                selectedSchoolId = state.schoolsState.selectedSchoolId
+                                selectedSchoolId = state.schoolsState.selectedSchoolId,
+                                onEvent = onEvent
                             )
                         }
 
@@ -606,36 +609,56 @@ private fun SchoolListItem(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(
                     buildString {
                         append(school.name)
                         append(" \u2022 ").append(school.districtModel.name)
                     }, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    buildString {
-                        school.category?.name?.let { append(it) }
-                        school.category?.classRange?.let { append(" \u2022 ").append(it) }
-                    }, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold
+                    "UDISE: ${school.udise}",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Normal
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                AppChip(
+                    modifier = Modifier.wrapContentWidth(),
+                    color = categoryColors[school.category?.key]?.value?.let { Color(it).copy(alpha = 0.05f) }
+                        ?: MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+                ) {
+                    Text(
+                        buildString {
+                            school.category?.name?.let { append(it) }
+                            school.category?.classRange?.let { append(" \u2022 ").append(it) }
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = categoryColors[school.category?.key]?.value?.let { Color(it) }
+                            ?: MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    )
+                }
             }
 
-            if (school.hasLocation()) {
-                Icon(
-                    imageVector = Icons.Outlined.LocationOn,
-                    contentDescription = "Has location",
-                    tint = Color(0xff65a30d)
-//                    tint = Color(0xffdc2626)
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.LocationOff,
-                    contentDescription = "No location",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-                )
-            }
+//            if (school.hasLocation()) {
+//                Icon(
+//                    imageVector = Icons.Outlined.LocationOn,
+//                    contentDescription = "Has location",
+//                    tint = Color(0xff65a30d)
+////                    tint = Color(0xffdc2626)
+//                )
+//            } else {
+//                Icon(
+//                    imageVector = Icons.Default.LocationOff,
+//                    contentDescription = "No location",
+//                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+//                )
+//            }
         }
     }
 }
@@ -650,9 +673,13 @@ private fun filterSchools(
     selectedDistrictId: Int?,
     selectedCategory: String?,
 ): List<SchoolUiModel> = schools.filter { school ->
-    val matchesQuery = searchQuery.isBlank() || school.name.contains(searchQuery, ignoreCase = true)
+    val matchesQuery = searchQuery.isBlank() || school.name.contains(
+        searchQuery,
+        ignoreCase = true
+    ) || school.udise.contains(searchQuery, ignoreCase = true)
     val matchesDistrict =
         selectedDistrictId == null || selectedDistrictId == -1 || school.districtModel.id == selectedDistrictId
-    val matchesCategory = selectedCategory.isNullOrBlank() || school.category?.key == selectedCategory
+    val matchesCategory =
+        selectedCategory.isNullOrBlank() || school.category?.key == selectedCategory
     matchesQuery && matchesDistrict && matchesCategory
 }

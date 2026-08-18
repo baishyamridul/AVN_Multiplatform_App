@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 data class SchoolDto(
     val id: String,
     val name: String,
+    val udise: String,
     val category: SchoolCategoryDto? = null,
     @SerialName("lat")
     val latitude: Double? = null,

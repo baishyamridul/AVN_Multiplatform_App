@@ -30,6 +30,7 @@ class SchoolMapper {
         return SchoolModel(
             id = dto.id,
             name = dto.name,
+            udise = dto.udise,
             category = dto.category?.toDomain(),
             latitude = dto.latitude,
             longitude = dto.longitude,

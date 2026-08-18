@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
@@ -23,13 +24,14 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun AppChip(
     modifier: Modifier,
+    color: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
     content: @Composable () -> Unit,
 ) {
 
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(50),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+        color = color
     ) {
         content()
     }

@@ -8,10 +8,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import org.maplibre.compose.expressions.ast.Expression
+import org.maplibre.compose.expressions.dsl.Feature.get
 import org.maplibre.compose.expressions.dsl.asBoolean
 import org.maplibre.compose.expressions.dsl.asString
 import org.maplibre.compose.expressions.dsl.case
@@ -19,13 +24,23 @@ import org.maplibre.compose.expressions.dsl.condition
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.expressions.dsl.contains
 import org.maplibre.compose.expressions.dsl.feature
+import org.maplibre.compose.expressions.dsl.format
+import org.maplibre.compose.expressions.dsl.offset
+import org.maplibre.compose.expressions.dsl.sp
+import org.maplibre.compose.expressions.dsl.span
 import org.maplibre.compose.expressions.dsl.switch
+import org.maplibre.compose.expressions.value.ExpressionType
+import org.maplibre.compose.expressions.value.ExpressionValue
+import org.maplibre.compose.expressions.value.SymbolAnchor
 import org.maplibre.compose.layers.CircleLayer
+import org.maplibre.compose.layers.SymbolLayer
 import org.maplibre.compose.sources.GeoJsonData
 import org.maplibre.compose.sources.rememberGeoJsonSource
+import org.maplibre.compose.util.ClickResult
 import org.maplibre.spatialk.geojson.Feature
 import org.maplibre.spatialk.geojson.FeatureCollection
 import org.maplibre.spatialk.geojson.Point
+import tech.sumato.avn.mp.feature.school_dashboard.presentation.event.SchoolDashboardEvent
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.SchoolCategoryUiModel
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.model.SchoolUiModel
 import kotlin.time.Duration.Companion.milliseconds
@@ -36,6 +51,11 @@ private const val POINTS_CHUNK_DELAY_MS = 16L
 private const val PROPERTY_SELECTED = "selected"
 
 private const val CATEGORY = "category"
+
+private const val SCHOOL_ID = "school_id"
+
+private const val SCHOOL_NAME = "school_name"
+
 
 private val CATEGORY_PALETTE = listOf(
     Color(0xffe53935),
@@ -59,6 +79,7 @@ fun SchoolsMapLayers(
     schools: List<SchoolUiModel>,
     categories: List<SchoolCategoryUiModel> = emptyList(),
     selectedSchoolId: String? = null,
+    onEvent: (event: SchoolDashboardEvent) -> Unit = {},
 ) {
 
     val located = remember(schools) { schools.filter { it.hasLocation() } }
@@ -85,6 +106,8 @@ fun SchoolsMapLayers(
                 properties = buildJsonObject {
                     put(PROPERTY_SELECTED, school.id == selectedSchoolId)
                     put(CATEGORY, school.category?.key)
+                    put(SCHOOL_ID, school.id)
+                    put(SCHOOL_NAME, school.name)
                 },
                 id = JsonPrimitive(school.id),
             )
@@ -95,24 +118,8 @@ fun SchoolsMapLayers(
         data = GeoJsonData.Features(FeatureCollection(features)),
     )
 
-    val categoryColorByKey = remember(categories) {
-        mapOf(
-            "primarySchool_1_to_5" to Color(0xff00E5FF),
-            "upperPrimarySchool_1_to_8" to Color(0xffFFD600),
-            "upperPrimarySchool_6_to_8" to Color(0xffFFD600),
-            "secondarySchool_1_to_10" to Color(0xff00E676),
-            "secondarySchool_6_to_10" to Color(0xff00E676),
-            "secondarySchool_9_to_10" to Color(0xff00E676),
-            "higherSecondarySchool_6_to_12" to Color(0xffD500F9),
-            "higherSecondarySchool_9_to_12" to Color(0xffD500F9),
-            "higherSecondarySchool_1_to_12" to Color(0xffD500F9),
-        )
-//        categories
-//            .sortedBy { it.key }
-//            .mapIndexed { index, category ->
-//                category.key to CATEGORY_PALETTE[index % CATEGORY_PALETTE.size]
-//            }
-//            .toMap()
+    val categoryColorByKey = remember {
+        categoryColors
     }
 
     val categoryCases = categoryColorByKey.map { (key, color) ->
@@ -122,16 +129,21 @@ fun SchoolsMapLayers(
     CircleLayer(
         id = "schoolsLayer",
         source = source,
+//        color = switch(
+//            condition(
+//                test = feature[PROPERTY_SELECTED].asBoolean(),
+//                output = const(Color.Blue),
+//            ),
+//            fallback = switch(
+//                input = feature[CATEGORY].asString(),
+//                *categoryCases.toTypedArray(),
+//                fallback = const(Color.Red),
+//            ),
+//        ),
         color = switch(
-            condition(
-                test = feature[PROPERTY_SELECTED].asBoolean(),
-                output = const(Color.Blue),
-            ),
-            fallback = switch(
-                input = feature[CATEGORY].asString(),
-                *categoryCases.toTypedArray(),
-                fallback = const(Color.Red),
-            ),
+            input = feature[CATEGORY].asString(),
+            *categoryCases.toTypedArray(),
+            fallback = const(Color.Red)
         ),
         radius = switch(
             condition(
@@ -142,5 +154,29 @@ fun SchoolsMapLayers(
         ),
         strokeColor = const(Color.Black),
         strokeWidth = const(1.dp),
+        onClick = { features ->
+            val schoolId =
+                features.firstOrNull()?.properties?.get(SCHOOL_ID)?.jsonPrimitive?.content ?: ""
+            onEvent(SchoolDashboardEvent.SelectSchool(schoolId = schoolId))
+            onEvent(SchoolDashboardEvent.LoadSchoolDetails(schoolId))
+            return@CircleLayer ClickResult.Consume
+        }
     )
+
+    SymbolLayer(
+        id = "schoolLabelLayer",
+        source = source,
+        filter = feature[PROPERTY_SELECTED].asBoolean(),
+        textField = format(span(feature[SCHOOL_NAME].asString())),
+        textFont = const(listOf("Noto Sans Regular")),
+        textSize = const(12f).sp,
+        textColor = const(Color.White),
+        textHaloColor = const(Color.Black),
+        textHaloWidth = const(1.dp),
+        textAnchor = const(SymbolAnchor.Top),
+        textOffset = offset(0f.sp, 10f.sp),
+        textAllowOverlap = const(true),
+
+        )
+
 }

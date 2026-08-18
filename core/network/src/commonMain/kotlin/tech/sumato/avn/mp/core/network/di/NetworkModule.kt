@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import tech.sumato.avn.mp.core.datastore.UserPreferencesStorage
+import tech.sumato.avn.mp.core.network.BaseUrls
 import tech.sumato.avn.mp.core.network.HttpClientFactory
 import tech.sumato.avn.mp.core.network.NetworkConfig
 
@@ -13,7 +14,16 @@ private val _logoutEvent = MutableSharedFlow<String>(extraBufferCapacity = 1)
 val logoutEvent: SharedFlow<String> = _logoutEvent.asSharedFlow()
 
 val NetworkModule = module {
-    single { NetworkConfig(baseUrl = "https://isam.sumato.tech/api/v1/") }
+    single {
+        BaseUrls(
+            baseUrl = "https://arunachalvidyanidhi.in",
+            apiBaseUrl = "https://arunachalvidyanidhi.in/api/v1/"
+        )
+    }
+    single {
+        val baseUrls: BaseUrls = get()
+        NetworkConfig(apiBaseUrl = baseUrls.apiBaseUrl)
+    }
     single<Json> {
         Json {
             ignoreUnknownKeys = true

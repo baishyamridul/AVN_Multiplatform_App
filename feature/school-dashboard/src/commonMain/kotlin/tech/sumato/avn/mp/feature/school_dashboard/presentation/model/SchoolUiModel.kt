@@ -8,6 +8,7 @@ import tech.sumato.avn.mp.domain.school.model.SchoolModel
 data class SchoolUiModel(
     val id: String,
     val name: String,
+    val udise: String,
     val category: SchoolCategoryUiModel? = null,
     val latitude: Double? = null,
     val longitude: Double? = null,
@@ -23,6 +24,7 @@ fun SchoolModel.toUiModel(): SchoolUiModel {
     return SchoolUiModel(
         id = id,
         name = name,
+        udise = udise,
         category = category?.toUiModel(),
         latitude = latitude,
         longitude = longitude,
