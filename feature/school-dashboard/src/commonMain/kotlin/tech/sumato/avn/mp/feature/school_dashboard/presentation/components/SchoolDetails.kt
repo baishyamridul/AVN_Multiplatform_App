@@ -88,7 +88,10 @@ import androidx.compose.material.icons.outlined.Science
 import androidx.compose.material.icons.outlined.Vrpano
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import tech.sumato.avn.mp.designsystem.components.app.AppChip
 import tech.sumato.avn.mp.domain.school.model.SchoolImage360Model
 import tech.sumato.avn.mp.domain.school.model.SchoolRoomConditionModel
@@ -139,7 +142,16 @@ fun SchoolDetails(
                 }
 
                 Text(
-                    details.name,
+                    buildAnnotatedString {
+                        append(details.name)
+                        append(" \u2022 ")
+                        withStyle(style = SpanStyle(
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                            fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
+                        )) {
+                            append(details.district?.name)
+                        }
+                    },
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -169,7 +181,7 @@ fun SchoolDetails(
 
             details.udiseCode?.let { udise ->
                 Box(modifier = Modifier.size(80.dp)) {
-                    val painter = rememberQrKitPainter("AVN_UDISE_$udise") {
+                    val painter = rememberQrKitPainter(details.qrUrl) {
                         shapes = QrKitShapes(
                             ballShape = getSelectedQrBall(QrBallType.RoundCornersQrBall(radius = 0.2f)),
                             darkPixelShape = getSelectedPixel(QrPixelType.RoundCornerPixel()),
@@ -639,7 +651,7 @@ private fun facilityIcon(key: String, label: String): FacilityIcon {
         }
 
         "surveillance" -> {
-            FacilityIcon(Icons.Outlined.CameraOutdoor, Color(0xff57534e))
+            FacilityIcon(Icons.Outlined.CameraOutdoor, Color(0xffea580c))
         }
 
         "extra" -> {

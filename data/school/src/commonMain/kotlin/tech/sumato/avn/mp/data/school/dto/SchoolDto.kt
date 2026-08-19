@@ -13,5 +13,9 @@ data class SchoolDto(
     val latitude: Double? = null,
     @SerialName("lng")
     val longitude: Double? = null,
-    val district: SchoolDistrictDto
+    val district: SchoolDistrictDto,
+    @SerialName("gs")
+    val goldenJubilee: Boolean = false,
+    @SerialName("pms")
+    val pmShri: Boolean = false,
 )

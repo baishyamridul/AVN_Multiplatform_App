@@ -1,5 +1,6 @@
 package tech.sumato.avn.mp.data.school.mapper
 
+import tech.sumato.avn.mp.core.network.BaseUrls
 import tech.sumato.avn.mp.data.school.dto.SchoolCategoryDto
 import tech.sumato.avn.mp.data.school.dto.SchoolDetailsDto
 import tech.sumato.avn.mp.data.school.dto.SchoolDistrictDto
@@ -23,7 +24,7 @@ import tech.sumato.avn.mp.domain.school.model.SchoolRoomCountModel
 import tech.sumato.avn.mp.domain.school.model.SchoolStaffsModel
 import tech.sumato.avn.mp.domain.school.model.SchoolStudentsModel
 
-class SchoolMapper {
+class SchoolMapper(private val baseUrls: BaseUrls) {
 
 
     fun toDomain(dto: SchoolDto): SchoolModel {
@@ -34,7 +35,10 @@ class SchoolMapper {
             category = dto.category?.toDomain(),
             latitude = dto.latitude,
             longitude = dto.longitude,
-            district = dto.district.toDomain()
+            district = dto.district.toDomain(),
+            qrUrl = "${baseUrls.baseUrl}school/${dto.id}/qr-scan",
+            goldenJubilee = dto.goldenJubilee,
+            pmShri = dto.pmShri
         )
     }
 
@@ -127,6 +131,7 @@ class SchoolMapper {
                     allocatedAmount = p.allocatedAmount,
                 )
             },
+            qrUrl = "${baseUrls.baseUrl}/school/${dto.id}/qr-scan"
         )
     }
 

@@ -3,7 +3,6 @@ package tech.sumato.avn.mp.feature.school_dashboard.presentation.screen_variants
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,11 +24,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.LocationOff
 import androidx.compose.material.icons.filled.LockReset
 import androidx.compose.material.icons.outlined.Category
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.outlined.WorkspacePremium
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,7 +42,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -55,18 +54,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import org.maplibre.compose.expressions.dsl.const
-import org.maplibre.compose.expressions.dsl.contains
-import org.maplibre.compose.layers.LineLayer
-import org.maplibre.compose.sources.GeoJsonData
-import org.maplibre.compose.sources.rememberGeoJsonSource
-import tech.sumato.avn.mp.component.map.GeoJsonLoader
 import tech.sumato.avn.mp.component.map.MapHolder
 import tech.sumato.avn.mp.component.map.MapHolderBoundingBox
 import tech.sumato.avn.mp.component.map.MapHolderCameraState
 import tech.sumato.avn.mp.component.map.MapHolderPosition
 import tech.sumato.avn.mp.component.map.MapHolderState
-import tech.sumato.avn.mp.component.map.MapView
 import tech.sumato.avn.mp.designsystem.components.AppCardBordered
 import tech.sumato.avn.mp.designsystem.components.AppTextField
 import tech.sumato.avn.mp.designsystem.components.app.AppChip
@@ -126,12 +118,16 @@ fun SchoolDashboardScreenExpanded(
         state.schoolsState.searchQuery,
         state.schoolsState.selectedDistrictId,
         state.schoolsState.selectedCategory,
+        state.schoolsState.goldenJubilee,
+        state.schoolsState.pmShri
     ) {
         filterSchools(
             schools = allSchools,
             searchQuery = state.schoolsState.searchQuery,
             selectedDistrictId = state.schoolsState.selectedDistrictId,
             selectedCategory = state.schoolsState.selectedCategory,
+            goldenJubilee = state.schoolsState.goldenJubilee,
+            pmShri = state.schoolsState.pmShri
         )
     }
 
@@ -254,6 +250,8 @@ fun SchoolDashboardScreenExpanded(
                         searchQuery = state.schoolsState.searchQuery,
                         selectedDistrictId = state.schoolsState.selectedDistrictId,
                         selectedCategory = state.schoolsState.selectedCategory,
+                        selectedGoldenJubilee = state.schoolsState.goldenJubilee,
+                        selectedPmShri = state.schoolsState.pmShri,
                         sortOption = state.schoolsState.sortOption,
                         isLoading = state.schoolsState.isLoading,
                         onSearchQueryChange = { query ->
@@ -264,6 +262,12 @@ fun SchoolDashboardScreenExpanded(
                         },
                         onCategorySelected = { category ->
                             onEvent(SchoolDashboardEvent.SelectCategory(category))
+                        },
+                        onGoldenJubileeSelected = { enabled ->
+                            onEvent(SchoolDashboardEvent.SelectGoldenJubilee(enabled))
+                        },
+                        onPmShriSelected = { enabled ->
+                            onEvent(SchoolDashboardEvent.SelectPmShri(enabled))
                         },
                         onSortOptionChange = { option ->
                             onEvent(SchoolDashboardEvent.SelectSortOption(option))
@@ -342,11 +346,15 @@ private fun SchoolListContent(
     searchQuery: String,
     selectedDistrictId: Int?,
     selectedCategory: String?,
+    selectedGoldenJubilee: Boolean?,
+    selectedPmShri: Boolean?,
     sortOption: SchoolSortOption,
     isLoading: Boolean,
     onSearchQueryChange: (String) -> Unit,
     onDistrictSelected: (Int?) -> Unit,
     onCategorySelected: (String?) -> Unit,
+    onGoldenJubileeSelected: (Boolean?) -> Unit,
+    onPmShriSelected: (Boolean?) -> Unit,
     onSortOptionChange: (SchoolSortOption) -> Unit,
     onSelectSchool: (String) -> Unit,
 ) {
@@ -362,6 +370,9 @@ private fun SchoolListContent(
     Column(modifier = Modifier.fillMaxSize()) {
 
         val categories = allCategories
+
+        val goldenJubileeOptions = booleanFilterOptions("Golden Jubilee")
+        val pmShriOptions = booleanFilterOptions("PM Shri")
 
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
@@ -399,6 +410,31 @@ private fun SchoolListContent(
                     onDistrictSelected(if (district.id == ALL_DISTRICT.id) null else district.id)
                 },
             )
+
+            FilterChipMenu(
+                icon = Icons.Outlined.Star,
+                defaultLabel = "Golden Jubilee School: Show all",
+                options = goldenJubileeOptions,
+                selected = goldenJubileeOptions.firstOrNull { it.value == selectedGoldenJubilee }
+                    ?: goldenJubileeOptions.first(),
+                labelTransformer = { "Golden Jubilee School: ${it.label}" },
+                onSelected = { option ->
+                    onGoldenJubileeSelected(option.value)
+                },
+            )
+
+            FilterChipMenu(
+                icon = Icons.Outlined.WorkspacePremium,
+                defaultLabel = "PM Shri",
+                options = pmShriOptions,
+                selected = pmShriOptions.firstOrNull { it.value == selectedPmShri }
+                    ?: pmShriOptions.first(),
+                labelTransformer = { it.label },
+                onSelected = { option ->
+                    onPmShriSelected(option.value)
+                },
+            )
+
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -667,11 +703,24 @@ private val ALL_DISTRICT = DistrictUiModel(id = -1, name = "All Districts")
 
 private val ALL_CATEGORY = SchoolCategoryUiModel(key = "", name = "All Categories", classRange = "")
 
+private data class BooleanFilterOption(
+    val label: String,
+    val value: Boolean?,
+)
+
+private fun booleanFilterOptions(subject: String): List<BooleanFilterOption> = listOf(
+    BooleanFilterOption("Show All", null),
+    BooleanFilterOption("Show Only", true),
+    BooleanFilterOption("Hide", false),
+)
+
 private fun filterSchools(
     schools: List<SchoolUiModel>,
     searchQuery: String,
     selectedDistrictId: Int?,
     selectedCategory: String?,
+    goldenJubilee: Boolean?,
+    pmShri: Boolean?,
 ): List<SchoolUiModel> = schools.filter { school ->
     val matchesQuery = searchQuery.isBlank() || school.name.contains(
         searchQuery,
@@ -681,5 +730,9 @@ private fun filterSchools(
         selectedDistrictId == null || selectedDistrictId == -1 || school.districtModel.id == selectedDistrictId
     val matchesCategory =
         selectedCategory.isNullOrBlank() || school.category?.key == selectedCategory
-    matchesQuery && matchesDistrict && matchesCategory
+
+    val matchesGoldenJubilee = goldenJubilee == null || school.goldenJubilee == goldenJubilee
+    val matchesPmShri = pmShri == null || school.pmShri == pmShri
+
+    matchesQuery && matchesDistrict && matchesCategory && matchesGoldenJubilee && matchesPmShri
 }

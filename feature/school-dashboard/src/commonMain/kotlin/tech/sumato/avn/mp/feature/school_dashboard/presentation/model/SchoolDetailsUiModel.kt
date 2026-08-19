@@ -29,6 +29,7 @@ data class SchoolDetailsUiModel(
     val schoolImages: List<SchoolImageModel> = emptyList(),
     val schoolImages360: List<SchoolImage360Model> = emptyList(),
     val projects: List<SchoolProjectModel> = emptyList(),
+    val qrUrl: String,
 )
 
 fun SchoolDetailsModel.toUiModel(): SchoolDetailsUiModel {
@@ -50,5 +51,6 @@ fun SchoolDetailsModel.toUiModel(): SchoolDetailsUiModel {
         schoolImages = schoolImages,
         schoolImages360 = schoolImages360,
         projects = projects,
+        qrUrl = qrUrl,
     )
 }

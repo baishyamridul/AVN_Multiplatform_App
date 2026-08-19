@@ -22,6 +22,7 @@ data class SchoolDetailsModel(
     val schoolImages: List<SchoolImageModel> = emptyList(),
     val schoolImages360: List<SchoolImage360Model> = emptyList(),
     val projects: List<SchoolProjectModel> = emptyList(),
+    val qrUrl: String,
 )
 
 data class SchoolStudentsModel(

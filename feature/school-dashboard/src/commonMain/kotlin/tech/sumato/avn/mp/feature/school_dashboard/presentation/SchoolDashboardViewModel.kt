@@ -111,6 +111,26 @@ class SchoolDashboardViewModel(
                     )
                 }
             }
+
+            is SchoolDashboardEvent.SelectGoldenJubilee -> {
+                _state.update { state ->
+                    state.copy(
+                        schoolsState = state.schoolsState.copy(
+                            goldenJubilee = event.enabled
+                        )
+                    )
+                }
+            }
+
+            is SchoolDashboardEvent.SelectPmShri -> {
+                _state.update { state ->
+                    state.copy(
+                        schoolsState = state.schoolsState.copy(
+                            pmShri = event.enabled
+                        )
+                    )
+                }
+            }
         }
     }
 

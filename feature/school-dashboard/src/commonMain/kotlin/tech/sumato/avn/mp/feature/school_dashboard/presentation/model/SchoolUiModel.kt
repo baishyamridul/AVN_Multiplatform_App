@@ -13,6 +13,9 @@ data class SchoolUiModel(
     val latitude: Double? = null,
     val longitude: Double? = null,
     val districtModel: DistrictUiModel,
+    val qrUrl: String,
+    val goldenJubilee: Boolean = false,
+    val pmShri: Boolean = false,
 ) {
     fun hasLocation(): Boolean {
         return latitude != null && longitude != null
@@ -28,7 +31,10 @@ fun SchoolModel.toUiModel(): SchoolUiModel {
         category = category?.toUiModel(),
         latitude = latitude,
         longitude = longitude,
-        districtModel = district.toUiModel()
+        districtModel = district.toUiModel(),
+        qrUrl = qrUrl,
+        goldenJubilee = goldenJubilee,
+        pmShri = pmShri,
     )
 }
 

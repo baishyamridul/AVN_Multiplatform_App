@@ -29,6 +29,8 @@ data class SchoolsState(
     val sortOption: SchoolSortOption = SchoolSortOption.SchoolName,
     val schoolDetails: SchoolDetailsUiModel? = null,
     val isSchoolDetailsLoading: Boolean = false,
+    val goldenJubilee: Boolean? = null,
+    val pmShri: Boolean? = null,
 )
 
 enum class SchoolSortOption(val label: String) {

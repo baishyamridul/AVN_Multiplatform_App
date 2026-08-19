@@ -22,4 +22,8 @@ sealed interface SchoolDashboardEvent {
 
     data class SelectSortOption(val option: SchoolSortOption) : SchoolDashboardEvent
 
+    data class SelectGoldenJubilee(val enabled: Boolean?) : SchoolDashboardEvent
+
+    data class SelectPmShri(val enabled: Boolean?) : SchoolDashboardEvent
+
 }

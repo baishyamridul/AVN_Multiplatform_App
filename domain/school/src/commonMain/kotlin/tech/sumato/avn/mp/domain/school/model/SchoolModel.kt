@@ -9,5 +9,8 @@ data class SchoolModel(
     val category: SchoolCategoryModel? = null,
     val latitude: Double? = null,
     val longitude: Double? = null,
-    val district: DistrictModel
+    val district: DistrictModel,
+    val qrUrl: String,
+    val goldenJubilee: Boolean,
+    val pmShri: Boolean,
 )
