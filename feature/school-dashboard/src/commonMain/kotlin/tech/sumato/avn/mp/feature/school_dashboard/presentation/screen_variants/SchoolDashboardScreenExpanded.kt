@@ -3,6 +3,7 @@ package tech.sumato.avn.mp.feature.school_dashboard.presentation.screen_variants
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.LockReset
@@ -29,7 +31,6 @@ import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.WorkspacePremium
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -371,9 +372,6 @@ private fun SchoolListContent(
 
         val categories = allCategories
 
-        val goldenJubileeOptions = booleanFilterOptions("Golden Jubilee")
-        val pmShriOptions = booleanFilterOptions("PM Shri")
-
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -411,27 +409,21 @@ private fun SchoolListContent(
                 },
             )
 
-            FilterChipMenu(
+            FilterToggleChip(
                 icon = Icons.Outlined.Star,
-                defaultLabel = "Golden Jubilee School: Show all",
-                options = goldenJubileeOptions,
-                selected = goldenJubileeOptions.firstOrNull { it.value == selectedGoldenJubilee }
-                    ?: goldenJubileeOptions.first(),
-                labelTransformer = { "Golden Jubilee School: ${it.label}" },
-                onSelected = { option ->
-                    onGoldenJubileeSelected(option.value)
+                label = "Golden Jubilee",
+                selected = selectedGoldenJubilee == true,
+                onClick = {
+                    onGoldenJubileeSelected(if (selectedGoldenJubilee == true) null else true)
                 },
             )
 
-            FilterChipMenu(
+            FilterToggleChip(
                 icon = Icons.Outlined.WorkspacePremium,
-                defaultLabel = "PM Shri",
-                options = pmShriOptions,
-                selected = pmShriOptions.firstOrNull { it.value == selectedPmShri }
-                    ?: pmShriOptions.first(),
-                labelTransformer = { it.label },
-                onSelected = { option ->
-                    onPmShriSelected(option.value)
+                label = "PM Shri",
+                selected = selectedPmShri == true,
+                onClick = {
+                    onPmShriSelected(if (selectedPmShri == true) null else true)
                 },
             )
 
@@ -627,6 +619,59 @@ private fun <T> FilterChipMenu(
 
 
 @Composable
+private fun FilterToggleChip(
+    icon: ImageVector,
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    AppChip(
+        modifier = Modifier
+            .wrapContentWidth()
+            .clip(RoundedCornerShape(50))
+            .clickable(onClick = onClick),
+        color = if (selected) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+        },
+    ) {
+        Row(
+            modifier = Modifier.wrapContentWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (selected) {
+                Icon(
+                    Icons.Default.Check,
+                    "Selected",
+                    modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                )
+            } else {
+                Icon(
+                    icon,
+                    "",
+                    modifier = Modifier.size(16.dp),
+                    tint = LocalContentColor.current.copy(alpha = 0.85f),
+                )
+            }
+            Text(
+                label,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                color = if (selected) {
+                    MaterialTheme.colorScheme.onPrimary
+                } else {
+                    LocalContentColor.current.copy(alpha = 0.85f)
+                },
+            )
+        }
+    }
+}
+
+
+@Composable
 private fun SchoolListItem(
     school: SchoolUiModel,
     isSelected: Boolean,
@@ -702,17 +747,6 @@ private fun SchoolListItem(
 private val ALL_DISTRICT = DistrictUiModel(id = -1, name = "All Districts")
 
 private val ALL_CATEGORY = SchoolCategoryUiModel(key = "", name = "All Categories", classRange = "")
-
-private data class BooleanFilterOption(
-    val label: String,
-    val value: Boolean?,
-)
-
-private fun booleanFilterOptions(subject: String): List<BooleanFilterOption> = listOf(
-    BooleanFilterOption("Show All", null),
-    BooleanFilterOption("Show Only", true),
-    BooleanFilterOption("Hide", false),
-)
 
 private fun filterSchools(
     schools: List<SchoolUiModel>,
