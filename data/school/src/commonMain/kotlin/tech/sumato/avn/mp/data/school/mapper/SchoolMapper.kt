@@ -7,6 +7,8 @@ import tech.sumato.avn.mp.data.school.dto.SchoolDistrictDto
 import tech.sumato.avn.mp.data.school.dto.SchoolDto
 import tech.sumato.avn.mp.data.school.dto.SchoolImageDto
 import tech.sumato.avn.mp.data.school.dto.SchoolImage360Dto
+import tech.sumato.avn.mp.data.school.dto.SchoolProjectCategoryDto
+import tech.sumato.avn.mp.data.school.dto.SchoolProjectSchemeDto
 import tech.sumato.avn.mp.data.school.dto.SchoolRoomConditionDto
 import tech.sumato.avn.mp.domain.common.model.DistrictModel
 import tech.sumato.avn.mp.domain.school.model.SchoolAttendanceModel
@@ -18,7 +20,9 @@ import tech.sumato.avn.mp.domain.school.model.SchoolFacilityModel
 import tech.sumato.avn.mp.domain.school.model.SchoolImageModel
 import tech.sumato.avn.mp.domain.school.model.SchoolImage360Model
 import tech.sumato.avn.mp.domain.school.model.SchoolModel
+import tech.sumato.avn.mp.domain.school.model.SchoolProjectCategoryModel
 import tech.sumato.avn.mp.domain.school.model.SchoolProjectModel
+import tech.sumato.avn.mp.domain.school.model.SchoolProjectSchemeModel
 import tech.sumato.avn.mp.domain.school.model.SchoolRoomConditionModel
 import tech.sumato.avn.mp.domain.school.model.SchoolRoomCountModel
 import tech.sumato.avn.mp.domain.school.model.SchoolStaffsModel
@@ -125,14 +129,28 @@ class SchoolMapper(private val baseUrls: BaseUrls) {
                 SchoolProjectModel(
                     id = p.id,
                     name = p.name,
-                    category = p.category,
+                    category = p.category?.toDomain(),
                     status = p.status,
                     percent = p.percent,
                     allocatedAmount = p.allocatedAmount,
+                    scheme = p.scheme?.toDomain(),
+                    estimatedAmount = p.estimatedCost,
+                    financialYear = p.financialYear,
+                    workType = p.workType,
+                    subWorkType = p.subWorkType
                 )
             },
-            qrUrl = "${baseUrls.baseUrl}/school/${dto.id}/qr-scan"
-        )
+            qrUrl = "${baseUrls.baseUrl}/school/${dto.id}/qr-scan",
+
+            )
+    }
+
+    fun SchoolProjectSchemeDto.toDomain(): SchoolProjectSchemeModel {
+        return SchoolProjectSchemeModel(id = id, name = name)
+    }
+
+    fun SchoolProjectCategoryDto.toDomain(): SchoolProjectCategoryModel {
+        return SchoolProjectCategoryModel(id, name = name)
     }
 
 }

@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MapLibre Style Editor</title>
+<link href="https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.css" rel="stylesheet">
+<style>
+  :root {
+    --bg: #101418;
+    --panel: #171c22;
+    --panel2: #1d242c;
+    --border: #2a333d;
+    --text: #e6eaef;
+    --muted: #8b97a5;
+    --accent: #3b82f6;
+    --danger: #ef4444;
+    --ok: #22c55e;
+    --warn: #f59e0b;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--bg);
+  }
+  #app {
+    display: grid;
+    grid-template-rows: 48px 1fr 28px;
+    height: 100vh;
+  }
+  header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 12px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 {
+    font-size: 15px; margin: 0 12px 0 0; white-space: nowrap;
+    font-weight: 600;
+  }
+  .spacer { flex: 1; }
+  button, select, input, textarea {
+    font: inherit; color: var(--text);
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 9px;
+  }
+  button { cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.danger:hover { border-color: var(--danger); color: var(--danger); }
+  button.small { padding: 2px 7px; font-size: 12px; }
+  #status {
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 12px; font-size: 12px; color: var(--muted);
+    background: var(--panel); border-top: 1px solid var(--border);
+    white-space: nowrap; overflow: hidden;
+  }
+  #status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex-shrink: 0; }
+  #status .dot.err { background: var(--danger); }
+  #status .dot.warn { background: var(--warn); }
+  #status .count { margin-left: auto; }
+
+  main {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr) minmax(0, 1fr);
+    min-height: 0;
+  }
+  .col { display: flex; flex-direction: column; min-height: 0; }
+  .col + .col { border-left: 1px solid var(--border); }
+
+  /* left panel */
+  #left { background: var(--panel); }
+  .panel-title {
+    padding: 8px 12px; font-size: 11px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .panel-title .spacer { flex: 1; }
+  #topSettings { border-bottom: 1px solid var(--border); padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; }
+  .field { display: flex; flex-direction: column; gap: 3px; }
+  .field label { font-size: 11px; color: var(--muted); }
+  .field input, .field select, .field textarea { width: 100%; }
+  #layerList { flex: 1; overflow: auto; }
+  .layer-tools { display: flex; gap: 4px; padding: 8px 12px; flex-wrap: wrap; border-top: 1px solid var(--border); }
+  .layer-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 12px; cursor: pointer; border-left: 3px solid transparent;
+  }
+  .layer-item:hover { background: var(--panel2); }
+  .layer-item.selected { background: var(--panel2); border-left-color: var(--accent); }
+  .layer-item .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .badge {
+    font-size: 10px; padding: 1px 6px; border-radius: 4px; flex-shrink: 0;
+  }
+  .badge.fill { background: #155e75; }
+  .badge.line { background: #7c2d12; }
+  .badge.symbol { background: #4a044e; }
+  .badge.background { background: #374151; }
+  .badge.other { background: #374151; }
+  .eye { cursor: pointer; color: var(--muted); flex-shrink: 0; }
+  .eye.off { opacity: .4; }
+
+  /* center editor */
+  #center { overflow: auto; }
+  #layerMeta { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 8px; }
+  #layerMeta .field { flex: 1 1 130px; }
+  .section {
+    border-bottom: 1px solid var(--border);
+  }
+  .section > .head {
+    padding: 7px 14px; display: flex; align-items: center; gap: 8px;
+    cursor: pointer; font-weight: 600;
+  }
+  .section > .head .toggle { color: var(--muted); }
+  .section > .head .spacer { flex: 1; }
+  .section > .head .count { font-size: 11px; color: var(--muted); font-weight: 400; }
+  .section .body { padding: 6px 14px 12px; }
+  .section.collapsed .body { display: none; }
+  .prop {
+    display: grid; grid-template-columns: 150px minmax(0,1fr) 24px;
+    align-items: center; gap: 8px; padding: 4px 0;
+  }
+  .prop .key {
+    font-size: 12px; color: var(--muted);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .prop .ctrl { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .prop .ctrl input[type="text"], .prop .ctrl input[type="number"], .prop .ctrl select {
+    width: 100%; min-width: 0;
+  }
+  .prop .ctrl input[type="range"] { flex: 1; min-width: 60px; }
+  .prop .ctrl input[type="color"] { width: 44px; height: 28px; padding: 1px; flex-shrink: 0; }
+  .prop .ctrl textarea { width: 100%; min-height: 60px; font-family: ui-monospace, monospace; font-size: 12px; resize: vertical; }
+  .prop .ctrl input.err, .prop .ctrl textarea.err { border-color: var(--danger); }
+  .prop .rm { background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 0; }
+  .prop .rm:hover { color: var(--danger); }
+  .addrow { display: flex; gap: 6px; padding: 6px 0 2px; }
+  .addrow select { flex: 1; }
+  .inline-json {
+    font-size: 11px; color: var(--muted); margin-top: 2px;
+  }
+  .inline-json input { width: 100%; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  /* preview */
+  #previewCol { position: relative; }
+  #preview { position: absolute; inset: 0; }
+  #empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--muted); }
+
+  /* modal */
+  #modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,.55);
+    display: none; align-items: center; justify-content: center; z-index: 50;
+  }
+  #modal.open { display: flex; }
+  #modal .box {
+    width: min(720px, 90vw); max-height: 85vh;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    display: flex; flex-direction: column;
+  }
+  #modal .box .head { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; }
+  #modal .box .head .spacer { flex: 1; }
+  #modal textarea {
+    flex: 1; min-height: 50vh; margin: 12px 14px; border-radius: 6px;
+    font-family: ui-monospace, monospace; font-size: 12px; resize: vertical;
+  }
+  #modal .box .foot { padding: 10px 14px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+  .hint { font-size: 11px; color: var(--muted); padding: 4px 14px; }
+  .hint code { color: var(--text); }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>MapLibre Style Editor</h1>
+    <button id="btnLoad">Load from URL</button>
+    <button id="btnReset">Reset</button>
+    <div class="spacer"></div>
+    <button id="btnJson">View JSON</button>
+    <button id="btnCopy">Copy JSON</button>
+    <button id="btnDownload" class="primary">Download JSON</button>
+  </header>
+
+  <main>
+    <div class="col" id="left">
+      <div class="panel-title">Style settings</div>
+      <div id="topSettings"></div>
+
+      <div class="panel-title">
+        Layers
+        <span id="layerCount" style="font-weight:400;text-transform:none;letter-spacing:0;"></span>
+      </div>
+      <div id="layerList"></div>
+      <div class="layer-tools">
+        <button id="btnAdd" class="small">+ Add</button>
+        <button id="btnDup" class="small">Duplicate</button>
+        <button id="btnDel" class="small danger">Delete</button>
+        <button id="btnUp" class="small">↑</button>
+        <button id="btnDown" class="small">↓</button>
+      </div>
+    </div>
+
+    <div class="col" id="center">
+      <div id="layerMeta"></div>
+      <div id="propSections"></div>
+    </div>
+
+    <div class="col" id="previewCol">
+      <div id="preview"></div>
+      <div id="empty">Loading map…</div>
+    </div>
+  </main>
+
+  <div id="status">
+    <span class="dot"></span>
+    <span id="statusMsg">Loading…</span>
+    <span class="count" id="statusCount"></span>
+  </div>
+</div>
+
+<div id="modal">
+  <div class="box">
+    <div class="head">
+      <strong>Style JSON</strong>
+      <div class="spacer"></div>
+      <button id="modalClose">Close</button>
+    </div>
+    <textarea id="jsonArea" spellcheck="false"></textarea>
+    <div class="foot">
+      <span class="hint" id="jsonErr" style="margin-right:auto;color:var(--danger);"></span>
+      <button id="jsonApply">Apply</button>
+    </div>
+  </div>
+</div>
+
+<script id="default-style-json" type="application/json">
+{"version":8,"name":"style@5.7.2 flavor@dark lang@en","glyphs":"https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf","sprite":"https://protomaps.github.io/basemaps-assets/sprites/v4/dark","sources":{"protomaps":{"attribution":"<a href=\"https://github.com/protomaps/basemaps\">Protomaps</a> \u00a9 <a href=\"https://openstreetmap.org\">OpenStreetMap</a>","type":"vector","tiles":["https://api.protomaps.com/tiles/v4/{z}/{x}/{y}.mvt?key=73c45a97eddd43fb"],"maxzoom":15}},"layers":[{"id":"background","type":"background","paint":{"background-color":"#34373d"}},{"id":"earth","type":"fill","filter":["==","$type","Polygon"],"source":"protomaps","source-layer":"earth","paint":{"fill-color":"#1f1f1f"}},{"id":"landcover","type":"fill","source":"protomaps","source-layer":"landcover","paint":{"fill-color":["match",["get","kind"],"grassland","rgba(30, 41, 31, 1)","barren","rgba(38, 38, 36, 1)","urban_area","rgba(28, 28, 28, 1)","farmland","rgba(31, 36, 32, 1)","glacier","rgba(43, 43, 43, 1)","scrub","rgba(34, 36, 30, 1)","rgba(28, 41, 37, 1)"],"fill-opacity":["interpolate",["linear"],["zoom"],5,1,7,0]}},{"id":"landuse_park","type":"fill","source":"protomaps","source-layer":"landuse","filter":["in","kind","national_park","park","cemetery","protected_area","nature_reserve","forest","golf_course","wood","scrub","grassland","grass","glacier","sand","military","naval_base","airfield"],"paint":{"fill-opacity":["interpolate",["linear"],["zoom"],6,0,11,1],"fill-color":["case",["in",["get","kind"],["literal",["national_park","park","cemetery","protected_area","nature_reserve","forest","golf_course"]]],"#192a24",["==",["get","kind"],"wood"],"#202121",["in",["get","kind"],["literal",["scrub","grassland","grass"]]],"#222323",["==",["get","kind"],"glacier"],"#1c1c1c",["==",["get","kind"],"sand"],"#212123",["in",["get","kind"],["literal",["military","naval_base","airfield"]]],"#222323","#1f1f1f"]}},{"id":"landuse_urban_green","type":"fill","source":"protomaps","source-layer":"landuse","filter":["in","kind","allotments","village_green","playground"],"paint":{"fill-color":"#192a24","fill-opacity":0.7}},{"id":"landuse_hospital","type":"fill","source":"protomaps","source-layer":"landuse","filter":["==","kind","hospital"],"paint":{"fill-color":"#252424"}},{"id":"landuse_industrial","type":"fill","source":"protomaps","source-layer":"landuse","filter":["==","kind","industrial"],"paint":{"fill-color":"#222222"}},{"id":"landuse_school","type":"fill","source":"protomaps","source-layer":"landuse","filter":["in","kind","school","university","college"],"paint":{"fill-color":"#262323"}},{"id":"landuse_beach","type":"fill","source":"protomaps","source-layer":"landuse","filter":["in","kind","beach"],"paint":{"fill-color":"#28282a"}},{"id":"landuse_zoo","type":"fill","source":"protomaps","source-layer":"landuse","filter":["in","kind","zoo"],"paint":{"fill-color":"#222323"}},{"id":"landuse_aerodrome","type":"fill","source":"protomaps","source-layer":"landuse","filter":["in","kind","aerodrome"],"paint":{"fill-color":"#1e1e1e"}},{"id":"roads_runway","type":"line","source":"protomaps","source-layer":"roads","filter":["==","kind_detail","runway"],"paint":{"line-color":"#333333","line-width":["interpolate",["exponential",1.6],["zoom"],10,0,12,4,18,30]}},{"id":"roads_taxiway","type":"line","source":"protomaps","source-layer":"roads","minzoom":13,"filter":["==","kind_detail","taxiway"],"paint":{"line-color":"#333333","line-width":["interpolate",["exponential",1.6],["zoom"],13,0,13.5,1,15,6]}},{"id":"landuse_runway","type":"fill","source":"protomaps","source-layer":"landuse","filter":["any",["in","kind","runway","taxiway"]],"paint":{"fill-color":"#333333"}},{"id":"water","type":"fill","filter":["==","$type","Polygon"],"source":"protomaps","source-layer":"water","paint":{"fill-color":"#31353f"}},{"id":"water_stream","type":"line","source":"protomaps","source-layer":"water","minzoom":14,"filter":["in","kind","stream"],"paint":{"line-color":"#31353f","line-width":0.5}},{"id":"water_river","type":"line","source":"protomaps","source-layer":"water","minzoom":9,"filter":["in","kind","river"],"paint":{"line-color":"#31353f","line-width":["interpolate",["exponential",1.6],["zoom"],9,0,9.5,1,18,12]}},{"id":"landuse_pedestrian","type":"fill","source":"protomaps","source-layer":"landuse","filter":["in","kind","pedestrian","dam"],"paint":{"fill-color":"#1e1e1e"}},{"id":"landuse_pier","type":"fill","source":"protomaps","source-layer":"landuse","filter":["==","kind","pier"],"paint":{"fill-color":"#333333"}},{"id":"roads_tunnels_other_casing","type":"line","source":"protomaps","source-layer":"roads","filter":["all",["has","is_tunnel"],["in","kind","other","path"]],"paint":{"line-color":"#141414","line-gap-width":["interpolate",["exponential",1.6],["zoom"],14,0,20,7]}},{"id":"roads_tunnels_minor_casing","type":"line","source":"protomaps","source-layer":"roads","filter":["all",["has","is_tunnel"],["==","kind","minor_road"]],"paint":{"line-color":"#141414","line-dasharray":[3,2],"line-gap-width":["interpolate",["exponential",1.6],["zoom"],11,0,12.5,0.5,15,2,18,11],"line-width":["interpolate",["exponential",1.6],["zoom"],12,0,12.5,1]}},{"id":"roads_tunnels_link_casing","type":"line","source":"protomaps","source-layer":"roads","filter":["all",["has","is_tunnel"],["has","is_link"]],"paint":{"line-color":"#141414","line-dasharray":[3,2],"line-gap-width":["interpolate",["exponential",1.6],["zoom"],13,0,13.5,1,18,11],"line-width":["interpolate",["exponential",1.6],["zoom"],12,0,12.5,1]}},{"id":"roads_tunnels_major_casing","type":"line","source":"protomaps","source-layer":"roads","filter":["all",["has","is_tunnel"],["!has","is_bridge"],["==","kind","major_road"]],"paint":{"line-color":"#141414","line-dasharray":[3,2],"line-gap-width":["interpolate",["exponential",1.6],["zoom"],7,0,7.5,0.5,18,13],"line-width":["interpolate",["exponential",1.6],["zoom"],9,0,9.5,1]}},{"id":"roads_tunnels_highway_casing","type":"line","source":"protomaps","source-layer":"roads","filter":["all",["has","is_tunnel"],["!has","is_bridge"],["==","kind","highway"],["!has","is_link"]],"paint":{"line-color":"#141414","line-dasharray":[6,0.5],"line-gap-width":["interpolate",["exponential",1.6],["zoom"],3,0,3.5,0.5,18,15],"line-width":["interpolate",["exponential",1.6],["zoom"],7,0,7.5,1,20,15]}},{"id":"roads_tunnels_other","type":"line","source":"protomaps","source-layer":"roads","filter":["all",["has","is_tunnel"],["in","kind","other","path"]],"paint":{"line-color":"#292929","line-dasharray":[4.5,0.5],"line-width":["interpolate",["exponential",1.6],["zoom"],14,0,20,7]}},{"id":"roads_tunnels_minor","type":"line","source":"protomaps","source-layer":"roads","filter":["all",["has","is_tunnel"],["==","kind","minor_road"]],"paint":{"line-color":"#292929","line-width":["interpolate",["exponential",1.6],["zoom"],11,0,12.5,0.5,15,2,18,11]}},{"id":"roads_tunnels_link","type":"line","source":"protomaps","source-layer":"roads","filter":["all",["has","is_tunnel"],["has","is_link"]],"paint":{"line-color":"#292929","line-width":["interpolate",["exponential",1.6],["zoom"],13,0,13.5,1,18,11]}},{"id":"roads_tunnels_major","type":"line","source":"protomaps","source-layer":"roads","filter":["all",["has","is_tunnel"],["==","kind","major_road"]],"paint":{"line-color":"#292929","line-width":["interpolate",["exponential",1.6],["zoom"],6,0,12,1.6,15,3,18,13]}},{"id":"roads_tunnels_highway","type":"line","source":"protomaps","source-layer":"roads","filter":["all",["has","is_tunnel"],["==",["get","kind"],"highway"],["!",["has","is_link"]]],"paint":{"line-color":"#292929","line-width":["interpolate",["exponential",1.6],["zoom"],3,0,6,1.1,12,1.6,15,5,18,15]}},{"id":"buildings","type":"fill","source":"protomaps","source-layer":"buildings","filter":["in","kind","building","building_part"],"paint":{"fill-color":"#111111","fill-opacity":0.5}},{"id":"roads_pier","type":"line","source":"protomaps","source-layer":"roads","filter":["==","kind_detail","pier"],"paint":{"line-color":"#333333","line-width":["interpolate",["exponential",1.6],["zoom"],12,0,12.5,0.5,20,16]}},{"id":"roads_minor_service_casing","type":"line","source":"protomaps","source-layer":"roads","minzoom":13,"filter":["all",["!has","is_tunnel"],["!has","is_bridge"],["==","kind","minor_road"],["==","kind_detail","service"]],"paint":{"line-color":"#1f1f1f","line-gap-width":["interpolate",["exponential",1.6],["zoom"],13,0,18,8],"line-width":["interpolate",["exponential",1.6],["zoom"],13,0,13.5,0.8]}},{"id":"roads_minor_casing","type":"line","source":"protomaps","source-layer":"roads","filter":["all",["!has","is_tunnel"],["!has","is_bridge"],["==","kind","minor_road"],["!=","kind_detail","service"]],"paint":{"line-color":"#1f1f1f","line-gap-width":["interpolate",["exponential",1.6],["zoom"],11,0,12.5,0.5,15,2,18,11],"line-width":["interpolate",["exponential",1.6],["zoom"],12,0,12.5,1]}},{"id":"roads_link_casing","type":"line","source":"protomaps","source-layer":"roads","minzoom":13,"filter":["has","is_link"],"paint":{"line-color":"#1f1f1f","line-gap-width":["interpolate",["exponential",1.6],["zoom"],13,0,13.5,1,18,11],"line-width":["interpolate",["exponential",1.6],["zoom"],13,0,13.5,1.5]}},{"id":"roads_major_casing_late","type":"line","source":"protomaps","source-layer":"roads","minzoom":12,"filter":["all",["!has","is_tunnel"],["!has","is_bridge"],["==","kind","major_road"]],"paint":{"line-color":"#1f1f1f","line-gap-width":["interpolate",["exponential",1.6],["zoom"],6,0,12,1.6,15,3,18,13],"line-width":["interpolate",["exponential",1.6],["zoom"],9,0,9.5,1]}},{"id":"roads_highway_casing_late","type":"line","source":"protomaps","source-layer":"roads","minzoom":12,"filter":["all",["!has","is_tunnel"],["!has","is_bridge"],["==","kind","highway"],["!has","is_link"]],"paint":{"line-color":"#1f1f1f","line-gap-width":["interpolate",["exponential",1.6],["zoom"],3,0,3.5,0.5,18,15],"line-width":["interpolate",["exponential",1.6],["zoom"],7,0,7.5,1,20,15]}},{"id":"roads_other","type":"line","source":"protomaps","source-layer":"roads","filter":["all",["!has","is_tunnel"],["!has","is_bridge"],["in","kind","other","path"],["!=","kind_detail","pier"]],"paint":{"line-color":"#333333","line-width":["interpolate",["exponential",1.6],["zoom"],14,0.5,20,12]}},{"id":"roads_link","type":"line","source":"protomaps","source-layer":"roads","filter":["has","is_link"],"paint":{"line-color":"#3d3d3d","line-width":["interpolate",["exponential",1.6],["zoom"],13,0,13.5,1,18,11]}},{"id":"roads_minor_service","type":"line","source":"protomaps","source-layer":"roads","filter":["all",["!has","is_tunnel"],["!has","is_bridge"],["==","kind","minor_road"],["==","kind_detail","service"]],"paint":{"line-color":"#333333","line-width":["interpolate",["exponential",1.6],["zoom"],13,0,18,8]}},{"id":"roads_minor","type":"line","source":"protomaps","source-layer":"roads","filter":["all",["!has","is_tunnel"],["!has","is_bridge"],["==","kind","minor_road"],["!=","kind_detail","service"]],"paint":{"line-color":["interpolate",["exponential",1.6],["zoom"],11,"#3d3d3d",16,"#333333"],"line-width":["interpolate",["exponential",1.6],["zoom"],11,0,12.5,0.5,15,2,18,11]}},{"id":"roads_major_casing_early","type":"line","source":"protomaps","source-layer":"roads","maxzoom":12,"filter":["all",["!has","is_tunnel"],["!has","is_bridge"],["==","kind","major_road"]],"paint":{"line-color":"#1f1f1f","line-gap-width":["interpolate",["exponential",1.6],["zoom"],7,0,7.5,0.5,18,13],"line-width":["interpolate",["exponential",1.6],["zoom"],9,0,9.5,1]}},{"id":"roads_major","type":"line","source":"protomaps","source-layer":"roads","filter":["all",["!has","is_tunnel"],["!has","is_bridge"],["==","kind","major_road"]],"paint":{"line-color":"#3d3d3d","line-width":["interpolate",["exponential",1.6],["zoom"],6,0,12,1.6,15,3,18,13]}},{"id":"roads_highway_casing_early","type":"line","source":"protomaps","source-layer":"roads","maxzoom":12,"filter":["all",["!has","is_tunnel"],["!has","is_bridge"],["==","kind","highway"],["!has","is_link"]],"paint":{"line-color":"#1f1f1f","line-gap-width":["interpolate",["exponential",1.6],["zoom"],3,0,3.5,0.5,18,15],"line-width":["interpolate",["exponential",1.6],["zoom"],7,0,7.5,1]}},{"id":"roads_highway","type":"line","source":"protomaps","source-layer":"roads","filter":["all",["!has","is_tunnel"],["!has","is_bridge"],["==","kind","highway"],["!has","is_link"]],"paint":{"line-color":"#474747","line-width":["interpolate",["exponential",1.6],["zoom"],3,0,6,1.1,12,1.6,15,5,18,15]}},{"id":"roads_rail","type":"line","source":"protomaps","source-layer":"roads","filter":["==","kind","rail"],"paint":{"line-dasharray":[0.3,0.75],"line-opacity":0.5,"line-color":"#000000","line-width":["interpolate",["exponential",1.6],["zoom"],3,0,6,0.15,18,9]}},{"id":"boundaries_country","type":"line","source":"protomaps","source-layer":"boundaries","filter":["<=","kind_detail",2],"paint":{"line-color":"#5b6374","line-width":0.7,"line-dasharray":["step",["zoom"],["literal",[2,0]],4,["literal",[2,1]]]}},{"id":"boundaries","type":"line","source":"protomaps","source-layer":"boundaries","filter":[">","kind_detail",2],"paint":{"line-color":"#5b6374","line-width":0.4,"line-dasharray":["step",["zoom"],["literal",[2,0]],4,["literal",[2,1]]]}},{"id":"roads_bridges_other_casing","type":"line","source":"protomaps","source-layer":"roads","minzoom":12,"filter":["all",["has","is_bridge"],["in","kind","other","path"]],"paint":{"line-color":"#2b2b2b","line-gap-width":["interpolate",["exponential",1.6],["zoom"],14,0,20,7]}},{"id":"roads_bridges_link_casing","type":"line","source":"protomaps","source-layer":"roads","minzoom":12,"filter":["all",["has","is_bridge"],["has","is_link"]],"paint":{"line-color":"#1f1f1f","line-gap-width":["interpolate",["exponential",1.6],["zoom"],13,0,13.5,1,18,11],"line-width":["interpolate",["exponential",1.6],["zoom"],12,0,12.5,1.5]}},{"id":"roads_bridges_minor_casing","type":"line","source":"protomaps","source-layer":"roads","minzoom":12,"filter":["all",["has","is_bridge"],["==","kind","minor_road"]],"paint":{"line-color":"#1f1f1f","line-gap-width":["interpolate",["exponential",1.6],["zoom"],11,0,12.5,0.5,15,2,18,11],"line-width":["interpolate",["exponential",1.6],["zoom"],13,0,13.5,0.8]}},{"id":"roads_bridges_major_casing","type":"line","source":"protomaps","source-layer":"roads","minzoom":12,"filter":["all",["has","is_bridge"],["==","kind","major_road"]],"paint":{"line-color":"#1f1f1f","line-gap-width":["interpolate",["exponential",1.6],["zoom"],7,0,7.5,0.5,18,10],"line-width":["interpolate",["exponential",1.6],["zoom"],9,0,9.5,1.5]}},{"id":"roads_bridges_other","type":"line","source":"protomaps","source-layer":"roads","minzoom":12,"filter":["all",["has","is_bridge"],["in","kind","other","path"]],"paint":{"line-color":"#333333","line-dasharray":[2,1],"line-width":["interpolate",["exponential",1.6],["zoom"],14,0,20,7]}},{"id":"roads_bridges_minor","type":"line","source":"protomaps","source-layer":"roads","minzoom":12,"filter":["all",["has","is_bridge"],["==","kind","minor_road"]],"paint":{"line-color":"#333333","line-width":["interpolate",["exponential",1.6],["zoom"],11,0,12.5,0.5,15,2,18,11]}},{"id":"roads_bridges_link","type":"line","source":"protomaps","source-layer":"roads","minzoom":12,"filter":["all",["has","is_bridge"],["has","is_link"]],"paint":{"line-color":"#333333","line-width":["interpolate",["exponential",1.6],["zoom"],13,0,13.5,1,18,11]}},{"id":"roads_bridges_major","type":"line","source":"protomaps","source-layer":"roads","minzoom":12,"filter":["all",["has","is_bridge"],["==","kind","major_road"]],"paint":{"line-color":"#3d3d3d","line-width":["interpolate",["exponential",1.6],["zoom"],6,0,12,1.6,15,3,18,13]}},{"id":"roads_bridges_highway_casing","type":"line","source":"protomaps","source-layer":"roads","minzoom":12,"filter":["all",["has","is_bridge"],["==","kind","highway"],["!has","is_link"]],"paint":{"line-color":"#1f1f1f","line-gap-width":["interpolate",["exponential",1.6],["zoom"],3,0,3.5,0.5,18,15],"line-width":["interpolate",["exponential",1.6],["zoom"],7,0,7.5,1,20,15]}},{"id":"roads_bridges_highway","type":"line","source":"protomaps","source-layer":"roads","filter":["all",["has","is_bridge"],["==","kind","highway"],["!has","is_link"]],"paint":{"line-color":"#474747","line-width":["interpolate",["exponential",1.6],["zoom"],3,0,6,1.1,12,1.6,15,5,18,15]}},{"id":"address_label","type":"symbol","source":"protomaps","source-layer":"buildings","minzoom":18,"filter":["==","kind","address"],"layout":{"symbol-placement":"point","text-font":["Noto Sans Italic"],"text-field":["get","addr_housenumber"],"text-size":12},"paint":{"text-color":"#525252","text-halo-color":"#1f1f1f","text-halo-width":1}},{"id":"water_waterway_label","type":"symbol","source":"protomaps","source-layer":"water","minzoom":13,"filter":["in","kind","river","stream"],"layout":{"symbol-placement":"line","text-font":["Noto Sans Italic"],"text-field":["case",["all",["any",["has","name"],["has","pgf:name"]],["!",["any",["has","name2"],["has","pgf:name2"]]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["has","script"],["case",["any",["is-supported-script",["get","name"]],["has","pgf:name"]],["format",["coalesce",["get","name:en"],["get","name:en"]],{},"\n",{},["case",["all",["!",["has","name:en"]],["has","name:en"],["!",["has","script"]]],"",["coalesce",["get","pgf:name"],["get","name"]]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["get","name:en"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{}]],["all",["any",["has","name"],["has","pgf:name"]],["any",["has","name2"],["has","pgf:name2"]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["all",["has","script"],["has","script2"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["has","script2"],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]],["case",["all",["has","script"],["has","script2"],["has","script3"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["!",["has","script"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["!",["has","script2"]],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name3"],["get","name3"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]]],"text-size":12,"text-letter-spacing":0.2},"paint":{"text-color":"#717784","text-halo-color":"#31353f","text-halo-width":1}},{"id":"roads_oneway","type":"symbol","source":"protomaps","source-layer":"roads","minzoom":16,"filter":["==",["get","oneway"],"yes"],"layout":{"symbol-placement":"line","icon-image":"arrow","icon-rotate":90,"symbol-spacing":100}},{"id":"roads_labels_minor","type":"symbol","source":"protomaps","source-layer":"roads","minzoom":15,"filter":["in","kind","minor_road","other","path"],"layout":{"symbol-sort-key":["get","min_zoom"],"symbol-placement":"line","text-font":["Noto Sans Regular"],"text-field":["case",["all",["any",["has","name"],["has","pgf:name"]],["!",["any",["has","name2"],["has","pgf:name2"]]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["has","script"],["case",["any",["is-supported-script",["get","name"]],["has","pgf:name"]],["format",["coalesce",["get","name:en"],["get","name:en"]],{},"\n",{},["case",["all",["!",["has","name:en"]],["has","name:en"],["!",["has","script"]]],"",["coalesce",["get","pgf:name"],["get","name"]]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["get","name:en"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{}]],["all",["any",["has","name"],["has","pgf:name"]],["any",["has","name2"],["has","pgf:name2"]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["all",["has","script"],["has","script2"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["has","script2"],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]],["case",["all",["has","script"],["has","script2"],["has","script3"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["!",["has","script"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["!",["has","script2"]],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name3"],["get","name3"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]]],"text-size":12},"paint":{"text-color":"#525252","text-halo-color":"#1f1f1f","text-halo-width":1}},{"id":"water_label_ocean","type":"symbol","source":"protomaps","source-layer":"water","filter":["in","kind","sea","ocean","bay","strait","fjord"],"layout":{"text-font":["Noto Sans Italic"],"text-field":["case",["all",["any",["has","name"],["has","pgf:name"]],["!",["any",["has","name2"],["has","pgf:name2"]]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["has","script"],["case",["any",["is-supported-script",["get","name"]],["has","pgf:name"]],["format",["coalesce",["get","name:en"],["get","name:en"]],{},"\n",{},["case",["all",["!",["has","name:en"]],["has","name:en"],["!",["has","script"]]],"",["coalesce",["get","pgf:name"],["get","name"]]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["get","name:en"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{}]],["all",["any",["has","name"],["has","pgf:name"]],["any",["has","name2"],["has","pgf:name2"]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["all",["has","script"],["has","script2"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["has","script2"],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]],["case",["all",["has","script"],["has","script2"],["has","script3"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["!",["has","script"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["!",["has","script2"]],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name3"],["get","name3"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]]],"text-size":["interpolate",["linear"],["zoom"],3,10,10,12],"text-letter-spacing":0.1,"text-max-width":9,"text-transform":"uppercase"},"paint":{"text-color":"#717784","text-halo-width":1,"text-halo-color":"#31353f"}},{"id":"earth_label_islands","type":"symbol","source":"protomaps","source-layer":"earth","filter":["in","kind","island"],"layout":{"text-font":["Noto Sans Italic"],"text-field":["case",["all",["any",["has","name"],["has","pgf:name"]],["!",["any",["has","name2"],["has","pgf:name2"]]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["has","script"],["case",["any",["is-supported-script",["get","name"]],["has","pgf:name"]],["format",["coalesce",["get","name:en"],["get","name:en"]],{},"\n",{},["case",["all",["!",["has","name:en"]],["has","name:en"],["!",["has","script"]]],"",["coalesce",["get","pgf:name"],["get","name"]]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["get","name:en"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{}]],["all",["any",["has","name"],["has","pgf:name"]],["any",["has","name2"],["has","pgf:name2"]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["all",["has","script"],["has","script2"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["has","script2"],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]],["case",["all",["has","script"],["has","script2"],["has","script3"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["!",["has","script"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["!",["has","script2"]],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name3"],["get","name3"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]]],"text-size":10,"text-letter-spacing":0.1,"text-max-width":8},"paint":{"text-color":"#525252","text-halo-color":"#1f1f1f","text-halo-width":1}},{"id":"water_label_lakes","type":"symbol","source":"protomaps","source-layer":"water","filter":["in","kind","lake","water"],"layout":{"text-font":["Noto Sans Italic"],"text-field":["case",["all",["any",["has","name"],["has","pgf:name"]],["!",["any",["has","name2"],["has","pgf:name2"]]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["has","script"],["case",["any",["is-supported-script",["get","name"]],["has","pgf:name"]],["format",["coalesce",["get","name:en"],["get","name:en"]],{},"\n",{},["case",["all",["!",["has","name:en"]],["has","name:en"],["!",["has","script"]]],"",["coalesce",["get","pgf:name"],["get","name"]]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["get","name:en"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{}]],["all",["any",["has","name"],["has","pgf:name"]],["any",["has","name2"],["has","pgf:name2"]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["all",["has","script"],["has","script2"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["has","script2"],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]],["case",["all",["has","script"],["has","script2"],["has","script3"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["!",["has","script"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["!",["has","script2"]],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name3"],["get","name3"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]]],"text-size":["interpolate",["linear"],["zoom"],3,10,6,12,10,12],"text-letter-spacing":0.1,"text-max-width":9},"paint":{"text-color":"#717784","text-halo-color":"#31353f","text-halo-width":1}},{"id":"roads_shields","type":"symbol","source":"protomaps","source-layer":"roads","filter":["all",["in",["get","kind"],["literal",["highway","major_road"]]],["has","shield_text"],["<=",["length",["get","shield_text"]],5]],"layout":{"icon-image":["match",["get","network"],"US:I",["concat","US:I-",["length",["get","shield_text"]],"char"],"NL:S-road",["concat","NL:S-road-",["length",["get","shield_text"]],"char"],["concat","generic_shield-",["length",["get","shield_text"]],"char"]],"text-field":["get","shield_text"],"text-font":["Noto Sans Medium"],"text-size":8,"icon-size":0.8,"symbol-placement":"line","icon-rotation-alignment":"viewport","text-rotation-alignment":"viewport"},"paint":{"text-color":"#666666"}},{"id":"roads_labels_major","type":"symbol","source":"protomaps","source-layer":"roads","minzoom":11,"filter":["in","kind","highway","major_road"],"layout":{"symbol-sort-key":["get","min_zoom"],"symbol-placement":"line","text-font":["Noto Sans Regular"],"text-field":["case",["all",["any",["has","name"],["has","pgf:name"]],["!",["any",["has","name2"],["has","pgf:name2"]]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["has","script"],["case",["any",["is-supported-script",["get","name"]],["has","pgf:name"]],["format",["coalesce",["get","name:en"],["get","name:en"]],{},"\n",{},["case",["all",["!",["has","name:en"]],["has","name:en"],["!",["has","script"]]],"",["coalesce",["get","pgf:name"],["get","name"]]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["get","name:en"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{}]],["all",["any",["has","name"],["has","pgf:name"]],["any",["has","name2"],["has","pgf:name2"]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["all",["has","script"],["has","script2"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["has","script2"],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]],["case",["all",["has","script"],["has","script2"],["has","script3"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["!",["has","script"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["!",["has","script2"]],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name3"],["get","name3"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]]],"text-size":12},"paint":{"text-color":"#666666","text-halo-color":"#1f1f1f","text-halo-width":1}},{"id":"pois","type":"symbol","source":"protomaps","source-layer":"pois","filter":["all",["in",["get","kind"],["literal",["beach","forest","marina","park","peak","zoo","garden","bench","aerodrome","station","bus_stop","ferry_terminal","stadium","university","library","school","animal","toilets","drinking_water","post_office","building","townhall","restaurant","fast_food","cafe","bar","supermarket","convenience","books","beauty","electronics","clothes","attraction","museum","theatre","artwork"]]],[">=",["zoom"],["+",["get","min_zoom"],0]]],"layout":{"icon-image":["match",["get","kind"],"station","train_station",["get","kind"]],"text-font":["Noto Sans Regular"],"text-justify":"auto","text-field":["case",["all",["any",["has","name"],["has","pgf:name"]],["!",["any",["has","name2"],["has","pgf:name2"]]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["has","script"],["case",["any",["is-supported-script",["get","name"]],["has","pgf:name"]],["format",["coalesce",["get","name:en"],["get","name:en"]],{},"\n",{},["case",["all",["!",["has","name:en"]],["has","name:en"],["!",["has","script"]]],"",["coalesce",["get","pgf:name"],["get","name"]]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["get","name:en"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{}]],["all",["any",["has","name"],["has","pgf:name"]],["any",["has","name2"],["has","pgf:name2"]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["all",["has","script"],["has","script2"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["has","script2"],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]],["case",["all",["has","script"],["has","script2"],["has","script3"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["!",["has","script"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["!",["has","script2"]],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name3"],["get","name3"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]]],"text-size":["interpolate",["linear"],["zoom"],17,10,19,16],"text-max-width":8,"text-offset":[1.1,0],"text-variable-anchor":["left","right"]},"paint":{"text-color":["case",["in",["get","kind"],["literal",["beach","forest","marina","park","peak","zoo","garden","bench"]]],"#30C573",["in",["get","kind"],["literal",["aerodrome","station","bus_stop","ferry_terminal"]]],"#2B5CEA",["in",["get","kind"],["literal",["stadium","university","library","school","animal","toilets","drinking_water","post_office","building","townhall"]]],"#93939F",["in",["get","kind"],["literal",["supermarket","convenience","books","beauty","electronics","clothes"]]],"#4299BB",["in",["get","kind"],["literal",["restaurant","fast_food","cafe","bar"]]],"#F19B6E",["in",["get","kind"],["literal",["attraction","museum","theatre","artwork"]]],"#EF56BA","#1f1f1f"],"text-halo-color":"#1f1f1f","text-halo-width":1}},{"id":"places_subplace","type":"symbol","source":"protomaps","source-layer":"places","filter":["in","kind","neighbourhood","macrohood"],"layout":{"symbol-sort-key":["case",["has","sort_key"],["get","sort_key"],["get","min_zoom"]],"text-field":["case",["all",["any",["has","name"],["has","pgf:name"]],["!",["any",["has","name2"],["has","pgf:name2"]]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["has","script"],["case",["any",["is-supported-script",["get","name"]],["has","pgf:name"]],["format",["coalesce",["get","name:en"],["get","name:en"]],{},"\n",{},["case",["all",["!",["has","name:en"]],["has","name:en"],["!",["has","script"]]],"",["coalesce",["get","pgf:name"],["get","name"]]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["get","name:en"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{}]],["all",["any",["has","name"],["has","pgf:name"]],["any",["has","name2"],["has","pgf:name2"]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["all",["has","script"],["has","script2"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["has","script2"],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]],["case",["all",["has","script"],["has","script2"],["has","script3"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["!",["has","script"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["!",["has","script2"]],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name3"],["get","name3"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]]],"text-font":["Noto Sans Regular"],"text-max-width":7,"text-letter-spacing":0.1,"text-padding":["interpolate",["linear"],["zoom"],5,2,8,4,12,18,15,20],"text-size":["interpolate",["exponential",1.2],["zoom"],11,8,14,14,18,24],"text-transform":"uppercase"},"paint":{"text-color":"#525252","text-halo-color":"#1f1f1f","text-halo-width":1}},{"id":"places_region","type":"symbol","source":"protomaps","source-layer":"places","filter":["==","kind","region"],"layout":{"symbol-sort-key":["get","sort_key"],"text-field":["step",["zoom"],["coalesce",["get","ref:en"],["get","ref"]],6,["case",["all",["any",["has","name"],["has","pgf:name"]],["!",["any",["has","name2"],["has","pgf:name2"]]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["has","script"],["case",["any",["is-supported-script",["get","name"]],["has","pgf:name"]],["format",["coalesce",["get","name:en"],["get","name:en"]],{},"\n",{},["case",["all",["!",["has","name:en"]],["has","name:en"],["!",["has","script"]]],"",["coalesce",["get","pgf:name"],["get","name"]]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["get","name:en"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{}]],["all",["any",["has","name"],["has","pgf:name"]],["any",["has","name2"],["has","pgf:name2"]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["all",["has","script"],["has","script2"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["has","script2"],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]],["case",["all",["has","script"],["has","script2"],["has","script3"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["!",["has","script"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["!",["has","script2"]],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name3"],["get","name3"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]]]],"text-font":["Noto Sans Regular"],"text-size":["interpolate",["linear"],["zoom"],3,11,7,16],"text-radial-offset":0.2,"text-anchor":"center","text-transform":"uppercase"},"paint":{"text-color":"#3d3d3d","text-halo-color":"#1f1f1f","text-halo-width":1}},{"id":"places_locality","type":"symbol","source":"protomaps","source-layer":"places","filter":["==","kind","locality"],"layout":{"icon-image":["step",["zoom"],["case",["==",["get","capital"],"yes"],"capital","townspot"],8,""],"icon-size":0.7,"text-field":["case",["all",["any",["has","name"],["has","pgf:name"]],["!",["any",["has","name2"],["has","pgf:name2"]]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["has","script"],["case",["any",["is-supported-script",["get","name"]],["has","pgf:name"]],["format",["coalesce",["get","name:en"],["get","name:en"]],{},"\n",{},["case",["all",["!",["has","name:en"]],["has","name:en"],["!",["has","script"]]],"",["coalesce",["get","pgf:name"],["get","name"]]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["get","name:en"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{}]],["all",["any",["has","name"],["has","pgf:name"]],["any",["has","name2"],["has","pgf:name2"]],["!",["any",["has","name3"],["has","pgf:name3"]]]],["case",["all",["has","script"],["has","script2"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["has","script2"],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]],["case",["all",["has","script"],["has","script2"],["has","script3"]],["format",["get","name:en"],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["case",["!",["has","script"]],["format",["coalesce",["get","name:en"],["get","pgf:name"],["get","name"]],{},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["!",["has","script2"]],["format",["coalesce",["get","name:en"],["get","pgf:name2"],["get","name2"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name3"],["get","name3"]],{"text-font":["case",["==",["get","script3"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}],["format",["coalesce",["get","name:en"],["get","pgf:name3"],["get","name3"]],{},"\n",{},["coalesce",["get","pgf:name"],["get","name"]],{"text-font":["case",["==",["get","script"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]},"\n",{},["coalesce",["get","pgf:name2"],["get","name2"]],{"text-font":["case",["==",["get","script2"],"Devanagari"],["literal",["Noto Sans Devanagari Regular v1"]],["literal",["Noto Sans Regular"]]]}]]]],"text-font":["case",["<=",["get","min_zoom"],5],["literal",["Noto Sans Medium"]],["literal",["Noto Sans Regular"]]],"symbol-sort-key":["case",["has","sort_key"],["get","sort_key"],["get","min_zoom"]],"text-padding":["interpolate",["linear"],["zoom"],5,3,8,7,12,11],"text-size":["interpolate",["linear"],["zoom"],2,["case",["<",["get","population_rank"],13],8,[">=",["get","population_rank"],13],13,0],4,["case",["<",["get","population_rank"],13],10,[">=",["get","population_rank"],13],15,0],6,["case",["<",["get","population_rank"],12],11,[">=",["get","population_rank"],12],17,0],8,["case",["<",["get","population_rank"],11],11,[">=",["get","population_rank"],11],18,0],10,["case",["<",["get","population_rank"],9],12,[">=",["get","population_rank"],9],20,0],15,["case",["<",["get","population_rank"],8],12,[">=",["get","population_rank"],8],22,0]],"icon-padding":["interpolate",["linear"],["zoom"],0,0,8,4,10,8,12,6,22,2],"text-justify":"auto","text-variable-anchor":["step",["zoom"],["literal",["bottom","left","right","top"]],8,["literal",["center"]]],"text-radial-offset":0.3},"paint":{"text-color":"#7a7a7a","text-halo-color":"#212121","text-halo-width":1}},{"id":"places_country","type":"symbol","source":"protomaps","source-layer":"places","filter":["==","kind","country"],"layout":{"symbol-sort-key":["case",["has","sort_key"],["get","sort_key"],["get","min_zoom"]],"text-field":["format",["coalesce",["get","name:en"],["get","name:en"]],{}],"text-font":["Noto Sans Medium"],"text-size":["interpolate",["linear"],["zoom"],2,["case",["<",["get","population_rank"],10],8,[">=",["get","population_rank"],10],12,0],6,["case",["<",["get","population_rank"],8],10,[">=",["get","population_rank"],8],18,0],8,["case",["<",["get","population_rank"],7],11,[">=",["get","population_rank"],7],20,0]],"icon-padding":["interpolate",["linear"],["zoom"],0,2,14,2,16,20,17,2,22,2],"text-transform":"uppercase"},"paint":{"text-color":"#5c5c5c","text-halo-color":"#1f1f1f","text-halo-width":1}}]}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
+<script>
+"use strict";
+
+const DEFAULT_STYLE_URL = "https://api.protomaps.com/styles/v5/dark/en.json?key=73c45a97eddd43fb";
+const DEFAULT_CENTER = [93.6, 27.08];
+const DEFAULT_ZOOM = 7.5;
+
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
+const esc = (s) => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+
+let style = null;
+let selectedLayerId = null;
+let searchText = "";
+let typeFilter = "all";
+let map = null;
+let mapReady = false;
+let debounceTimer = null;
+let defaultStyle = null;
+
+/* ---------- property metadata (style-spec-ish) ---------- */
+
+const ENUMS = {
+  "symbol-placement": ["point","line","line-center"],
+  "text-anchor": ["center","left","right","top","bottom","top-left","top-right","bottom-left","bottom-right"],
+  "text-justify": ["auto","left","right","center"],
+  "text-transform": ["none","uppercase","lowercase"],
+  "text-rotation-alignment": ["map","viewport","auto"],
+  "icon-rotation-alignment": ["map","viewport","auto"],
+  "icon-pitch-alignment": ["map","viewport","auto"],
+  "text-pitch-alignment": ["map","viewport","auto"],
+  "text-variable-anchor": ["center","left","right","top","bottom","top-left","top-right","bottom-left","bottom-right"],
+  "visibility": ["visible","none"],
+  "line-cap": ["butt","round","square"],
+  "line-join": ["bevel","round","miter"],
+};
+
+const PAINT_DEFAULTS = {
+  "fill-color": ["#888888","color"], "fill-opacity": [1,"number"], "fill-outline-color": ["#888888","color"],
+  "fill-sort-key": [0,"number"], "fill-pattern": ["","text"],
+  "line-color": ["#888888","color"], "line-opacity": [1,"number"], "line-width": [1,"number"],
+  "line-gap-width": [0,"number"], "line-blur": [0,"number"], "line-offset": [0,"number"],
+  "line-dasharray": ["","array"],
+  "background-color": ["#333333","color"], "background-opacity": [1,"number"],
+  "text-color": ["#ffffff","color"], "text-opacity": [1,"number"],
+  "text-halo-color": ["rgba(0,0,0,1)","color"], "text-halo-width": [0,"number"], "text-halo-blur": [0,"number"],
+  "icon-color": ["#ffffff","color"], "icon-opacity": [1,"number"],
+  "icon-halo-color": ["rgba(0,0,0,1)","color"], "icon-halo-width": [0,"number"],
+  "circle-radius": [5,"number"], "circle-color": ["#888888","color"], "circle-opacity": [1,"number"],
+  "circle-stroke-color": ["#000000","color"], "circle-stroke-width": [0,"number"],
+};
+
+const LAYOUT_DEFAULTS = {
+  "visibility": ["visible","enum"],
+  "symbol-placement": ["point","enum"], "symbol-spacing": [250,"number"], "symbol-sort-key": [0,"number"],
+  "text-field": ["","text"], "text-size": [16,"number"], "text-font": ["","array"],
+  "text-anchor": ["center","enum"], "text-justify": ["auto","enum"], "text-transform": ["none","enum"],
+  "text-letter-spacing": [0,"number"], "text-line-height": [1.2,"number"], "text-max-width": [10,"number"],
+  "text-max-angle": [45,"number"], "text-rotate": [0,"number"], "text-padding": [2,"number"],
+  "text-radial-offset": [0,"number"], "text-variable-anchor": ["","array"],
+  "text-rotation-alignment": ["auto","enum"], "text-pitch-alignment": ["auto","enum"],
+  "icon-image": ["","text"], "icon-size": [1,"number"], "icon-padding": [2,"number"],
+  "icon-rotate": [0,"number"], "icon-rotation-alignment": ["auto","enum"], "icon-pitch-alignment": ["auto","enum"],
+  "icon-text-fit": ["none","enum"], "line-cap": ["round","enum"], "line-join": ["round","enum"],
+  "line-miter-limit": [2,"number"], "line-round-limit": [1.05,"number"],
+};
+
+function paintKeysFor(type) {
+  const base = ["fill-color","fill-opacity","line-color","line-opacity","line-width",
+    "background-color","background-opacity","text-color","text-halo-color","text-halo-width",
+    "circle-color","circle-opacity","circle-radius"];
+  return Object.keys(PAINT_DEFAULTS).filter(k => base.includes(k) || k.endsWith("-color") || k.endsWith("-opacity") || k.includes(type));
+}
+function layoutKeysFor(type) {
+  return Object.keys(LAYOUT_DEFAULTS).filter(k => LAYOUT_DEFAULTS[k][1] === "enum" || true);
+}
+
+/* ---------- state helpers ---------- */
+
+function deepCopy(o) { return JSON.parse(JSON.stringify(o)); }
+function layerIndex(id) { return style.layers.findIndex(l => l.id === id); }
+function selectedIndex() { return layerIndex(selectedLayerId); }
+
+function status(msg, kind) {
+  const dot = $("#status .dot");
+  $("#statusMsg").textContent = msg;
+  dot.className = "dot" + (kind === "err" ? " err" : kind === "warn" ? " warn" : "");
+}
+
+function schedulePreview() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(updatePreview, 350);
+}
+
+function updatePreview() {
+  if (!mapReady || !style) return;
+  try {
+    map.setStyle(deepCopy(style));
+    status("Preview updated");
+  } catch (e) {
+    status("Style error: " + e.message, "err");
+  }
+}
+
+/* ---------- rendering: top settings + sources ---------- */
+
+function renderTopSettings() {
+  const box = $("#topSettings");
+  if (!style) { box.innerHTML = ""; return; }
+  box.innerHTML = `
+    <div class="field"><label>Name</label><input id="tName" value="${esc(style.name || "")}"></div>
+    <div class="field"><label>Glyphs URL</label><input id="tGlyphs" value="${esc(style.glyphs || "")}"></div>
+    <div class="field"><label>Sprite URL</label><input id="tSprite" value="${esc(style.sprite || "")}"></div>
+    ${Object.entries(style.sources || {}).map(([id, src]) => `
+      <div class="field"><label>Source · ${esc(id)}</label>
+        <input class="src-url" data-id="${esc(id)}" value="${esc(src.url || "")}" placeholder="style URL">
+        <input class="src-tiles" data-id="${esc(id)}" value="${esc((src.tiles || []).join("\n"))}" placeholder="tiles (one per line)">
+        <input class="src-maxzoom" data-id="${esc(id)}" type="number" value="${esc(src.maxzoom ?? "")}" placeholder="maxzoom">
+      </div>`).join("")}
+  `;
+  const onUrl = (e) => { const src = style.sources[e.target.dataset.id]; if (src) src.url = e.target.value || undefined; schedulePreview(); };
+  const onTiles = (e) => { const src = style.sources[e.target.dataset.id]; if (src) { src.tiles = e.target.value.split("\n").map(s => s.trim()).filter(Boolean); schedulePreview(); } };
+  const onMaxzoom = (e) => { const src = style.sources[e.target.dataset.id]; if (src) src.maxzoom = e.target.value === "" ? undefined : Number(e.target.value); schedulePreview(); };
+  const onName = (e) => { style.name = e.target.value; };
+  const onGlyphs = (e) => { style.glyphs = e.target.value; schedulePreview(); };
+  const onSprite = (e) => { style.sprite = e.target.value; schedulePreview(); };
+  $("#tName").oninput = onName;
+  $("#tGlyphs").oninput = onGlyphs;
+  $("#tSprite").oninput = onSprite;
+  $$(".src-url").forEach(el => el.oninput = onUrl);
+  $$(".src-tiles").forEach(el => el.oninput = onTiles);
+  $$(".src-maxzoom").forEach(el => el.oninput = onMaxzoom);
+}
+
+/* ---------- rendering: layer list ---------- */
+
+function renderLayerList() {
+  const list = $("#layerList");
+  if (!style) { list.innerHTML = ""; return; }
+  const q = searchText.toLowerCase();
+  const filtered = style.layers.filter(l =>
+    (typeFilter === "all" || l.type === typeFilter) &&
+    (!q || l.id.toLowerCase().includes(q))
+  );
+  $("#layerCount").textContent = `${filtered.length}/${style.layers.length}`;
+  list.innerHTML = filtered.map(l => {
+    const selected = l.id === selectedLayerId ? " selected" : "";
+    const vis = (l.layout && l.layout.visibility === "none") ? " off" : "";
+    return `<div class="layer-item${selected}" data-id="${esc(l.id)}">
+      <span class="badge ${esc(l.type)}">${esc(l.type)}</span>
+      <span class="name">${esc(l.id)}</span>
+      <span class="eye${vis}" data-vis="${esc(l.id)}" title="Toggle visibility">👁</span>
+    </div>`;
+  }).join("");
+  $$(".layer-item").forEach(el => el.onclick = () => selectLayer(el.dataset.id));
+  $$(".eye").forEach(el => el.onclick = (e) => {
+    e.stopPropagation();
+    const l = style.layers.find(x => x.id === el.dataset.vis);
+    if (!l) return;
+    if (!l.layout) l.layout = {};
+    l.layout.visibility = (l.layout.visibility === "none") ? "visible" : "none";
+    renderLayerList();
+    if (l.id === selectedLayerId) renderLayerMeta();
+    schedulePreview();
+  });
+}
+
+function selectLayer(id) {
+  selectedLayerId = id;
+  renderLayerList();
+  renderLayerMeta();
+  renderSections();
+}
+
+/* ---------- rendering: layer meta ---------- */
+
+function renderLayerMeta() {
+  const box = $("#layerMeta");
+  const i = selectedIndex();
+  if (i < 0) { box.innerHTML = '<div class="hint">Select a layer on the left to edit it.</div>'; return; }
+  const l = style.layers[i];
+  box.innerHTML = `
+    <div class="field" style="flex:2"><label>ID</label><input id="mId" value="${esc(l.id)}"></div>
+    <div class="field"><label>Type</label><select id="mType">${["background","fill","line","symbol","circle","raster","fill-extrusion","hillshade","heatmap"].map(t => `<option ${t===l.type?"selected":""}>${t}</option>`).join("")}</select></div>
+    <div class="field"><label>Source</label><input id="mSource" value="${esc(l.source || "")}"></div>
+    <div class="field"><label>Source-layer</label><input id="mSourcelayer" value="${esc(l["source-layer"] || "")}"></div>
+    <div class="field"><label>Min zoom</label><input id="mMin" type="number" value="${esc(l.minzoom ?? "")}"></div>
+    <div class="field"><label>Max zoom</label><input id="mMax" type="number" value="${esc(l.maxzoom ?? "")}"></div>
+  `;
+  $("#mId").onchange = (e) => { const old = l.id; l.id = e.target.value; selectedLayerId = l.id; renderLayerList(); status("Layer renamed: " + old + " → " + l.id); };
+  $("#mType").onchange = (e) => { l.type = e.target.value; renderLayerList(); renderSections(); schedulePreview(); };
+  $("#mSource").onchange = (e) => { l.source = e.target.value || undefined; schedulePreview(); };
+  $("#mSourcelayer").onchange = (e) => { if (e.target.value) l["source-layer"] = e.target.value; else delete l["source-layer"]; schedulePreview(); };
+  $("#mMin").onchange = (e) => { l.minzoom = e.target.value === "" ? undefined : Number(e.target.value); schedulePreview(); };
+  $("#mMax").onchange = (e) => { l.maxzoom = e.target.value === "" ? undefined : Number(e.target.value); schedulePreview(); };
+}
+
+/* ---------- rendering: property sections ---------- */
+
+function renderSections() {
+  const box = $("#propSections");
+  const i = selectedIndex();
+  if (i < 0) { box.innerHTML = ""; return; }
+  const l = style.layers[i];
+  const paint = l.paint || {};
+  const layout = l.layout || {};
+  const filter = l.filter || null;
+
+  box.innerHTML = `
+    <div class="section" data-sec="filter">
+      <div class="head"><span class="toggle">▾</span> Filter <span class="spacer"></span><span class="count">expression</span></div>
+      <div class="body">
+        <div class="prop" style="grid-template-columns:150px minmax(0,1fr);">
+          <span class="key">filter</span>
+          <div class="ctrl"><textarea id="pFilter" placeholder="null">${esc(JSON.stringify(filter ?? null, null, 1))}</textarea></div>
+        </div>
+      </div>
+    </div>
+    <div class="section" data-sec="layout">
+      <div class="head"><span class="toggle">▾</span> Layout <span class="spacer"></span><span class="count">${Object.keys(layout).length} props</span></div>
+      <div class="body">
+        ${renderProps("layout", layout, l.type)}
+        <div class="addrow">
+          <select id="addLayout">
+            <option value="">+ Add layout property…</option>
+            ${layoutKeysFor(l.type).filter(k => !(k in layout)).map(k => `<option value="${esc(k)}">${esc(k)}</option>`).join("")}
+          </select>
+          <button class="small" id="btnAddLayout">Add</button>
+        </div>
+      </div>
+    </div>
+    <div class="section" data-sec="paint">
+      <div class="head"><span class="toggle">▾</span> Paint <span class="spacer"></span><span class="count">${Object.keys(paint).length} props</span></div>
+      <div class="body">
+        ${renderProps("paint", paint, l.type)}
+        <div class="addrow">
+          <select id="addPaint">
+            <option value="">+ Add paint property…</option>
+            ${paintKeysFor(l.type).filter(k => !(k in paint)).map(k => `<option value="${esc(k)}">${esc(k)}</option>`).join("")}
+          </select>
+          <button class="small" id="btnAddPaint">Add</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  $$(".section > .head").forEach(head => head.onclick = () => {
+    head.parentElement.classList.toggle("collapsed");
+    const t = head.querySelector(".toggle");
+    if (t) t.textContent = head.parentElement.classList.contains("collapsed") ? "▸" : "▾";
+  });
+
+  const pf = $("#pFilter");
+  pf.oninput = () => {
+    try { const v = JSON.parse(pf.value); if (v === null) { delete l.filter; } else { l.filter = v; } pf.classList.remove("err"); schedulePreview(); }
+    catch { pf.classList.add("err"); status("Invalid filter JSON", "err"); }
+  };
+
+  const la = $("#addLayout");
+  la.onchange = () => { if (la.value) addProp("layout", la.value); };
+  const pa = $("#addPaint");
+  pa.onchange = () => { if (pa.value) addProp("paint", pa.value); };
+  $("#btnAddLayout").onclick = () => { if (la.value) addProp("layout", la.value); };
+  $("#btnAddPaint").onclick = () => { if (pa.value) addProp("paint", pa.value); };
+
+  bindPropInputs();
+}
+
+function renderProps(section, obj, type) {
+  return Object.entries(obj).map(([key, value]) => {
+    return `<div class="prop" data-section="${section}" data-key="${esc(key)}">
+      <span class="key" title="${esc(key)}">${esc(key)}</span>
+      ${renderControl(section, key, value)}
+      <button class="rm" data-rm="${esc(section)}:${esc(key)}" title="Remove">✕</button>
+    </div>`;
+  }).join("");
+}
+
+function isExpression(v) { return Array.isArray(v) && v.length > 0; }
+function isFlatArray(v) { return Array.isArray(v) && v.every(x => typeof x === "string" || typeof x === "number" || typeof x === "boolean"); }
+
+function controlType(section, key, value) {
+  // A nested/expression value (or object) is always edited as raw JSON.
+  if (isExpression(value) && !isFlatArray(value)) return "expr";
+  const def = (section === "paint" ? PAINT_DEFAULTS : LAYOUT_DEFAULTS)[key];
+  const base = def ? def[1] : null;
+  if (base) {
+    if (base === "color") return "color";
+    if (base === "enum") return ENUMS[key] ? "enum" : "text";
+    if (base === "number") return "number";
+    if (base === "text") return "text";
+    if (base === "array") return isFlatArray(value) ? "array" : "expr";
+  }
+  if (typeof value === "boolean") return "bool";
+  if (typeof value === "number") return "number";
+  if (typeof value === "string") {
+    if (/^#|^rgba?\(/.test(value)) return "color";
+    if (ENUMS[key]) return "enum";
+    return "text";
+  }
+  return "expr";
+}
+
+function renderControl(section, key, value) {
+  const t = controlType(section, key, value);
+  const k = `${section}__${key}`;
+  switch (t) {
+    case "color": {
+      const hex = /^#[0-9a-fA-F]{6}$/.test(value) ? value : "#888888";
+      return `<div class="ctrl">
+        <input type="color" data-k="${esc(k)}" value="${hex}">
+        <input type="text" data-k="${esc(k)}" value="${esc(value)}" style="font-family:ui-monospace,monospace;">
+      </div>`;
+    }
+    case "enum":
+      return `<div class="ctrl"><select data-k="${esc(k)}">${ENUMS[key].map(o => `<option ${o===value?"selected":""}>${esc(o)}</option>`).join("")}</select></div>`;
+    case "number": {
+      const isPct = (section === "paint" && key.endsWith("-opacity"));
+      const step = isPct ? 0.05 : 1;
+      const min = isPct ? 0 : -100;
+      const max = isPct ? 1 : 500;
+      return `<div class="ctrl">
+        <input type="range" data-k="${esc(k)}" min="${min}" max="${max}" step="${step}" value="${value}">
+        <input type="number" data-k="${esc(k)}" value="${value}" style="width:64px;">
+      </div>`;
+    }
+    case "bool":
+      return `<div class="ctrl"><input type="checkbox" data-k="${esc(k)}" ${value?"checked":""}></div>`;
+    case "array":
+      return `<div class="ctrl"><input type="text" data-k="${esc(k)}" value="${esc(Array.isArray(value) ? value.join(", ") : value)}" placeholder="comma-separated"></div>`;
+    case "expr":
+      return `<div class="ctrl"><textarea data-k="${esc(k)}" spellcheck="false">${esc(JSON.stringify(value))}</textarea></div>`;
+    default:
+      return `<div class="ctrl"><input type="text" data-k="${esc(k)}" value="${esc(value)}"></div>`;
+  }
+}
+
+function bindPropInputs() {
+  $$(".prop [data-k]").forEach(el => {
+    const [section, key] = el.dataset.k.split("__");
+    const i = selectedIndex();
+    if (i < 0) return;
+    const l = style.layers[i];
+    const target = (section === "paint") ? l.paint : l.layout;
+    if (!target) return;
+
+    const commit = (v, ok) => {
+      if (ok) {
+        target[key] = v;
+        el.classList.remove("err");
+        schedulePreview();
+      } else {
+        el.classList.add("err");
+        status("Invalid value for " + key, "err");
+      }
+    };
+
+    if (el.type === "color") {
+      el.oninput = () => {
+        const hex = el.value;
+        const txt = el.parentElement.querySelector('input[type="text"]');
+        if (txt) txt.value = hex;
+        commit(hex, true);
+      };
+    } else if (el.type === "range") {
+      el.oninput = () => { const n = Number(el.value); const pair = el.parentElement.querySelector('input[type="number"]'); if (pair) pair.value = n; commit(n, !isNaN(n)); };
+    } else if (el.type === "number") {
+      el.oninput = () => { const n = Number(el.value); const pair = el.parentElement.querySelector('input[type="range"]'); if (pair && !isNaN(n)) pair.value = n; commit(n, !isNaN(n)); };
+    } else if (el.type === "checkbox") {
+      el.onchange = () => commit(el.checked, true);
+    } else if (el.tagName === "SELECT") {
+      el.onchange = () => commit(el.value, true);
+    } else if (el.tagName === "TEXTAREA") {
+      el.oninput = () => {
+        try { const v = JSON.parse(el.value); commit(v, true); }
+        catch { el.classList.add("err"); status("Invalid expression JSON", "err"); }
+      };
+    } else { // text
+      el.oninput = () => commit(el.value, true);
+    }
+  });
+
+  $$(".prop .rm").forEach(btn => {
+    btn.onclick = () => {
+      const [section, key] = btn.dataset.rm.split(":");
+      const i = selectedIndex();
+      if (i < 0) return;
+      const l = style.layers[i];
+      const target = (section === "paint") ? l.paint : l.layout;
+      if (target) delete target[key];
+      renderSections();
+      schedulePreview();
+    };
+  });
+}
+
+function addProp(section, key) {
+  const i = selectedIndex();
+  if (i < 0) return;
+  const l = style.layers[i];
+  if (!l[section]) l[section] = {};
+  const def = (section === "paint" ? PAINT_DEFAULTS : LAYOUT_DEFAULTS)[key];
+  l[section][key] = def ? deepCopy(def[0]) : defaultFor(section, key);
+  renderSections();
+  schedulePreview();
+}
+
+function defaultFor(section, key) {
+  const ctl = (section === "paint" ? PAINT_DEFAULTS : LAYOUT_DEFAULTS)[key];
+  if (ctl) return deepCopy(ctl[0]);
+  if (key.endsWith("-color")) return "#888888";
+  if (key.endsWith("-opacity")) return 1;
+  if (ENUMS[key]) return ENUMS[key][0];
+  return "";
+}
+
+/* ---------- layer ops ---------- */
+
+function addLayer() {
+  const types = ["background","fill","line","symbol","circle","raster","fill-extrusion"];
+  const type = prompt("Layer type:", "fill");
+  if (!type || !types.includes(type)) return;
+  const id = prompt("Layer id:", "new_" + type + "_" + Date.now().toString(36));
+  if (!id) return;
+  const l = { id, type };
+  if (type !== "background" && type !== "raster") l.source = Object.keys(style.sources || {})[0] || "protomaps";
+  if (type !== "background" && type !== "raster") l["source-layer"] = "";
+  style.layers.push(l);
+  selectedLayerId = id;
+  renderAll();
+  schedulePreview();
+  status("Added layer: " + id);
+}
+function duplicateLayer() {
+  const i = selectedIndex();
+  if (i < 0) return;
+  const l = deepCopy(style.layers[i]);
+  l.id = l.id + "_copy";
+  style.layers.splice(i + 1, 0, l);
+  selectedLayerId = l.id;
+  renderAll();
+  schedulePreview();
+}
+function deleteLayer() {
+  const i = selectedIndex();
+  if (i < 0) return;
+  style.layers.splice(i, 1);
+  selectedLayerId = style.layers[Math.min(i, style.layers.length - 1)]?.id ?? null;
+  renderAll();
+  schedulePreview();
+  status("Deleted layer", "warn");
+}
+function moveLayer(dir) {
+  const i = selectedIndex();
+  const j = i + dir;
+  if (i < 0 || j < 0 || j >= style.layers.length) return;
+  [style.layers[i], style.layers[j]] = [style.layers[j], style.layers[i]];
+  renderAll();
+  schedulePreview();
+}
+
+/* ---------- render all ---------- */
+
+function renderAll() {
+  renderTopSettings();
+  renderLayerList();
+  renderLayerMeta();
+  renderSections();
+}
+
+/* ---------- JSON modal ---------- */
+
+function openJson() {
+  if (!style) return;
+  $("#jsonArea").value = JSON.stringify(style, null, 2);
+  $("#jsonErr").textContent = "";
+  $("#modal").classList.add("open");
+  $("#jsonArea").oninput = () => {
+    try { JSON.parse($("#jsonArea").value); $("#jsonErr").textContent = ""; }
+    catch (e) { $("#jsonErr").textContent = e.message; }
+  };
+}
+function applyJson() {
+  try {
+    const v = JSON.parse($("#jsonArea").value);
+    if (!v || !Array.isArray(v.layers)) throw new Error("Missing layers array");
+    if (!v.sources || typeof v.sources !== "object") throw new Error("Missing sources object");
+    style = v;
+    selectedLayerId = style.layers[0]?.id ?? null;
+    renderAll();
+    schedulePreview();
+    $("#modal").classList.remove("open");
+    status("Style applied from JSON");
+  } catch (e) {
+    $("#jsonErr").textContent = "Invalid style: " + e.message;
+  }
+}
+
+/* ---------- export ---------- */
+
+function copyJson() {
+  const text = JSON.stringify(style, null, 2);
+  navigator.clipboard.writeText(text).then(
+    () => status("Copied to clipboard"),
+    () => { const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); status("Copied to clipboard"); }
+  );
+}
+function downloadJson() {
+  const blob = new Blob([JSON.stringify(style, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "custom-map-style.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+  status("Downloaded custom-map-style.json");
+}
+
+/* ---------- load ---------- */
+
+async function loadFromUrl(url) {
+  status("Fetching " + url + "…");
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    setStyle(data, true);
+    status("Loaded from URL: " + url);
+  } catch (e) {
+    status("Fetch failed (" + e.message + ") — using embedded default", "err");
+    setStyle(deepCopy(defaultStyle), true);
+  }
+}
+function resetToDefault() {
+  setStyle(deepCopy(defaultStyle), true);
+  status("Reset to embedded default");
+}
+function setStyle(newStyle, rebuild) {
+  style = newStyle;
+  selectedLayerId = style.layers[0]?.id ?? null;
+  renderAll();
+  if (rebuild) {
+    if (mapReady) {
+      try { map.setStyle(deepCopy(style)); } catch (e) { status("Style error: " + e.message, "err"); }
+    }
+  } else {
+    schedulePreview();
+  }
+}
+
+/* ---------- init ---------- */
+
+function init() {
+  defaultStyle = JSON.parse($("#default-style-json").textContent);
+  style = deepCopy(defaultStyle);
+  selectedLayerId = style.layers[0]?.id ?? null;
+
+  try {
+    map = new maplibregl.Map({
+      container: $("#preview"),
+      style: deepCopy(style),
+      center: DEFAULT_CENTER,
+      zoom: DEFAULT_ZOOM,
+    });
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+    map.on("load", () => { mapReady = true; $("#empty").style.display = "none"; });
+    map.on("error", (e) => { status("Map error: " + (e && e.error && e.error.message ? e.error.message : "unknown"), "err"); });
+  } catch (e) {
+    status("MapLibre init failed: " + e.message, "err");
+    $("#empty").textContent = "MapLibre failed to load: " + e.message;
+  }
+
+  renderAll();
+  status("Ready — editing embedded Protomaps dark style");
+
+  $("#btnLoad").onclick = () => loadFromUrl(DEFAULT_STYLE_URL);
+  $("#btnReset").onclick = resetToDefault;
+  $("#btnJson").onclick = openJson;
+  $("#jsonApply").onclick = applyJson;
+  $("#modalClose").onclick = () => $("#modal").classList.remove("open");
+  $("#modal").onclick = (e) => { if (e.target === $("#modal")) $("#modal").classList.remove("open"); };
+  $("#btnCopy").onclick = copyJson;
+  $("#btnDownload").onclick = downloadJson;
+  $("#btnAdd").onclick = addLayer;
+  $("#btnDup").onclick = duplicateLayer;
+  $("#btnDel").onclick = deleteLayer;
+  $("#btnUp").onclick = () => moveLayer(-1);
+  $("#btnDown").onclick = () => moveLayer(1);
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>

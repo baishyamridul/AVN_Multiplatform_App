@@ -92,8 +92,24 @@ data class SchoolImage360Model(
 data class SchoolProjectModel(
     val id: String,
     val name: String,
-    val category: String? = null,
+    val category: SchoolProjectCategoryModel? = null,
     val status: String? = null,
     val percent: Int = 0,
     val allocatedAmount: Long? = null,
+    val estimatedAmount: Long? = null,
+    val scheme: SchoolProjectSchemeModel? = null,
+    val financialYear: String? = null,
+    val workType: String? = null,
+    val subWorkType: String? = null,
+)
+
+
+data class SchoolProjectCategoryModel(
+    val id: String,
+    val name: String,
+)
+
+data class SchoolProjectSchemeModel(
+    val id: String,
+    val name: String
 )

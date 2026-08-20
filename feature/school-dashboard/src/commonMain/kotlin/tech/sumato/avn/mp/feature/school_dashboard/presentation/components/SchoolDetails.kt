@@ -722,7 +722,7 @@ private fun ProjectsSection(projects: List<SchoolProjectModel>) {
                                 fontWeight = FontWeight.Normal,
                             )
                         }
-                        project.allocatedAmount?.let {
+                        project.estimatedAmount?.let {
                             Text(
                                 "\u20B9 $it",
                                 style = MaterialTheme.typography.bodySmall,

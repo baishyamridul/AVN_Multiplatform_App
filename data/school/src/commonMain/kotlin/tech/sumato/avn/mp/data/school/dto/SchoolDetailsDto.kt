@@ -29,7 +29,8 @@ data class SchoolDetailsDto(
     @SerialName("school_images_360")
     val schoolImages360: List<SchoolImage360Dto> = emptyList(),
     val projects: List<SchoolProjectDto> = emptyList(),
-)
+
+    )
 
 @Serializable
 data class SchoolStudentsDto(
@@ -100,9 +101,33 @@ data class SchoolImage360Dto(
 data class SchoolProjectDto(
     val id: String,
     val name: String,
-    val category: String? = null,
+    val category: SchoolProjectCategoryDto? = null,
     val status: String? = null,
     val percent: Int = 0,
     @SerialName("allocated_amount")
     val allocatedAmount: Long? = null,
+    @SerialName("estimated_cost")
+    val estimatedCost: Long? = null,
+    val scheme: SchoolProjectSchemeDto? = null,
+    @SerialName("financial_year")
+    val financialYear: String? = null,
+    @SerialName("work_type")
+    val workType: String? = null,
+    @SerialName("sub_work_type")
+    val subWorkType: String? = null,
+
+    )
+
+
+@Serializable
+data class SchoolProjectCategoryDto(
+    val id: String,
+    val name: String
+
+)
+
+@Serializable
+data class SchoolProjectSchemeDto(
+    val id: String,
+    val name: String,
 )
