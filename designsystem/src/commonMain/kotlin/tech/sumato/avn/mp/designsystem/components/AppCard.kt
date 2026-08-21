@@ -35,7 +35,8 @@ fun AppCard(
 ) {
     val shape = RoundedCornerShape(12.dp)
     Card(
-        modifier = if (onClick != null) modifier.clickable(onClick = onClick) else modifier,
+        modifier = if (onClick != null) modifier.clip(CardDefaults.shape)
+            .clickable(onClick = onClick) else modifier,
         shape = shape,
         border = border,
         colors = CardDefaults.cardColors(

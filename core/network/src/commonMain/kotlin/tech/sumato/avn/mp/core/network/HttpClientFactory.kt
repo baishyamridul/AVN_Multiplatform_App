@@ -39,7 +39,7 @@ object HttpClientFactory {
             }
         }
 
-        return HttpClient {
+        return HttpClient(createHttpClientEngine()) {
             install(authPlugin)
 
             install(logoutHandlerPlugin)
