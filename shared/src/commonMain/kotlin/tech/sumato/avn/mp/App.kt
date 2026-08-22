@@ -37,6 +37,8 @@ import tech.sumato.avn.mp.feature.login.di.LoginFeatureModule
 import tech.sumato.avn.mp.feature.login.presentation.LoginRoute
 import tech.sumato.avn.mp.feature.map_analytics.di.MapAnalyticsFeatureModule
 import tech.sumato.avn.mp.feature.map_analytics.presentation.MapAnalyticsRoute
+import tech.sumato.avn.mp.feature.project_dashboard.di.ProjectDashboardFeatureModule
+import tech.sumato.avn.mp.feature.project_dashboard.presentation.ProjectDashboardRoute
 import tech.sumato.avn.mp.feature.school_dashboard.di.SchoolDashboardFeatureModule
 import tech.sumato.avn.mp.feature.school_dashboard.presentation.SchoolDashboardRoute
 
@@ -58,6 +60,7 @@ fun App(
             DistrictDashboardFeatureModule,
             SchoolDashboardFeatureModule,
             SchoolDataModule,
+            ProjectDashboardFeatureModule,
         )
     }, content = {
         AVNTheme {
@@ -137,6 +140,13 @@ fun AppNavGraph(navController: NavHostController) {
                     navController.popBackStack()
                 }
             )
+        }
+
+        composable(
+            route = Route.PROJECT_DASHBOARD,
+            arguments = listOf(),
+        ) { backStackEntry ->
+            ProjectDashboardRoute() { }
         }
 
     }

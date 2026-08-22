@@ -87,6 +87,8 @@ kotlin {
 
             implementation(projects.data.school)
 
+            implementation(projects.feature.projectDashboard)
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

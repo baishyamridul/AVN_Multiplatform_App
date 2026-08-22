@@ -17,4 +17,7 @@ object Route {
     fun schoolDashboard(districtId: Int?, category: String? = null) =
         "school_dashboard?districtId=${districtId ?: -1}&category=${category ?: ""}"
 
+    const val PROJECT_DASHBOARD = "project-dashboard"
+
+
 }

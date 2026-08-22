@@ -2,6 +2,7 @@ package tech.sumato.avn.mp.feature.district_dashboard.presentation.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -40,10 +41,13 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import tech.sumato.avn.mp.core.navigation.Route
 import tech.sumato.avn.mp.designsystem.FormFactor
 import tech.sumato.avn.mp.designsystem.LocalFormFactor
 import tech.sumato.avn.mp.designsystem.components.AppCardBordered
+import tech.sumato.avn.mp.designsystem.components.app.AppChip
 import tech.sumato.avn.mp.designsystem.theme.geistMonoFontFamily
+import tech.sumato.avn.mp.feature.district_dashboard.presentation.event.DistrictDashboardEvent
 import tech.sumato.avn.mp.feature.district_dashboard.presentation.model.DistrictDashboardProjectStatsUiModel
 import kotlin.math.roundToInt
 
@@ -52,7 +56,8 @@ import kotlin.math.roundToInt
 fun ProjectsStats(
     modifier: Modifier,
     projectStats: List<DistrictDashboardProjectStatsUiModel>,
-    totalProjects: Int
+    totalProjects: Int,
+    onTotalProjectClick: () -> Unit = {}
 ) {
 
     AppCardBordered(modifier = modifier) {
@@ -69,9 +74,12 @@ fun ProjectsStats(
                 modifier = Modifier.weight(1f).fillMaxWidth()
             )
 
-            Surface(
-                shape = RoundedCornerShape(50),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+
+            AppChip(
+                modifier = Modifier,
+                onClick = {
+                    onTotalProjectClick()
+                }
             ) {
                 Text(
                     "$totalProjects total projects",
@@ -81,6 +89,7 @@ fun ProjectsStats(
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                 )
             }
+
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -213,9 +222,7 @@ private fun completionColor(percent: Float): Color = when {
 
 @Composable
 fun ProjectStatsCategoryCard(
-    modifier: Modifier,
-    accent: Color,
-    stats: DistrictDashboardProjectStatsUiModel
+    modifier: Modifier, accent: Color, stats: DistrictDashboardProjectStatsUiModel
 ) {
 
     val percent = stats.completedPercent.coerceIn(0f, 100f)

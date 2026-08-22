@@ -177,7 +177,14 @@ private fun ExpandedDashboardContent(
                 },
                 onCategoryClicked = { categoryId ->
                     val districtId = userDistricts.firstOrNull { it.id == selectedDistrictId }?.id
-                    onEvent(DistrictDashboardEvent.Navigate(Route.schoolDashboard(districtId, categoryId)))
+                    onEvent(
+                        DistrictDashboardEvent.Navigate(
+                            Route.schoolDashboard(
+                                districtId,
+                                categoryId
+                            )
+                        )
+                    )
                 }
             )
         }
@@ -187,7 +194,10 @@ private fun ExpandedDashboardContent(
         ProjectsStats(
             modifier = Modifier.fillMaxWidth(),
             projectStats = data.projectStats.projects.map { it.toUiModel() },
-            totalProjects = data.projectStats.totalProjects
+            totalProjects = data.projectStats.totalProjects,
+            onTotalProjectClick = {
+                onEvent(DistrictDashboardEvent.Navigate(Route.PROJECT_DASHBOARD))
+            }
         )
 
 
